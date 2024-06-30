@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsString,
   IsNumber,
+  IsNotEmpty,
 } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
 
@@ -27,12 +28,12 @@ import * as paginate from 'mongoose-paginate-v2';
     },
   },
 })
-export class User {
-
+export class Auth {
   @prop({ unique: true }) // 设置唯一索引
   userId: number;
 
-  @IsString({ message: "what's your account?" })
+  @IsNotEmpty({ message: '请输入您的账号' })
+  @IsString()
   @IsDefined()
   @prop({ required: true })
   account: string;
@@ -59,4 +60,4 @@ export class User {
   update_at?: Date;
 }
 
-export const UserProvider = getProviderByTypegoose(User);
+export const AuthProvider = getProviderByTypegoose(Auth);

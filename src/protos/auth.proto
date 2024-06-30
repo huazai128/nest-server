@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package authproto;
+
+service AuthService {
+  rpc login (LoginReuset) returns (Response);
+}
+
+message LoginReuset {
+  string uesrname = 1;
+  string password = 2;
+}
