@@ -12,7 +12,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: 'userproto',
+      package: ['userproto', 'authproto'],
       protoPath: [
         join(__dirname, '../protos/user.proto'),
         join(__dirname, '../protos/auth.proto'),
