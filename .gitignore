@@ -3,7 +3,11 @@
 /node_modules
 /build
 /config.ts
-/src/protos
+/src/protos/node_modules
+/src/protos/scripts
+/src/protos/.gitignore
+/src/protos/package.json
+/src/protos/yarn.lock
 
 # Logs
 logs
