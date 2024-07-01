@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AUTH } from '@app/config';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDTO } from './auth.dto';
 import { InjectModel } from '@app/transformers/model.transform';
 import { MongooseID, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { decodeBase64, decodeMd5 } from '@app/utils/util';
 import { Auth } from './auth.model';
 import { LoginInfo, TokenInfo, UserInfo } from '@app/interfaces/auth.interface';
+import { LoginReuset } from '@app/types/auth';
 
 @Injectable()
 export class AuthService {
@@ -51,11 +51,11 @@ export class AuthService {
 
   /**
    * login
-   * @param {AuthDTO} auth
+   * @param {LoginReuset} auth
    * @return {*}  {Promise<LoginInfo>}
    * @memberof AuthService
    */
-  public async login(auth: AuthDTO): Promise<LoginInfo> {
+  public async login(auth: LoginReuset): Promise<LoginInfo> {
     const existAuth = await this.authModel.findOne(
       { account: auth.account },
       '+password',
@@ -84,11 +84,11 @@ export class AuthService {
 
   /**
    * 新建账号
-   * @param {AuthDTO} auth
+   * @param {LoginReuset} auth
    * @return {*}
    * @memberof AuthService
    */
-  public async createUser(auth: AuthDTO) {
+  public async createUser(auth: LoginReuset) {
     const newPassword = decodeMd5(decodeBase64(auth.password));
     const existedAuth = await this.authModel
       .findOne({ account: auth.account })

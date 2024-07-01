@@ -13,7 +13,10 @@ async function bootstrap() {
     transport: Transport.GRPC,
     options: {
       package: 'userproto',
-      protoPath: join(__dirname, '../protos/user.proto'),
+      protoPath: [
+        join(__dirname, '../protos/user.proto'),
+        join(__dirname, '../protos/auth.proto'),
+      ],
       url: '0.0.0.0:50052',
       onLoadPackageDefinition: (pkg, server) => {
         new ReflectionService(pkg).addToServer(server);

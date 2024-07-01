@@ -1,16 +1,14 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { GrpcMethod } from '@nestjs/microservices';
+import { AuthService } from './auth.service';
+import { LoginReuset } from '@app/types/auth';
 
 @Controller('user')
 export class AuthController {
-  @MessagePattern({ cmd: 'getUser' })
-  async getUsers() {
-    const user = [{ id: 1, name: 'user name' }];
-    return user;
-  }
+  constructor(private readonly authService: AuthService) {}
 
-  @MessagePattern({ cmd: 'getUserFromService' })
-  async getUserFromService() {
-    return { id: 10, name: 'test' };
+  @GrpcMethod('AuthService', 'login')
+  login(data: LoginReuset) {
+    return this.authService.login(data);
   }
 }
