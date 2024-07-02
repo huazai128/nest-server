@@ -23,8 +23,8 @@ export class AuthService {
    */
   creatToken(data): TokenInfo {
     const token = {
-      access_token: this.jwtService.sign({ data }),
-      expires_in: AUTH.expiresIn as number,
+      accessToken: this.jwtService.sign({ data }),
+      expiresIn: AUTH.expiresIn as number,
     };
     return token;
   }
@@ -68,7 +68,11 @@ export class AuthService {
       account: existAuth.account,
       userId: existAuth.userId,
     });
-    return { ...token, account: existAuth.account, userId: existAuth.userId };
+    return {
+      ...token,
+      account: existAuth.account,
+      userId: existAuth.userId,
+    };
   }
 
   /**

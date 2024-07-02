@@ -8,7 +8,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @GrpcMethod('AuthService', 'login')
-  login(data: LoginReuset) {
-    return this.authService.login(data);
+  async login(data: LoginReuset) {
+    const res = await this.authService.login(data);
+    return res;
   }
 }

@@ -1,5 +1,3 @@
-import { resolve } from 'path';
-import { environment } from '@app/app.env';
 import session from 'express-session';
 
 export const APP = {

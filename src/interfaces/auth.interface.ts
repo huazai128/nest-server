@@ -4,8 +4,8 @@ export interface UserInfo {
 }
 
 export interface TokenInfo {
-  access_token: string;
-  expires_in: number;
+  accessToken: string;
+  expiresIn: number;
 }
 
 export type LoginInfo = UserInfo & TokenInfo;
