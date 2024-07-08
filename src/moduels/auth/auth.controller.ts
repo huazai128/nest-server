@@ -5,7 +5,6 @@ import {
   LoginResponse,
   LoginRequest,
   ValidateUserRequest,
-  TokenRequest,
 } from '@app/protos/auth';
 
 @Controller('user')
@@ -33,18 +32,6 @@ export class AuthController {
   @GrpcMethod('AuthService', 'validateUser')
   async validateUser(data: ValidateUserRequest) {
     const res = await this.authService.validateUser(data);
-    return res;
-  }
-
-  /**
-   * 生成token
-   * @param {TokenRequest} data
-   * @return {*}
-   * @memberof AuthController
-   */
-  @GrpcMethod('AuthService', 'creatToken')
-  async creatToken(data: TokenRequest) {
-    const res = await this.authService.creatToken(data);
     return res;
   }
 }

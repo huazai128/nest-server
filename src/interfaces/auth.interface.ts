@@ -3,9 +3,4 @@ export interface UserInfo {
   account: string;
 }
 
-export interface TokenInfo {
-  accessToken: string;
-  expiresIn: number;
-}
-
-export type LoginInfo = UserInfo & TokenInfo;
+export type LoginInfo = UserInfo;

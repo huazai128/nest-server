@@ -1,33 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { AUTH } from '@app/config';
-import { JwtService } from '@nestjs/jwt';
 import { Auth } from './auth.model';
 import { InjectModel } from '@app/transformers/model.transform';
 import { MongooseID, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { decodeBase64, decodeMd5 } from '@app/utils/util';
-import { LoginInfo, TokenInfo } from '@app/interfaces/auth.interface';
+import { LoginInfo } from '@app/interfaces/auth.interface';
 import { LoginRequest, ValidateUserRequest } from '@app/protos/auth';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectModel(Auth) private authModel: MongooseModel<Auth>,
-    private readonly jwtService: JwtService,
-  ) {}
-
-  /**
-   * 生成token
-   * @param {*} data
-   * @return {*}  {TokenInfo}
-   * @memberof AuthService
-   */
-  creatToken(data): TokenInfo {
-    const token = {
-      accessToken: this.jwtService.sign({ data }),
-      expiresIn: AUTH.expiresIn as number,
-    };
-    return token;
-  }
+  constructor(@InjectModel(Auth) private authModel: MongooseModel<Auth>) {}
 
   /**
    * 验证用户
@@ -64,12 +45,7 @@ export class AuthService {
     if (existAuth?.password !== password) {
       throw '账号有误，请确认!';
     }
-    const token = this.creatToken({
-      account: existAuth.account,
-      userId: existAuth.userId,
-    });
     return {
-      ...token,
       account: existAuth.account,
       userId: existAuth.userId,
     };

@@ -5,7 +5,6 @@ package authproto;
 service AuthService {
   rpc login (LoginRequest) returns (stream LoginResponse);
   rpc validateUser(ValidateUserRequest) returns (stream LoginResponse);
-  rpc creatToken(TokenRequest) returns (stream TokenResponse);
 }
 
 message LoginRequest {
@@ -14,23 +13,10 @@ message LoginRequest {
 }
 
 message  LoginResponse {
-  string access_token = 1;
-  int32 userId = 2;
-  string account = 3;
-  int32 expires_in = 4;
-}
-
-message ValidateUserRequest{
-  int32 userId = 1;
-}
-
-message TokenRequest {
   int32 userId = 1;
   string account = 2;
 }
 
-
-message TokenResponse {
-  string access_token = 1;
-  int32 expires_in = 2;
+message ValidateUserRequest{
+  int32 userId = 1;
 }
