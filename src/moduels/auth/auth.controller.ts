@@ -54,8 +54,7 @@ export class AuthController {
    */
   @MessagePattern({ cmd: 'getUserListRes' })
   async getUserList() {
-    const userList = [{ id: 1, name: '测试' }];
-    console.log('dasdad');
+    const userList = [{ id: 1, name: '测试der' }];
     return { userList };
   }
 }

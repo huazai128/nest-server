@@ -23,6 +23,14 @@ async function bootstrap() {
       },
     },
   });
+  // redis 微服务
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.REDIS,
+    options: {
+      host: 'localhost',
+      port: 6379,
+    },
+  });
   await app.startAllMicroservices();
   await app.listen(APP.PORT).then(() => {
     console.info(
