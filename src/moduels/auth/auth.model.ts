@@ -50,8 +50,8 @@ export class Auth {
   @IsNumber()
   @IsNumberString()
   @IsOptional()
-  @prop({ type: Number, default: 0 })
-  role: number;
+  @prop({ type: [Number], default: [0] })
+  role: number[];
 
   @prop({ default: Date.now, index: true, immutable: true })
   create_at?: Date;

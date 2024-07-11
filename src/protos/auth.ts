@@ -23,7 +23,17 @@ export interface ValidateUserRequest {
   userId: number;
 }
 
+export interface UserInfo {
+  userId: number;
+  account: string;
+  avatar: string;
+  role: number[];
+  createAt: string;
+  updateAt: string;
+}
+
 export interface AuthService {
   login(request: LoginRequest): Observable<LoginResponse>;
   validateUser(request: ValidateUserRequest): Observable<LoginResponse>;
+  getUserById(request: ValidateUserRequest): Observable<UserInfo>;
 }

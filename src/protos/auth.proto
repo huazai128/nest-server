@@ -5,6 +5,7 @@ package authproto;
 service AuthService {
   rpc login (LoginRequest) returns (stream LoginResponse);
   rpc validateUser(ValidateUserRequest) returns (stream LoginResponse);
+  rpc getUserById(ValidateUserRequest) returns (stream UserInfo);
 }
 
 message LoginRequest {
@@ -19,4 +20,14 @@ message  LoginResponse {
 
 message ValidateUserRequest{
   int32 userId = 1;
+}
+
+
+message UserInfo {
+  int32 userId = 1;
+  string account = 2;
+  string avatar = 3;
+  repeated int32 role = 4;
+  string createAt = 5;
+  string updateAt = 6;
 }

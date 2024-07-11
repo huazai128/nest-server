@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, MessagePattern } from '@nestjs/microservices';
 import { AuthService } from './auth.service';
 import {
   LoginResponse,
@@ -33,5 +33,29 @@ export class AuthController {
   async validateUser(data: ValidateUserRequest) {
     const res = await this.authService.validateUser(data);
     return res;
+  }
+
+  /**
+   * 根据Id 获取用户信息
+   * @param {ValidateUserRequest} data
+   * @return {*}
+   * @memberof AuthController
+   */
+  @GrpcMethod('AuthService', 'getUserById')
+  async getUserById(data: ValidateUserRequest) {
+    const res = await this.authService.getFindUserId(data.userId);
+    return res;
+  }
+
+  /**
+   * redis 微服务
+   * @return {*}
+   * @memberof AuthController
+   */
+  @MessagePattern({ cmd: 'getUserListRes' })
+  async getUserList() {
+    const userList = [{ id: 1, name: '测试' }];
+    console.log('dasdad');
+    return { userList };
   }
 }

@@ -1,6 +1,6 @@
-export interface UserInfo {
+export interface AuthInfo {
   userId: number;
   account: string;
 }
 
-export type LoginInfo = UserInfo;
+export type LoginInfo = AuthInfo;
