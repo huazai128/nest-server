@@ -6,7 +6,7 @@ import { RedisMicroserviceService } from './redis.microservice.service';
 @Global()
 @Module({
   imports: [
-    // 这里用于请求其他区服务 redis 微服务数据
+    //  redis 微服务数据
     ClientsModule.register([
       {
         name: REDIS_SERVICE,
