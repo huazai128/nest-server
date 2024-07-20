@@ -10,6 +10,7 @@ export class ProtousersController {
         {
           id: 1,
           name: 'dada11112',
+          createdAt: new Date(),
         },
       ],
     };

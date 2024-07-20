@@ -24,6 +24,7 @@ async function bootstrap() {
       },
     },
   });
+
   // redis 微服务
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.REDIS,
