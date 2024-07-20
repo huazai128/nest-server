@@ -1,7 +1,7 @@
 import { dbUrl } from 'config';
 import { connection, disconnect, connect, set } from 'mongoose';
 
-export const DB_CONNECTION_TOKEN = 'DB_CONNECTION_TOKEN';
+export const DB_CONNECTION_TOKEN = 'DB_CONNECTION_TOKEN'; // 非基于类的提供器令牌
 
 export const databaseProviders = [
   {
