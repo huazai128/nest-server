@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package userproto;
 
+import "google/protobuf/timestamp.proto";
+
+
 service UserService {
     rpc getUsers(getBooksRequest) returns (getUsersResponse) {}
 }
@@ -12,9 +15,12 @@ message getBooksRequest{
 
 message getUsersResponse {
     repeated User users = 1;
+    ;
+
 }
 
 message User {
     int32 id = 1;
     string name = 2;
+    google.protobuf.Timestamp createdAt = 3;
 }

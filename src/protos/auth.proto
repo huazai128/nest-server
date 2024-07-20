@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package authproto;
 
+
+
 service AuthService {
   rpc login (LoginRequest) returns (stream LoginResponse);
   rpc validateUser(ValidateUserRequest) returns (stream LoginResponse);
