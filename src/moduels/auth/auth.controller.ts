@@ -32,6 +32,7 @@ export class AuthController {
   @GrpcMethod('AuthService', 'validateUser')
   async validateUser(data: ValidateUserRequest) {
     const res = await this.authService.validateUser(data);
+
     return res;
   }
 
@@ -55,6 +56,7 @@ export class AuthController {
   @MessagePattern({ cmd: 'getUserListRes' })
   async getUserList() {
     const userList = [{ id: 1, name: '测试der' }];
+    console.log(userList, '=====');
     return { userList };
   }
 }

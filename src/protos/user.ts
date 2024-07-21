@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v1.181.1
 //   protoc               v5.27.1
-// source: protos/user.proto
+// source: user.proto
 
 /* eslint-disable */
 

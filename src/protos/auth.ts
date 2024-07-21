@@ -2,7 +2,7 @@
 // versions:
 //   protoc-gen-ts_proto  v1.181.1
 //   protoc               v5.27.1
-// source: protos/auth.proto
+// source: auth.proto
 
 /* eslint-disable */
 import { Observable } from "rxjs";
