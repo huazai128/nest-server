@@ -4,10 +4,15 @@ package userproto;
 
 import "google/protobuf/timestamp.proto";
 
-import public "orders/service.proto";
+// import public "orders/service.proto";
 
 service UserService {
-    rpc getUsers(getBooksRequest) returns (getUsersResponse) {}
+    rpc getUsers(getBooksRequest) returns (stream getUsersResponse) {}
+    rpc find(Order) returns (Order);
+    rpc sync(stream Order) returns (stream Order);
+    rpc syncCall(stream Order) returns (stream Order);
+    rpc streamReq(stream Order) returns (Order);
+    rpc streamReqCall(stream Order) returns (Order);
 }
 
 message getBooksRequest{
@@ -22,4 +27,9 @@ message User {
     int32 id = 1;
     string name = 2;
     google.protobuf.Timestamp createdAt = 3;
+}
+
+message Order {
+  int32 id = 1;
+  repeated int32 itemTypes = 2; 
 }

@@ -6,10 +6,10 @@
 
 /* eslint-disable */
 
-export const protobufPackage = "proto_example.common.shipments";
+export const protobufPackage = 'userproto.common.shipments'
 
 export interface ShipmentType {
-  from: string;
-  to: string;
-  carrier: string;
+  from: string
+  to: string
+  carrier: string
 }

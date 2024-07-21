@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "orders/message.proto";
-package proto_example.orders;
+package userproto.orders;
 
 service OrderService {
     rpc Find(Order) returns (Order);

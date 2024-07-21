@@ -1,5 +1,5 @@
 syntax = "proto3";
-package proto_example.common.items;
+package userproto.common.items;
 
 enum ItemType {
     DEFAULT = 0;

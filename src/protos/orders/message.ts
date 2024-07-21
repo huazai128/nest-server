@@ -5,13 +5,13 @@
 // source: orders/message.proto
 
 /* eslint-disable */
-import { type ItemType } from "../common/item_types";
-import { type ShipmentType } from "../common/shipment_types";
+import { type ItemType } from '../common/item_types'
+import { type ShipmentType } from '../common/shipment_types'
 
-export const protobufPackage = "proto_example.orders";
+export const protobufPackage = 'userproto.orders'
 
 export interface Order {
-  id: number;
-  itemTypes: ItemType[];
-  shipmentType: ShipmentType | undefined;
+  id: number
+  itemTypes: ItemType[]
+  shipmentType: ShipmentType | undefined
 }

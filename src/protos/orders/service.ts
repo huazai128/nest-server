@@ -5,15 +5,15 @@
 // source: orders/service.proto
 
 /* eslint-disable */
-import { Observable } from "rxjs";
-import { type Order } from "./message";
+import { Observable } from 'rxjs'
+import { type Order } from './message'
 
-export const protobufPackage = "proto_example.orders";
+export const protobufPackage = 'userproto.orders'
 
 export interface OrderService {
-  Find(request: Order): Promise<Order>;
-  Sync(request: Observable<Order>): Observable<Order>;
-  SyncCall(request: Observable<Order>): Observable<Order>;
-  StreamReq(request: Observable<Order>): Promise<Order>;
-  StreamReqCall(request: Observable<Order>): Promise<Order>;
+  Find(request: Order): Promise<Order>
+  Sync(request: Observable<Order>): Observable<Order>
+  SyncCall(request: Observable<Order>): Observable<Order>
+  StreamReq(request: Observable<Order>): Promise<Order>
+  StreamReqCall(request: Observable<Order>): Promise<Order>
 }
