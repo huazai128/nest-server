@@ -21,7 +21,6 @@ export class ProtousersController {
   ];
   @GrpcMethod('UserService', 'getUsers')
   getUsers() {
-    console.log(new Date());
     return {
       users: [
         {
@@ -85,12 +84,11 @@ export class ProtousersController {
     return o;
   }
 
-  // 用于在 Nest.js 中处理 gRPC 流式调用。它的作用是将一个方法标记为处理 gRPC 流式调用的端点，并将其与特定的 gRPC 服务和方法关联起来。
   @GrpcStreamCall('UserService', 'streamReqCall')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async streamReqCall(stream: any, callback: (p: any, p1: any) => any) {
     stream.on('data', (msg: any) => {
-      console.log(msg, '----');
+      console.log(msg);
     });
     stream.on('end', () => {
       callback(null, {
