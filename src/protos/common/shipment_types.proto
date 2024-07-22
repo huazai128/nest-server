@@ -1,5 +1,5 @@
 syntax = "proto3";
-package userproto.common.shipments;
+package proto_example.common.shipments;
 
 message ShipmentType {
     string from = 1;

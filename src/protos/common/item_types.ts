@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = 'userproto.common.items'
+export const protobufPackage = "proto_example.common.items";
 
 export enum ItemType {
   DEFAULT = 0,

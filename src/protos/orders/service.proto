@@ -1,9 +1,9 @@
 syntax = "proto3";
 import "orders/message.proto";
-package userproto.orders;
+package proto_example.orders;
 
 service OrderService {
-    rpc Find(Order) returns (Order);
+    rpc ind(Order) returns (Order);
     rpc Sync(stream Order) returns (stream Order);
     rpc SyncCall(stream Order) returns (stream Order);
     rpc StreamReq(stream Order) returns (Order);

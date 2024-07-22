@@ -1,5 +1,5 @@
 syntax = "proto3";
-package userproto.orders;
+package proto_example.orders;
 
 import public "common/item_types.proto";
 import public "common/shipment_types.proto";

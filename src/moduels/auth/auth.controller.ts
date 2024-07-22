@@ -56,7 +56,6 @@ export class AuthController {
   @MessagePattern({ cmd: 'getUserListRes' })
   async getUserList() {
     const userList = [{ id: 1, name: '测试der' }];
-    console.log(userList, '=====');
     return { userList };
   }
 }

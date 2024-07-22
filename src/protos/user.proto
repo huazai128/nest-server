@@ -10,7 +10,6 @@ service UserService {
     rpc getUsers(getBooksRequest) returns (stream getUsersResponse) {}
     rpc find(Order) returns (Order);
     rpc sync(stream Order) returns (stream Order);
-    rpc syncCall(stream Order) returns (stream Order);
     rpc streamReq(stream Order) returns (Order);
     rpc streamReqCall(stream Order) returns (Order);
 }
