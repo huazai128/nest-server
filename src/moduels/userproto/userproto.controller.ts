@@ -86,7 +86,7 @@ export class ProtousersController {
 
   @GrpcStreamCall('UserService', 'streamReqCall')
   // eslint-disable-next-line @typescript-eslint/ban-types
-  async streamReqCall(stream: any, callback: (p: any, p1: any) => any) {
+  async streamReqCall(stream: any, callback: (...args) => any) {
     stream.on('data', (msg: any) => {
       console.log(msg);
     });
