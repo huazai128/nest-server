@@ -1,4 +1,13 @@
 import session from 'express-session';
+import devConfig from './dev.config';
+
+export const environment = process.env.NODE_ENV;
+// 运行环境
+export const isDevEnv = Object.is(environment, 'dev');
+export const isProdEnv = Object.is(environment, 'prod');
+export const isTestEnv = Object.is(environment, 'test');
+
+export const CONFIG = isProdEnv ? devConfig : devConfig;
 
 export const APP = {
   PORT: 3008,

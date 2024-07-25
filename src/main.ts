@@ -4,7 +4,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ReflectionService } from '@grpc/reflection';
 import { getServerIp } from './utils/util';
-import { APP } from './config';
+import { APP, CONFIG } from './config';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -36,10 +36,7 @@ async function bootstrap() {
   // redis 微服务
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.REDIS,
-    options: {
-      host: 'localhost',
-      port: 6379,
-    },
+    options: CONFIG.redisConf,
   });
   await app.startAllMicroservices();
   await app.listen(APP.PORT).then(() => {
