@@ -5,6 +5,7 @@ const config: ConfigServer = {
     host: 'localhost',
     port: 6379,
   },
+  grpcUrl: '0.0.0.0:50052',
 };
 
 export default config;

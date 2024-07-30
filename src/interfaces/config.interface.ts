@@ -8,4 +8,5 @@ export interface ConfigServer {
     defaultCacheTTL?: number;
     username?: string;
   };
+  grpcUrl: string;
 }
