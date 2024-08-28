@@ -72,8 +72,8 @@ export class WeatherService implements OnModuleInit {
         });
       });
     }
-    const files = join(__dirname, '../../../../csv');
-    this.mergeCsvFiles(files);
+    // const files = join(__dirname, '../../../../csv');
+    // this.mergeCsvFiles(files);
     // console.log(files);
     // this.getInit();
   }
