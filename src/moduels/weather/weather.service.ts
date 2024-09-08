@@ -48,22 +48,22 @@ export class WeatherService implements OnModuleInit {
   private num = 6;
   async onModuleInit() {
     for (const [key, value] of provsMap.entries()) {
-      const provName = value.split(' ')[1];
-      const cityStr = cityMap.get(key);
+      const provName = value?.split(' ')[1];
+      const cityStr = cityMap.get(key) || '';
       const cityList = cityStr.split('|');
-      const areaList = areaMap.get(key);
+      const areaList = areaMap.get(key) || [];
       cityList.forEach((item) => {
         const list = item.split(' ') || [];
         const cityName = list?.[1].split('-')[0];
         const cKey = list[0];
-        let areaStr = areaList.find((item) => item.includes(cKey));
+        let areaStr = areaList.find((item: string) => item?.includes(cKey));
         if (!areaStr) {
-          areaStr = areaList.find((item) => item.includes(provName));
+          areaStr = areaList.find((item: string) => item?.includes(provName));
         }
         if (provName === '台湾') {
-          areaStr = areaList.find((item) => item.includes('高雄'));
+          areaStr = areaList.find((item: string) => item?.includes('高雄'));
         }
-        const aList = areaStr.split('|');
+        const aList = areaStr?.split('|');
         aList.forEach((str) => {
           const arList = str.split(' ') || [];
           const areaName = arList?.[1]?.split?.('-')?.[0];

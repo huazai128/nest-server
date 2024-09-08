@@ -1,5 +1,8 @@
+import { isDevEnv } from '@app/app.env';
+import { createLogger } from '@app/utils/logger';
 import { dbUrl } from 'config';
 import { connection, disconnect, connect, set } from 'mongoose';
+const logger = createLogger({ scope: 'databaseProviders', time: isDevEnv });
 
 export const DB_CONNECTION_TOKEN = 'DB_CONNECTION_TOKEN'; // 非基于类的提供器令牌
 
@@ -20,13 +23,13 @@ export const databaseProviders = [
       });
 
       connection.on('open', () => {
-        console.info('mongodb数据库连接成功');
+        logger.info('mongodb数据库连接成功');
         clearTimeout(reconnectionTask);
         reconnectionTask = null;
       });
 
       connection.on('error', (error) => {
-        console.error('数据库连接异常', error);
+        logger.error('数据库连接异常', error);
         disconnect();
       });
 
