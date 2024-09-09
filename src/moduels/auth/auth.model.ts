@@ -40,8 +40,8 @@ export class Auth {
 
   @IsString()
   @IsOptional()
-  @prop({ default: '' })
-  avatar: string;
+  @prop({ default: null })
+  avatar: string | null;
 
   @IsString()
   @prop({ type: String, select: false })
