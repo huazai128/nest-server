@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package siteproto;
+
+service SiteService {
+    rpc createSite (SiteRequest) returns (stream SiteResponse);
+}
+
+message SiteRequest {
+    int32 id = 1;
+    string name = 2;
+    int32 isApi = 3;
+    string reportUrl = 4;
+    int32 state = 5;
+}
+
+message SiteResponse {
+
+}
