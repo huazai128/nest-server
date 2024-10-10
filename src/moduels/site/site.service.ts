@@ -6,6 +6,8 @@ import {
 import { InjectModel } from '@app/transformers/model.transform';
 import { Site } from './site.model';
 import { Injectable } from '@nestjs/common';
+import { PaginateOptions, PaginateResult } from 'mongoose';
+import { PaginateQuery } from '@app/interfaces/paginate.interface';
 
 @Injectable()
 export class SiteService {
@@ -30,6 +32,20 @@ export class SiteService {
       ...site,
     });
     return res;
+  }
+
+  /**
+   * 分页获取数据
+   * @param {PaginateQuery<Site>} paginateQuery
+   * @param {PaginateOptions} paginateOptions
+   * @return {*}  {Promise<PaginateResult<Site>>}
+   * @memberof SiteService
+   */
+  public paginate(
+    paginateQuery: PaginateQuery<Site>,
+    paginateOptions: PaginateOptions,
+  ): Promise<PaginateResult<Site>> {
+    return this.siteModel.paginate(paginateQuery, paginateOptions);
   }
 
   /**

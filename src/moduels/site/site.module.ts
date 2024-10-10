@@ -7,6 +7,6 @@ import { SiteService } from './site.service';
   imports: [],
   controllers: [SiteController],
   providers: [SiteProvider, SiteService],
-  exports: [SiteService],
+  exports: [],
 })
 export class SiteModule {}

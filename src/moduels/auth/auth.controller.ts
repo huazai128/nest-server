@@ -32,7 +32,6 @@ export class AuthController {
   @GrpcMethod('AuthService', 'validateUser')
   async validateUser(data: ValidateUserRequest) {
     const res = await this.authService.validateUser(data);
-
     return res;
   }
 

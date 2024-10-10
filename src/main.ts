@@ -18,8 +18,9 @@ async function bootstrap() {
       //   join(__dirname, '../protos/user.proto'),
       //   join(__dirname, '../protos/auth.proto'),
       // ],
-      package: ['userproto', 'authproto'],
-      protoPath: ['user.proto', 'auth.proto'],
+      // 每次新增proto 都要在这里配置
+      package: ['userproto', 'authproto', 'siteproto'],
+      protoPath: ['user.proto', 'auth.proto', 'site.proto'],
       loader: {
         includeDirs: [join(__dirname, '../protos')],
         keepCase: true,

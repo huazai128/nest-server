@@ -8,7 +8,7 @@ import {
 } from '@typegoose/typegoose';
 import { Schema } from 'mongoose';
 import { AutoIncrementID } from '@typegoose/auto-increment';
-import paginate from 'mongoose-paginate-v2';
+import * as paginate from 'mongoose-paginate-v2';
 import {
   IsString,
   IsNotEmpty,

@@ -3,7 +3,7 @@ syntax = "proto3";
 package siteproto;
 
 service SiteService {
-    rpc createSite (SiteRequest) returns (stream SiteResponse);
+    rpc saveSite (SiteRequest) returns (stream SiteResponse);
 }
 
 message SiteRequest {
@@ -15,5 +15,5 @@ message SiteRequest {
 }
 
 message SiteResponse {
-
+    int32 id = 1;
 }
