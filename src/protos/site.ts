@@ -21,6 +21,18 @@ export interface SiteResponse {
   id: number;
 }
 
+export interface SiteQuery {
+  page: number;
+  size: number;
+  kw: string;
+  startTime: number;
+  endTime: number;
+}
+
+export interface SiteListRepeonse {
+}
+
 export interface SiteService {
   saveSite(request: SiteRequest): Observable<SiteResponse>;
+  getSiteList(request: SiteQuery): Observable<SiteListRepeonse>;
 }

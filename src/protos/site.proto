@@ -3,17 +3,30 @@ syntax = "proto3";
 package siteproto;
 
 service SiteService {
-    rpc saveSite (SiteRequest) returns (stream SiteResponse);
+  rpc saveSite (SiteRequest) returns (stream SiteResponse);
+  rpc getSiteList (SiteQuery) returns (stream SiteListRepeonse);
 }
 
 message SiteRequest {
-    int32 id = 1;
-    string name = 2;
-    int32 isApi = 3;
-    string reportUrl = 4;
-    int32 state = 5;
+  int32 id = 1;
+  string name = 2;
+  int32 isApi = 3;
+  string reportUrl = 4;
+  int32 state = 5;
 }
 
 message SiteResponse {
-    int32 id = 1;
+  int32 id = 1;
+}
+
+message SiteQuery {
+  int32 page = 1;
+  int32 size = 2;
+  string kw = 3;
+  int32 startTime = 4;
+  int32 endTime = 5;
+}
+
+message SiteListRepeonse {
+
 }
