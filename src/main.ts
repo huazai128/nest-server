@@ -40,6 +40,10 @@ async function bootstrap() {
     transport: Transport.REDIS,
     options: CONFIG.redisConf,
   });
+  // app.useGlobalInterceptors(new LoggingInterceptor());
+  // // 对应微服务全局配置，配置无效
+  // microservice.useGlobalInterceptors(new LoggingInterceptor());
+
   await app.startAllMicroservices();
   await app.listen(APP.PORT).then(() => {
     console.info(

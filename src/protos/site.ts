@@ -6,8 +6,30 @@
 
 /* eslint-disable */
 import { Observable } from "rxjs";
+import { type Pagination } from "./common/pagination";
 
 export const protobufPackage = "siteproto";
+
+export interface SiteDocument {
+  /** 文档名称 */
+  name: string;
+  /** 是否为API */
+  isApi: boolean;
+  /** 报告URL */
+  reportUrl: string;
+  /** 状态 */
+  state: number;
+  /** API规则列表 */
+  apiRules: string[];
+  /** 创建时间 */
+  createAt: string;
+  /** 更新时间 */
+  updateAt: string;
+  /** 文档ID */
+  id: number;
+  /** 白名单记录 */
+  recordWhiteList: string[];
+}
 
 export interface SiteRequest {
   id: number;
@@ -30,9 +52,14 @@ export interface SiteQuery {
 }
 
 export interface SiteListRepeonse {
+  /** 文档列表 */
+  data: SiteDocument[];
+  /** 分页信息 */
+  pagination: Pagination | undefined;
 }
 
 export interface SiteService {
   saveSite(request: SiteRequest): Observable<SiteResponse>;
   getSiteList(request: SiteQuery): Observable<SiteListRepeonse>;
+  updateSite(request: SiteRequest): Observable<SiteResponse>;
 }

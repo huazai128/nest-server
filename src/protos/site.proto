@@ -1,10 +1,23 @@
 syntax = "proto3";
-
 package siteproto;
+import public "common/pagination.proto";
 
 service SiteService {
   rpc saveSite (SiteRequest) returns (stream SiteResponse);
   rpc getSiteList (SiteQuery) returns (stream SiteListRepeonse);
+  rpc updateSite(SiteRequest) returns (stream SiteResponse);
+}
+
+message SiteDocument {
+  string name = 1;                     // 文档名称
+  bool isApi = 2;                      // 是否为API
+  string reportUrl = 3;                // 报告URL
+  int32 state = 4;                     // 状态
+  repeated string apiRules = 5;        // API规则列表
+  string create_at = 6;                // 创建时间
+  string update_at = 7;                // 更新时间
+  int64 id = 8;                        // 文档ID
+  repeated string recordWhiteList = 9; // 白名单记录
 }
 
 message SiteRequest {
@@ -28,5 +41,6 @@ message SiteQuery {
 }
 
 message SiteListRepeonse {
-
+  repeated SiteDocument data = 1;   // 文档列表
+  Pagination pagination = 2;            // 分页信息
 }

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Pagination {
+  int32 totalDocs = 1;                 // 文档总数
+  int32 limit = 2;                     // 每页限制
+  int32 totalPages = 3;                // 总页数
+  int32 page = 4;                      // 当前页
+  int32 pagingCounter = 5;             // 分页计数器
+  bool hasPrevPage = 6;                // 是否有上一页
+  bool hasNextPage = 7;                // 是否有下一页
+  int32 prevPage = 8;                  // 上一页编号
+  int32 nextPage = 9;                  // 下一页编号
+}

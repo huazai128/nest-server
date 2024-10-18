@@ -64,14 +64,15 @@ export class SiteService {
   }
 
   /**
-   * 更新站点
-   * @param {MongooseID} id
+   * 根据id 更新
+   * @param {number} id
    * @param {Site} data
+   * @return {*}
    * @memberof SiteService
    */
-  public async update(id: MongooseID, data: Site) {
+  public async updateSite(id: number, data: Site) {
     const site = await this.siteModel
-      .findByIdAndUpdate(id, data, { new: true })
+      .findOneAndUpdate({ id: id }, data, { new: true })
       .exec();
     if (!site) {
       throw `更新站点不存在`;
