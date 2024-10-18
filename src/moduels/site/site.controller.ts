@@ -2,7 +2,7 @@ import { Controller, UseInterceptors } from '@nestjs/common';
 import { Site } from './site.model';
 import { SiteService } from './site.service';
 import { GrpcMethod } from '@nestjs/microservices';
-import { SiteRequest } from '@app/protos/site';
+import { SiteRequest, SiteResponse } from '@app/protos/site';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import { isUndefined, trim } from 'lodash';
@@ -62,5 +62,16 @@ export class SiteController {
   @GrpcMethod('SiteService', 'updateSite')
   updateSite({ id, ...data }: SiteRequest) {
     return this.siteService.updateSite(id, data);
+  }
+
+  /**
+   * 根据id删除
+   * @param {number} id
+   * @return {*}
+   * @memberof SiteController
+   */
+  @GrpcMethod('SiteService', 'deleteSiteId')
+  deleteSiteId(id: SiteResponse) {
+    return this.siteService.deleteId(id);
   }
 }

@@ -6,17 +6,18 @@ service SiteService {
   rpc saveSite (SiteRequest) returns (stream SiteResponse);
   rpc getSiteList (SiteQuery) returns (stream SiteListRepeonse);
   rpc updateSite(SiteRequest) returns (stream SiteResponse);
+  rpc deleteSiteId(SiteResponse) returns (stream SiteResponse);
 }
 
 message SiteDocument {
-  string name = 1;                     // 文档名称
-  bool isApi = 2;                      // 是否为API
-  string reportUrl = 3;                // 报告URL
-  int32 state = 4;                     // 状态
-  repeated string apiRules = 5;        // API规则列表
-  string create_at = 6;                // 创建时间
-  string update_at = 7;                // 更新时间
-  int64 id = 8;                        // 文档ID
+  int32 id = 1;                        // 文档ID
+  string name = 2;                     // 文档名称
+  bool isApi = 3;                      // 是否为API
+  string reportUrl = 4;                // 报告URL
+  int32 state = 5;                     // 状态
+  repeated string apiRules = 6;        // API规则列表
+  string create_at = 7;                // 创建时间
+  string update_at = 8;                // 更新时间
   repeated string recordWhiteList = 9; // 白名单记录
 }
 

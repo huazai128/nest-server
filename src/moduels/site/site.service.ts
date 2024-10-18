@@ -49,15 +49,15 @@ export class SiteService {
   }
 
   /**
-   * 删除站点
-   * @param {Object} id
-   * @return {*}  {Promise<PaginateResult<string>>}
+   * 根据ID删除
+   * @param {*} data
+   * @return {*}  {Promise<MongooseDoc<Site>>}
    * @memberof SiteService
    */
-  public async deleteId(id: MongooseID): Promise<MongooseDoc<Site>> {
-    const site = await this.siteModel.findOneAndDelete({ id: id }).exec();
+  public async deleteId(data): Promise<MongooseDoc<Site>> {
+    const site = await this.siteModel.findOneAndDelete(data).exec();
     if (!site) {
-      throw `站点${id}没有找到`;
+      throw `站点${data.id}没有找到`;
     }
     // 缓存删除
     return site;
