@@ -1,8 +1,4 @@
-import {
-  MongooseDoc,
-  MongooseID,
-  MongooseModel,
-} from '@app/interfaces/mongoose.interface';
+import { MongooseDoc, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { InjectModel } from '@app/transformers/model.transform';
 import { Site } from './site.model';
 import { Injectable } from '@nestjs/common';
