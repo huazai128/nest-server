@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common'
-import { LogController } from './log.controller'
-import { LogService } from './log.service'
+import { Module } from '@nestjs/common';
+import { LogController } from './log.controller';
+import { LogService } from './log.service';
 
 @Module({
   imports: [],
