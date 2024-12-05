@@ -84,6 +84,7 @@ export class ProtousersController {
     return o;
   }
 
+  // 允许在 gRPC 中进行高效的流式通信，适用于需要频繁交互的应用场景。通过实现双向流式 RPC
   @GrpcStreamCall('UserService', 'streamReqCall')
   // eslint-disable-next-line @typescript-eslint/ban-types
   async streamReqCall(stream: any, callback: (...args) => any) {

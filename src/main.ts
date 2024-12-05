@@ -6,6 +6,7 @@ import { ReflectionService } from '@grpc/reflection';
 import { getServerIp } from './utils/util';
 import { APP, CONFIG } from './config';
 import { join } from 'path';
+import { PROTOPACKAGE, PROTOPATH } from './constants/proto.contant';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,8 +20,8 @@ async function bootstrap() {
       //   join(__dirname, '../protos/auth.proto'),
       // ],
       // 每次新增proto 都要在这里配置
-      package: ['userproto', 'authproto', 'siteproto'],
-      protoPath: ['user.proto', 'auth.proto', 'site.proto'],
+      package: PROTOPACKAGE,
+      protoPath: PROTOPATH,
       loader: {
         includeDirs: [join(__dirname, '../protos')],
         keepCase: true,
