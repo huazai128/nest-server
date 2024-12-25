@@ -11,6 +11,7 @@ export class LogController {
 
   @GrpcMethod('LogService', 'saveLog')
   async saveLog(data: LogRequest): Promise<LogResponse> {
+    console.log(data, 'data');
     return this.logService.create(data);
   }
 }
