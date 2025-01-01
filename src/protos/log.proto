@@ -14,7 +14,7 @@ message LogRequest {
   string reportsType = 2; // 报告类型
   string errorUUid = 3; // 错误 UUID
   string siteId = 4; // 站点 ID
-  RefType onModel = 5; // 模型引用类型
+  string onModel = 5; // 模型引用类型
   google.protobuf.Struct doce = 6; // 内容引用
   string category = 7; // 日志类别
   string userId = 8; // 用户 ID
@@ -33,36 +33,70 @@ message LogRequest {
   string traceId = 21; // 追踪 ID
   string monitorId = 22; // 
   string nodeId = 23; //
-}
-enum TransportCategory {
-  PV = 0; // 页面浏览
-  PREF = 1; // 性能
-  EVENT = 2; // 事件
-  CUSTOM = 3; // 自定义
-  API = 4; // API 请求
-  ERROR = 5; // 错误
-  RV = 6; // 视频
-  USER = 7; // 用户
+  double duration = 24; // 
+  string entryType = 25;
+  double startTime = 26;
+  double fmpTime = 27;
+  string cacheRate = 28;
+  RequestInfo requestInfo = 29; // 请求信息
+  double dns = 30;           // DNS 时间
+  double domParse = 31;      // DOM 解析时间
+  double domReady = 32;      // DOM 准备时间
+  double firstByte = 33;     // 首字节时间
+  double fp = 34;            // 首次图像可见时间
+  double load = 35;          // 加载时间
+  double res = 36;           // 资源时间
+  bool ssl = 37;            // 是否使用 SSL
+  double tcp = 38;          // TCP 时间
+  double trans = 39;        // 传输时间
+  double ttfb = 40;         // TTFB（首次字节时间）
+  double total = 41;        // 总时间
+  int64 endTime = 42;
+  int64 interactionTime = 43;
+  int64 loadedTime = 44;
+  int64 loadingTime = 45;
+  string queryUrl = 46;
+  int64 requestTime = 47;
+  int64 responseTime = 48;
+  int32 status = 49;
+  string statusText = 50;
+  string errorType = 51;
+  string content = 52;
+  Meta meta = 53;                 // 元数据
+
 }
 
-// 日志类型
-enum MetricsName {
-  FP = 0; // 首次绘制
-  FCP = 1; // 首次内容绘制
-  FMP = 2; // 首次有意义绘制
-  NT = 3; // 导航时间
-  RF = 4; // 资源流
-  RCR = 5; // 路由变化记录
-  CBR = 6; // 点击行为记录
-  CDR = 7; // 自定义定义记录
-  HT = 8; // HTTP 记录
-  CE = 9; // 变化曝光
-  JS = 10; // JS
-  RS = 11; // 资源
-  UJ = 12; // 未处理的拒绝
-  CS = 13; // CORS
-  REACT = 14; // React
-  HTS = 15; // HTTP
+message Meta {
+  google.protobuf.Struct body = 1;
+  int64 endTime = 2;
+  int64 interactionTime = 3;
+  int64 loadedTime = 4;
+  int64 loadingTime = 5;
+  string method = 6;
+  google.protobuf.Struct params = 7;
+  string queryUrl = 8;
+  int64 requestTime = 9;
+  Response response = 10;
+  int64 responseTime = 11;
+  int32 status = 12;
+  string statusText = 13;
+  string url = 14;
+}
+
+
+message RequestInfo {
+  double contentDownload = 1; // 内容下载
+  double dnsLookup = 2;       // DNS 查找
+  double initialConnect = 3;  // 初始连接
+  string initiatorType = 4;   // 发起者类型
+  bool isCache = 5;           // 是否缓存
+  string name = 6;            // 请求 URL
+  double requestDuration = 7; // 请求时长
+  double responseEnd = 8;     // 响应结束时间
+  bool ssl = 9;               // 是否使用 SSL
+  double startTime = 10;      // 开始时间
+  double timeToFirstByte = 11; // TTFB（首次字节时间）
+  double transferSize = 12;   // 传输大小
 }
 
 // 响应消息定义
@@ -72,20 +106,6 @@ message Response {
   google.protobuf.Struct data = 3;
 }
 
-
-// 引用类型
-enum RefType {
-  ApiLog = 0; // API 日志
-  EventLog = 1; // 事件日志
-  ErrorLog = 2; // 错误日志
-  PrefLog = 3; // 性能日志
-  PvLog = 4; // 页面浏览日志
-  CustomLog = 5; // 自定义日志
-  UserLog = 6; // 用户日志
-}
-
-
 message LogResponse {
-  int32 id = 1;
 }
 

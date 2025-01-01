@@ -9,82 +9,6 @@ import { Observable } from "rxjs";
 
 export const protobufPackage = "logproto";
 
-export enum TransportCategory {
-  /** PV - 页面浏览 */
-  PV = 0,
-  /** PREF - 性能 */
-  PREF = 1,
-  /** EVENT - 事件 */
-  EVENT = 2,
-  /** CUSTOM - 自定义 */
-  CUSTOM = 3,
-  /** API - API 请求 */
-  API = 4,
-  /** ERROR - 错误 */
-  ERROR = 5,
-  /** RV - 视频 */
-  RV = 6,
-  /** USER - 用户 */
-  USER = 7,
-  UNRECOGNIZED = -1,
-}
-
-/** 日志类型 */
-export enum MetricsName {
-  /** FP - 首次绘制 */
-  FP = 0,
-  /** FCP - 首次内容绘制 */
-  FCP = 1,
-  /** FMP - 首次有意义绘制 */
-  FMP = 2,
-  /** NT - 导航时间 */
-  NT = 3,
-  /** RF - 资源流 */
-  RF = 4,
-  /** RCR - 路由变化记录 */
-  RCR = 5,
-  /** CBR - 点击行为记录 */
-  CBR = 6,
-  /** CDR - 自定义定义记录 */
-  CDR = 7,
-  /** HT - HTTP 记录 */
-  HT = 8,
-  /** CE - 变化曝光 */
-  CE = 9,
-  /** JS - JS */
-  JS = 10,
-  /** RS - 资源 */
-  RS = 11,
-  /** UJ - 未处理的拒绝 */
-  UJ = 12,
-  /** CS - CORS */
-  CS = 13,
-  /** REACT - React */
-  REACT = 14,
-  /** HTS - HTTP */
-  HTS = 15,
-  UNRECOGNIZED = -1,
-}
-
-/** 引用类型 */
-export enum RefType {
-  /** ApiLog - API 日志 */
-  ApiLog = 0,
-  /** EventLog - 事件日志 */
-  EventLog = 1,
-  /** ErrorLog - 错误日志 */
-  ErrorLog = 2,
-  /** PrefLog - 性能日志 */
-  PrefLog = 3,
-  /** PvLog - 页面浏览日志 */
-  PvLog = 4,
-  /** CustomLog - 自定义日志 */
-  CustomLog = 5,
-  /** UserLog - 用户日志 */
-  UserLog = 6,
-  UNRECOGNIZED = -1,
-}
-
 export interface LogRequest {
   /** 唯一索引 */
   id: number;
@@ -95,7 +19,7 @@ export interface LogRequest {
   /** 站点 ID */
   siteId: string;
   /** 模型引用类型 */
-  onModel: RefType;
+  onModel: string;
   /** 内容引用 */
   doce:
     | { [key: string]: any }
@@ -144,6 +68,97 @@ export interface LogRequest {
   monitorId: string;
   /**  */
   nodeId: string;
+  /**  */
+  duration: number;
+  entryType: string;
+  startTime: number;
+  fmpTime: number;
+  cacheRate: string;
+  /** 请求信息 */
+  requestInfo:
+    | RequestInfo
+    | undefined;
+  /** DNS 时间 */
+  dns: number;
+  /** DOM 解析时间 */
+  domParse: number;
+  /** DOM 准备时间 */
+  domReady: number;
+  /** 首字节时间 */
+  firstByte: number;
+  /** 首次图像可见时间 */
+  fp: number;
+  /** 加载时间 */
+  load: number;
+  /** 资源时间 */
+  res: number;
+  /** 是否使用 SSL */
+  ssl: boolean;
+  /** TCP 时间 */
+  tcp: number;
+  /** 传输时间 */
+  trans: number;
+  /** TTFB（首次字节时间） */
+  ttfb: number;
+  /** 总时间 */
+  total: number;
+  endTime: number;
+  interactionTime: number;
+  loadedTime: number;
+  loadingTime: number;
+  queryUrl: string;
+  requestTime: number;
+  responseTime: number;
+  status: number;
+  statusText: string;
+  errorType: string;
+  content: string;
+  /** 元数据 */
+  meta: Meta | undefined;
+}
+
+export interface Meta {
+  body: { [key: string]: any } | undefined;
+  endTime: number;
+  interactionTime: number;
+  loadedTime: number;
+  loadingTime: number;
+  method: string;
+  params: { [key: string]: any } | undefined;
+  queryUrl: string;
+  requestTime: number;
+  response: Response | undefined;
+  responseTime: number;
+  status: number;
+  statusText: string;
+  url: string;
+}
+
+export interface RequestInfo {
+  /** 内容下载 */
+  contentDownload: number;
+  /** DNS 查找 */
+  dnsLookup: number;
+  /** 初始连接 */
+  initialConnect: number;
+  /** 发起者类型 */
+  initiatorType: string;
+  /** 是否缓存 */
+  isCache: boolean;
+  /** 请求 URL */
+  name: string;
+  /** 请求时长 */
+  requestDuration: number;
+  /** 响应结束时间 */
+  responseEnd: number;
+  /** 是否使用 SSL */
+  ssl: boolean;
+  /** 开始时间 */
+  startTime: number;
+  /** TTFB（首次字节时间） */
+  timeToFirstByte: number;
+  /** 传输大小 */
+  transferSize: number;
 }
 
 /** 响应消息定义 */
@@ -154,7 +169,6 @@ export interface Response {
 }
 
 export interface LogResponse {
-  id: number;
 }
 
 export interface LogService {

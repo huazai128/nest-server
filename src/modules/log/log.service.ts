@@ -37,6 +37,7 @@ import { Cron } from '@nestjs/schedule';
 import sizeof from 'object-sizeof';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { isDevEnv } from '@app/app.env';
+import { LogRequest } from '@app/protos/log';
 
 const maxSize = 1048576;
 
@@ -86,11 +87,11 @@ export class LogService {
 
   /**
    * 上报信息
-   * @param {(any & Report)} { siteId, ...log }
+   * @param {LogRequest} data
    * @return {*}  {Promise<any>}
    * @memberof LogService
    */
-  public async create(data: any): Promise<any> {
+  public async create(data: LogRequest): Promise<any> {
     const startNow = Date.now();
     // 站点放进缓存
     const site = await this.siteModel.findById(data.siteId);
@@ -98,6 +99,7 @@ export class LogService {
       logger.error('站点已删除或者不存在');
       return '站点已删除或者不存在';
     }
+    console.log(data, 'data====');
     // 录屏上报信息
     if (data.category === TransportCategory.RV) {
       this.saveErrorRecord(data as any);
@@ -122,10 +124,10 @@ export class LogService {
         ip: data.ip,
         reportsType: data.reportsType,
         errorUUid: data.errorUUid,
-        meta: data.meta && stringToObjectO(data.meta),
+        meta: data.meta,
         traceId: data.traceId,
       };
-      // TODO: ip查询地址比较耗时暂时去掉，后续替换其他查询服务
+      // TODO: ip查询地址比较耗时暂时去掉，后续替换其他查询服务, 这里还可以缓存起来，防止多次请求导致限流。
       log.ip_location =
         !isDevEnv && data.ip
           ? await this.ipService.queryLocation(data.ip)
@@ -134,6 +136,7 @@ export class LogService {
         '上报数据:',
         JSON.stringify({ ...log, content: data?.content }),
       );
+      console.log(log, 'log=====');
       try {
         switch (data.category) {
           case TransportCategory.EVENT: // 事件上报
@@ -193,7 +196,7 @@ export class LogService {
         logger.error(`上报错误`, JSON.stringify(data), error);
         this.alarnService.sendErrorSaveAlarm({
           content: error,
-          siteId: data.siteId,
+          siteId: data.siteId as unknown as ErrorLog['siteId'],
           userId: data.userId || undefined,
         });
         return error;

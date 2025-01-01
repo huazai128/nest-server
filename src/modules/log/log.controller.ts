@@ -1,4 +1,4 @@
-import { Controller, Query } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
 import { KW_KEYS } from '@app/constants/value.constant';
 import { LogService } from './log.service';
@@ -10,8 +10,9 @@ import {
   projectHourOption,
 } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
+import { LogRequest } from '@app/protos/log';
 
-@Controller('/api/log')
+@Controller('log')
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
@@ -21,8 +22,8 @@ export class LogController {
    * @memberof WeblogControll
    */
   @GrpcMethod('LogService', 'saveLog')
-  async saveLog(data: any) {
-    console.log(data, 'data======');
+  async saveLog(data: LogRequest) {
+    console.log(data, 'data=====');
     return this.logService.create(data);
   }
 
