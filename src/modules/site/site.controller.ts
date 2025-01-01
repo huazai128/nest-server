@@ -8,6 +8,7 @@ import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import { isUndefined, trim } from 'lodash';
 import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 import { PaginationInterceptor } from '@app/interceptors/pagination.intercetpor';
+import { MongooseID } from '@app/interfaces/mongoose.interface';
 
 @Controller('site')
 @UseInterceptors(new LoggingInterceptor())
@@ -61,7 +62,7 @@ export class SiteController {
    */
   @GrpcMethod('SiteService', 'updateSite')
   updateSite({ id, ...data }: SiteRequest) {
-    return this.siteService.updateSite(id, data);
+    return this.siteService.update(id as unknown as MongooseID, data);
   }
 
   /**
@@ -72,6 +73,6 @@ export class SiteController {
    */
   @GrpcMethod('SiteService', 'deleteSiteId')
   deleteSiteId(id: SiteResponse) {
-    return this.siteService.deleteId(id);
+    return this.siteService.deleteId(id as unknown as MongooseID);
   }
 }

@@ -11,12 +11,12 @@ service LogService {
 
 message LogRequest {
   int32 id = 1; // 唯一索引
-  MetricsName reportsType = 2; // 报告类型
+  string reportsType = 2; // 报告类型
   string errorUUid = 3; // 错误 UUID
   string siteId = 4; // 站点 ID
   RefType onModel = 5; // 模型引用类型
   google.protobuf.Struct doce = 6; // 内容引用
-  TransportCategory category = 7; // 日志类别
+  string category = 7; // 日志类别
   string userId = 8; // 用户 ID
   string title = 9; // 标题
   string path = 10; // 路径
@@ -31,6 +31,8 @@ message LogRequest {
   google.protobuf.Timestamp create_at = 19; // 创建时间
   google.protobuf.Timestamp update_at = 20; // 更新时间
   string traceId = 21; // 追踪 ID
+  string monitorId = 22; // 
+  string nodeId = 23; //
 }
 enum TransportCategory {
   PV = 0; // 页面浏览

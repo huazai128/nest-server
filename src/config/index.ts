@@ -41,3 +41,7 @@ export const AUTH = {
   jwtTokenSecret: 'nest_grpc_server',
   expiresIn: 3600 * 24 * 7, // TOKEN过期时间， 目前还没有处理实时更新token
 };
+
+// 数据相关连接错误告警
+export const ALARM_URL =
+  'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=dbeb48fd-af7d-41ed-b446-5272e8c87589';

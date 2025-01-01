@@ -1,3 +1,5 @@
+import { RedisModuleOptions } from './redis.interface';
+
 export interface ConfigServer {
   // 用于微服务链接
   redisConf: {
@@ -9,4 +11,6 @@ export interface ConfigServer {
     username?: string;
   };
   grpcUrl: string;
+  pageUrl: string;
+  redis: RedisModuleOptions;
 }
