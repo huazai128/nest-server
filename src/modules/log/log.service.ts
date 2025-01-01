@@ -99,7 +99,6 @@ export class LogService {
       logger.error('站点已删除或者不存在');
       return '站点已删除或者不存在';
     }
-    console.log(data, 'data====');
     // 录屏上报信息
     if (data.category === TransportCategory.RV) {
       this.saveErrorRecord(data as any);
@@ -136,7 +135,6 @@ export class LogService {
         '上报数据:',
         JSON.stringify({ ...log, content: data?.content }),
       );
-      console.log(log, 'log=====');
       try {
         switch (data.category) {
           case TransportCategory.EVENT: // 事件上报
@@ -170,7 +168,6 @@ export class LogService {
             break;
           case TransportCategory.PREF:
             if (log.reportsType == MetricsName.CDR) {
-              // this.alarnService.sendMetrics(data);
             }
             // 性能上报 perf
             log.onModel = RefType.PrefLog;
