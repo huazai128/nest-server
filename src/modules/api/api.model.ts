@@ -32,8 +32,8 @@ class ApiLogDTO extends Report {
   url: string | null;
 
   @IsString()
-  @prop({ type: String, default: null, text: true, index: true })
-  body: string | null;
+  @prop({ type: Object, default: null })
+  body: object | null;
 
   @IsInt()
   @prop({ type: Number, default: 0 })
@@ -55,8 +55,8 @@ class ApiLogDTO extends Report {
   response: Response | null;
 
   @IsString()
-  @prop({ type: String, default: null, text: true, index: true })
-  params: string | null;
+  @prop({ type: Object, default: null })
+  params: Object | null;
 
   @IsString()
   @prop({ type: String, default: null })

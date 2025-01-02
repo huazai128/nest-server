@@ -7,7 +7,7 @@ import logger from '@app/utils/logger';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 // import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
 import { Cron } from '@nestjs/schedule';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class UserLogService {

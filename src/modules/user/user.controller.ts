@@ -6,7 +6,7 @@ import {
 import { Controller } from '@nestjs/common';
 import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
 import { UserLog } from './user.model';
-import lodash from 'lodash';
+import { isUndefined } from 'lodash';
 import { UserLogService } from './user.service';
 import { TransportCategory } from '@app/constants/enum.contant';
 import { GrpcMethod } from '@nestjs/microservices';
@@ -23,7 +23,7 @@ export class UserLogController {
     const paginateOptions: PaginateOptions = { page, limit: size };
     const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     paginateQuery.category = TransportCategory.USER;
-    if (!lodash.isUndefined(sort)) {
+    if (!isUndefined(sort)) {
       paginateOptions.sort = { _id: sort };
     } else {
       paginateOptions.sort = { _id: -1 };

@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'fs-extra';
 import { NullableMappedPosition, SourceMapConsumer } from 'source-map';
 import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
 import logger from '@app/utils/logger';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { join } from 'path';
 import { isEmpty } from 'lodash';
 import { SiteService } from '../site/site.service';

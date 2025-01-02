@@ -5,7 +5,7 @@ import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { ApiLog } from './api.model';
 import logger from '@app/utils/logger';
 import { Cron } from '@nestjs/schedule';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class ApiLogService implements OnModuleInit {

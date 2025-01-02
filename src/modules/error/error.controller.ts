@@ -7,7 +7,7 @@ import {
 } from 'mongoose';
 import { ErrorLog } from './error.model';
 import { ErrorLogService } from './error.service';
-import lodash from 'lodash';
+import { isUndefined } from 'lodash';
 import { handleSearchKeys } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
 
@@ -37,7 +37,7 @@ export class ErrorLogController {
     const { page, size, sort, ...filters } = query;
     const paginateOptions: PaginateOptions = { page, limit: size };
     const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
-    if (!lodash.isUndefined(sort)) {
+    if (!isUndefined(sort)) {
       paginateOptions.sort = { _id: sort };
     } else {
       paginateOptions.sort = { _id: -1 };

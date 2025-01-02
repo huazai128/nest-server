@@ -150,8 +150,7 @@ export class Log {
   @prop({
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
-    default: undefined,
-    text: true,
+    default: null,
   })
   body: object | null;
 
@@ -160,7 +159,6 @@ export class Log {
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
     default: undefined,
-    text: true,
   })
   params: object | null;
 

@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import { EventLog } from './eventLog.model';
 import { EventLogService, KW_KEYS } from './eventLog.service';
-import lodash from 'lodash';
+import { isUndefined } from 'lodash';
 import { handleSearchKeys } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
 
@@ -22,7 +22,7 @@ export class EventLogController {
     const { page, size, sort } = query;
     const paginateOptions: PaginateOptions = { page, limit: size };
     const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
-    if (!lodash.isUndefined(sort)) {
+    if (!isUndefined(sort)) {
       paginateOptions.sort = { _id: sort };
     } else {
       paginateOptions.sort = { _id: -1 };

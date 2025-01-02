@@ -2,7 +2,7 @@ import { handleSearchKeys } from '@app/utils/searchCommon';
 import { Controller } from '@nestjs/common';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import { CustomLog } from './customLog.model';
-import lodasd from 'lodash';
+import { isUndefined } from 'lodash';
 import { CustomLogService, KW_KEYS } from './customLog.service';
 import { GrpcMethod } from '@nestjs/microservices';
 
@@ -21,7 +21,7 @@ export class CustomLogController {
     const { page, size, sort } = query;
     const paginateOptions: PaginateOptions = { page, limit: size };
     const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
-    if (!lodasd.isUndefined(sort)) {
+    if (!isUndefined(sort)) {
       paginateOptions.sort = { _id: sort };
     } else {
       paginateOptions.sort = { _id: -1 };

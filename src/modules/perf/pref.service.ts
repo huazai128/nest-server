@@ -5,7 +5,7 @@ import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { PrefLog } from './pref.model';
 import logger from '@app/utils/logger';
 import { Cron } from '@nestjs/schedule';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class PrefService {

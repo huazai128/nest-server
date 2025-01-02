@@ -1,7 +1,13 @@
 import { getProviderByTypegoose } from '@app/transformers/model.transform';
 import { indexOptions, indexWeights, Report } from '@app/utils/report';
 import { AutoIncrementID } from '@typegoose/auto-increment';
-import { index, modelOptions, prop, plugin } from '@typegoose/typegoose';
+import {
+  index,
+  modelOptions,
+  prop,
+  plugin,
+  Severity,
+} from '@typegoose/typegoose';
 import { IsString, IsArray, IsNumber, IsUrl } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
 import { ApiLog, Response } from '../api/api.model';
@@ -9,6 +15,7 @@ import { CustomLog } from '../customLog/customLog.model';
 import { EventLog } from '../eventLog/eventLog.model';
 import * as aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { Method } from 'axios';
+import mongoose from 'mongoose';
 
 export type BreadcrumbsType = CustomLog | ApiLog | EventLog;
 
@@ -35,9 +42,12 @@ export class Meta {
   @prop({ type: String, default: null, text: true })
   url: string | null;
 
-  @IsString()
-  @prop({ type: String, default: null, text: true })
-  body: string | null;
+  @prop({
+    allowMixed: Severity.ALLOW,
+    type: () => mongoose.Schema.Types.Mixed,
+    default: undefined,
+  })
+  body: object | null;
 
   @IsNumber()
   @prop({ type: Number, default: 0 })
@@ -58,9 +68,12 @@ export class Meta {
   @prop({ type: () => Response, _id: false, default: null })
   response: Response | null;
 
-  @IsString()
-  @prop({ type: String, default: null, text: true })
-  params: string | null;
+  @prop({
+    allowMixed: Severity.ALLOW,
+    type: () => mongoose.Schema.Types.Mixed,
+    default: undefined,
+  })
+  params: object | null;
 
   @IsString()
   @prop({ type: String, default: null })
@@ -129,8 +142,6 @@ export class ErrorDto extends Report {
     value: 'text',
     'meta.file': 'text',
     'meta.url': 'text',
-    'meta.body': 'text',
-    'meta.params': 'text',
   },
   {
     name: 'SearchIndex',
@@ -138,8 +149,6 @@ export class ErrorDto extends Report {
       ...indexWeights,
       'meta.file': 16,
       'meta.url': 5,
-      'meta.body': 14,
-      'meta.params': 14,
       file: 10,
       value: 4,
     },

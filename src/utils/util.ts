@@ -5,7 +5,7 @@ import { Request } from 'express';
 import { UAParser, IResult } from 'ua-parser-js';
 import { PipelineStage } from 'mongoose';
 import { TimeInfo, TimeMatch } from '@app/interfaces/request.interface';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 /**
  * 获取服务端IP

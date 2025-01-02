@@ -3,7 +3,7 @@ import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
 import { KW_KEYS } from '@app/constants/value.constant';
 import { LogService } from './log.service';
 import { Log } from './log.model';
-import lodash from 'lodash';
+import { isUndefined } from 'lodash';
 import {
   groupHourOption,
   handleSearchKeys,
@@ -46,7 +46,7 @@ export class LogController {
       page: page || 1,
       limit: size || 20,
     };
-    if (!lodash.isUndefined(sort)) {
+    if (!isUndefined(sort)) {
       paginateOptions.sort = { _id: sort };
     } else {
       paginateOptions.sort = { id: -1 };
@@ -88,8 +88,8 @@ export class LogController {
     paginateQuery = {
       cursor: cursor,
       limit: size || 20,
-      sort: !lodash.isUndefined(sort) ? { _id: sort } : { id: -1 },
-      primaryKey: !lodash.isUndefined(sort) ? '_id' : 'id',
+      sort: !isUndefined(sort) ? { _id: sort } : { id: -1 },
+      primaryKey: !isUndefined(sort) ? '_id' : 'id',
       select:
         '-href -path -title -value -params -response -body -ip_location -meta -url',
       populate: {
