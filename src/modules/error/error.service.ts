@@ -365,16 +365,6 @@ export class ErrorLogService implements OnModuleInit {
   }
 
   /**
-   *根据errorUUid 获取错误信息详情
-   * @param {string} errorId
-   * @return {*}
-   * @memberof ErrorLogService
-   */
-  public getErrorIdByInfo(errorId: string) {
-    return this.errorModel.find({ errorUUid: errorId }).exec();
-  }
-
-  /**
    *  通用处理单天、单月、年的统计数据数据
    * @param {PipelineStage.Match['$match']} matchFilter
    * @param {TimeInfo} timeInfo

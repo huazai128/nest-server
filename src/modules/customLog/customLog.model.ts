@@ -27,6 +27,10 @@ export class CustomDto extends Report {
   @IsNumberString()
   @prop({ default: 0, index: true })
   eventId: number;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 
 @index(

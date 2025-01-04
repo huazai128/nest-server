@@ -91,10 +91,6 @@ export class Log {
   @prop({ enum: MetricsName, index: true, default: MetricsName.HT })
   reportsType: MetricsName;
 
-  @IsString()
-  @prop({ type: String, default: null })
-  errorUUid?: string | null;
-
   @IsNotEmpty()
   @prop({ ref: () => Site, required: true, index: true })
   siteId: Ref<Site>;
@@ -183,6 +179,10 @@ export class Log {
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 
 export const LogProvider = getProviderByTypegoose(Log);

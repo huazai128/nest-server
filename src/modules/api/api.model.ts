@@ -61,6 +61,10 @@ class ApiLogDTO extends Report {
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 
 @index(

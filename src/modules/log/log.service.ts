@@ -122,7 +122,6 @@ export class LogService {
         value: data.value,
         ip: data.ip,
         reportsType: data.reportsType,
-        errorUUid: data.errorUUid,
         meta: data.meta,
         traceId: data.traceId,
       };
@@ -387,7 +386,6 @@ export class LogService {
   //       value: data.value,
   //       ip: data.ip,
   //       reportsType: data.reportsType,
-  //       errorUUid: data.errorUUid,
   //       meta: data.meta && stringToObjectO(data.meta),
   //       traceId: data.traceId,
   //     };

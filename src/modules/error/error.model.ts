@@ -82,6 +82,10 @@ export class Meta {
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 
 export class StackTrace {
@@ -125,10 +129,6 @@ export class ErrorDto extends Report {
   @IsString()
   @prop({ type: String, default: null, text: true })
   errorDetail: string | null;
-
-  @IsString()
-  @prop({ type: String, default: null })
-  errorUUid: string | null;
 
   @IsString()
   @prop({ type: String, default: null })

@@ -23,6 +23,7 @@ export class LogController {
    */
   @GrpcMethod('LogService', 'saveLog')
   async saveLog(data: LogRequest) {
+    console.log(data, 'data=====');
     return this.logService.create(data);
   }
 

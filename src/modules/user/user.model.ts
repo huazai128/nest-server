@@ -8,14 +8,7 @@ import {
   index,
   Severity,
 } from '@typegoose/typegoose';
-import {
-  ArrayUnique,
-  IsArray,
-  IsDefined,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-} from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
 
 @index(
@@ -71,8 +64,12 @@ export class UserLog extends Report {
    * 额外信息依照不同项目存储不同内容，在后台用户日志上报页面显示，支持换行符
    */
   @IsString()
-  @prop({ type: String, default: null, text: true, index: true })
-  extraInfo: string;
+  @prop({ type: Object, default: null })
+  extraInfo: object | null;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  traceId: string | null;
 }
 
 export const UserLogProvider = getProviderByTypegoose(UserLog);

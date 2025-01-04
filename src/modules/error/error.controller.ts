@@ -100,17 +100,6 @@ export class ErrorLogController {
   }
 
   /**
-   * 根据errorUUID 获取数据
-   * @param {QueryParamsResult} { query }
-   * @return {*}
-   * @memberof ErrorLogController
-   */
-  @GrpcMethod('ErrorService', 'getErrorUUidByInfo')
-  getErrorUUidByInfo(query: any) {
-    return this.errorLogService.getErrorIdByInfo(query.errorId);
-  }
-
-  /**
    * 统计单天数据，包含昨天以及7天前的数据
    * @param {any} { startTime, endTime, ...query }
    * @return {*}
