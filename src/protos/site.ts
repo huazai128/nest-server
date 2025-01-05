@@ -11,8 +11,8 @@ import { type Pagination } from "./common/pagination";
 export const protobufPackage = "siteproto";
 
 export interface SiteDocument {
-  /** 文档ID */
-  id: number;
+  /** 文档ID，这个文档id,不能使用int，会变成Long 就要进行处理，为了减少 */
+  id: string;
   /** 文档名称 */
   name: string;
   /** 是否为API */
@@ -29,10 +29,12 @@ export interface SiteDocument {
   updateAt: string;
   /** 白名单记录 */
   recordWhiteList: string[];
+  /** 系统id */
+  Id: string;
 }
 
 export interface SiteRequest {
-  id: number;
+  id: string;
   name: string;
   isApi: number;
   reportUrl: string;
@@ -40,7 +42,7 @@ export interface SiteRequest {
 }
 
 export interface SiteResponse {
-  id: number;
+  id: string;
 }
 
 export interface SiteQuery {
@@ -63,4 +65,5 @@ export interface SiteService {
   getSiteList(request: SiteQuery): Observable<SiteListRepeonse>;
   updateSite(request: SiteRequest): Observable<SiteResponse>;
   deleteSiteId(request: SiteResponse): Observable<SiteResponse>;
+  getByIdSiteInfo(request: SiteResponse): Observable<SiteResponse>;
 }

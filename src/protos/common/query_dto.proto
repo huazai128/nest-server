@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "google/protobuf/struct.proto"; // 导入 google 的结构类型
+
+message QueryDTO {
+  string category = 1;
+  int32 sort = 2;
+  string reportsType = 3;
+  string traceId = 4;
+  string kw = 5;
+  int32 siteId = 6;
+  int64 startTime = 7;             // 请求时间
+  int64 endTime = 8;            // 响应时间
+  int32 timeSlot = 9;
+  string keyId = 10;
+  google.protobuf.Struct keywordParmas = 11;
+  int32 page = 12;
+  int32 size = 13;
+  int32 total = 14;
+}

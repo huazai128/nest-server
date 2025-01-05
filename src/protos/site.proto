@@ -7,10 +7,11 @@ service SiteService {
   rpc getSiteList (SiteQuery) returns (stream SiteListRepeonse);
   rpc updateSite(SiteRequest) returns (stream SiteResponse);
   rpc deleteSiteId(SiteResponse) returns (stream SiteResponse);
+  rpc getByIdSiteInfo(SiteResponse) returns (stream SiteResponse);
 }
 
 message SiteDocument {
-  int32 id = 1;                        // 文档ID
+  string id = 1;                        // 文档ID，这个文档id,不能使用int，会变成Long 就要进行处理，为了减少
   string name = 2;                     // 文档名称
   bool isApi = 3;                      // 是否为API
   string reportUrl = 4;                // 报告URL
@@ -19,10 +20,11 @@ message SiteDocument {
   string create_at = 7;                // 创建时间
   string update_at = 8;                // 更新时间
   repeated string recordWhiteList = 9; // 白名单记录
+  string _id = 10;                     // 系统id
 }
 
 message SiteRequest {
-  int32 id = 1;
+  string id = 1;
   string name = 2;
   int32 isApi = 3;
   string reportUrl = 4;
@@ -30,7 +32,7 @@ message SiteRequest {
 }
 
 message SiteResponse {
-  int32 id = 1;
+  string id = 1;
 }
 
 message SiteQuery {

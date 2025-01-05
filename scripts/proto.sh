@@ -1,4 +1,3 @@
-复制
 #!/bin/bash
 
 PROTO_DIR="./src/protos" 

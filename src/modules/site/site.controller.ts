@@ -8,7 +8,6 @@ import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import { isUndefined, trim } from 'lodash';
 import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 import { PaginationInterceptor } from '@app/interceptors/pagination.intercetpor';
-import { MongooseID } from '@app/interfaces/mongoose.interface';
 
 @Controller('site')
 @UseInterceptors(new LoggingInterceptor())
@@ -23,7 +22,7 @@ export class SiteController {
    */
   @GrpcMethod('SiteService', 'saveSite')
   async saveSite(data: SiteRequest): Promise<Site> {
-    return this.siteService.createSite(data);
+    return this.siteService.createSite({ ...data, id: Number(data.id) });
   }
 
   /**
@@ -46,7 +45,7 @@ export class SiteController {
       const keywordRegExp = new RegExp(trimmed, 'i');
       paginateQuery.$or = [{ name: keywordRegExp }];
     }
-    paginateOptions.select = '-__v -_id';
+    paginateOptions.select = '-__v';
     const result = await this.siteService.paginate(
       paginateQuery,
       paginateOptions,
@@ -62,7 +61,7 @@ export class SiteController {
    */
   @GrpcMethod('SiteService', 'updateSite')
   updateSite({ id, ...data }: SiteRequest) {
-    return this.siteService.update(id as unknown as MongooseID, data);
+    return this.siteService.update(id, data);
   }
 
   /**
@@ -72,7 +71,18 @@ export class SiteController {
    * @memberof SiteController
    */
   @GrpcMethod('SiteService', 'deleteSiteId')
-  deleteSiteId(id: SiteResponse) {
-    return this.siteService.deleteId(id as unknown as MongooseID);
+  deleteSiteId({ id }: SiteResponse) {
+    return this.siteService.deleteId(id);
+  }
+
+  /**
+   * 进入页面是通过自增id 获取站点信息
+   * @param {*} param
+   * @return {*}
+   * @memberof SiteController
+   */
+  @GrpcMethod('SiteService', 'getByIdSiteInfo')
+  getByIdSiteInfo(param: any) {
+    return this.siteService.getByIdSiteInfo(param.id);
   }
 }

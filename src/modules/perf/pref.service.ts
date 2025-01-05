@@ -3,10 +3,10 @@ import { InjectModel } from '@app/transformers/model.transform';
 import { Injectable } from '@nestjs/common';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { PrefLog } from './pref.model';
-import logger from '@app/utils/logger';
 import { Cron } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
-
+import { createLogger } from '@app/utils/logger';
+const logger = createLogger({ scope: 'LogService', time: true });
 @Injectable()
 export class PrefService {
   constructor(
@@ -39,6 +39,7 @@ export class PrefService {
     const prefResult = await this.prefModel
       .deleteMany({ siteId: siteId })
       .exec();
+    logger.log('站点删除后pref日志删除', siteId, prefResult);
     return prefResult;
   }
 

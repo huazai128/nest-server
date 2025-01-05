@@ -3,13 +3,16 @@ import { InjectModel } from '@app/transformers/model.transform';
 import { Injectable } from '@nestjs/common';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { CustomLog } from './customLog.model';
-import logger from '@app/utils/logger';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import {
   groupHourOption,
   handleSearchKeys,
   projectHourOption,
 } from '@app/utils/searchCommon';
+
+import { createLogger } from '@app/utils/logger';
+
+const logger = createLogger({ scope: 'CustomLogService', time: true });
 
 export const KW_KEYS: Array<string> = [
   'eventId',
@@ -52,6 +55,7 @@ export class CustomLogService {
     const customResult = await this.customModel
       .deleteMany({ siteId: siteId })
       .exec();
+    logger.log('站点删除后custom日志删除', siteId, customResult);
     return customResult;
   }
 
@@ -65,6 +69,7 @@ export class CustomLogService {
     const customResult = await this.customModel
       .deleteMany({ _id: { $in: ids } })
       .exec();
+    logger.log('站点删除后custom日志删除');
     return customResult;
   }
 

@@ -6,16 +6,16 @@
 
 /* eslint-disable */
 import { Observable } from "rxjs";
+import { type Pagination } from "./common/pagination";
+import { type QueryDTO } from "./common/query_dto";
 
 export const protobufPackage = "logproto";
 
-export interface LogRequest {
+export interface SaveLogRequest {
   /** 唯一索引 */
   id: number;
   /** 报告类型 */
   reportsType: string;
-  /** 错误 UUID */
-  errorUUid: string;
   /** 站点 ID */
   siteId: string;
   /** 模型引用类型 */
@@ -66,13 +66,17 @@ export interface LogRequest {
   traceId: string;
   /**  */
   monitorId: string;
-  /**  */
+  /** 标签id */
   nodeId: string;
   /**  */
   duration: number;
+  /**  */
   entryType: string;
+  /**  */
   startTime: number;
+  /**  */
   fmpTime: number;
+  /**  */
   cacheRate: string;
   /** 请求信息 */
   requestInfo:
@@ -102,16 +106,27 @@ export interface LogRequest {
   ttfb: number;
   /** 总时间 */
   total: number;
+  /** 结束时间 */
   endTime: number;
+  /** 交互时间 */
   interactionTime: number;
+  /** 加载时间 */
   loadedTime: number;
+  /** 正在加载时间 */
   loadingTime: number;
+  /** 查询 URL */
   queryUrl: string;
+  /** 请求时间 */
   requestTime: number;
+  /** 响应时间 */
   responseTime: number;
+  /** 状态 */
   status: number;
+  /** 状态文本 */
   statusText: string;
+  /** 错误类型 */
   errorType: string;
+  /** 内容 */
   content: string;
   /** 元数据 */
   meta: Meta | undefined;
@@ -163,15 +178,23 @@ export interface RequestInfo {
 
 /** 响应消息定义 */
 export interface Response {
-  code: number;
-  msg: string;
-  data: { [key: string]: any } | undefined;
+  status: number;
+  message: string;
+  result: { [key: string]: any } | undefined;
 }
 
 export interface LogResponse {
 }
 
+export interface LogList {
+  /** 文档列表 */
+  data: SaveLogRequest[];
+  /** 分页信息 */
+  pagination: Pagination | undefined;
+}
+
 export interface LogService {
   /** 保存走kafka, 不过两种都支持==== */
-  saveLog(request: LogRequest): Observable<LogResponse>;
+  saveLog(request: SaveLogRequest): Observable<LogResponse>;
+  getLogs(request: QueryDTO): Observable<LogList>;
 }

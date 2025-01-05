@@ -7,7 +7,6 @@ import { ErrorLog, StackTrace } from './error.model';
 import { existsSync, readFileSync } from 'fs-extra';
 import { NullableMappedPosition, SourceMapConsumer } from 'source-map';
 import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
-import logger from '@app/utils/logger';
 import * as dayjs from 'dayjs';
 import { join } from 'path';
 import { isEmpty } from 'lodash';
@@ -17,6 +16,9 @@ import { TimeInfo } from '@app/interfaces/request.interface';
 import { groupHourOption, projectHourOption } from '@app/utils/searchCommon';
 import { MetricsName } from '@app/constants/enum.contant';
 import { Cron } from '@nestjs/schedule';
+import { createLogger } from '@app/utils/logger';
+
+const logger = createLogger({ scope: 'ErrorLogService', time: true });
 
 interface SourceInfo {
   context: string | string[];
@@ -95,6 +97,7 @@ export class ErrorLogService implements OnModuleInit {
     const errorResult = await this.errorModel
       .deleteMany({ siteId: siteId })
       .exec();
+    logger.log('站点删除后error日志删除', siteId, errorResult);
     return errorResult;
   }
 

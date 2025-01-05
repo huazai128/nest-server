@@ -3,9 +3,11 @@ import { InjectModel } from '@app/transformers/model.transform';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { ApiLog } from './api.model';
-import logger from '@app/utils/logger';
 import { Cron } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
+import { createLogger } from '@app/utils/logger';
+
+const logger = createLogger({ scope: 'ApiLogService', time: true });
 
 @Injectable()
 export class ApiLogService implements OnModuleInit {
@@ -61,6 +63,7 @@ export class ApiLogService implements OnModuleInit {
    */
   public async siteIdRemove(siteId: MongooseID) {
     const apiResult = await this.apiModel.deleteMany({ siteId: siteId }).exec();
+    logger.log('删除站点后api日志删除', siteId, apiResult);
     return apiResult;
   }
 

@@ -3,7 +3,6 @@ import { MongooseID, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 // import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { InjectModel } from '@app/transformers/model.transform';
-import logger from '@app/utils/logger';
 import { Injectable } from '@nestjs/common';
 import {
   PipelineStage,
@@ -27,7 +26,7 @@ import { Site } from '../site/site.model';
 import { Log, RefType } from './log.model';
 import { UserLogService } from '../user/user.service';
 import { UserLog } from '../user/user.model';
-import { isObject, isString } from 'lodash';
+import { isObject } from 'lodash';
 import { stringToObjectO } from '@app/transformers/value.transform';
 import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
 import * as dayjs from 'dayjs';
@@ -37,7 +36,9 @@ import { Cron } from '@nestjs/schedule';
 import * as sizeof from 'object-sizeof';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { isDevEnv } from '@app/app.env';
-import { LogRequest } from '@app/protos/log';
+import { SaveLogRequest } from '@app/protos/log';
+import { createLogger } from '@app/utils/logger';
+const logger = createLogger({ scope: 'LogService', time: true });
 
 const maxSize = 1048576;
 
@@ -87,11 +88,11 @@ export class LogService {
 
   /**
    * 上报信息
-   * @param {LogRequest} data
+   * @param {SaveLogRequest} data
    * @return {*}  {Promise<any>}
    * @memberof LogService
    */
-  public async create(data: LogRequest): Promise<any> {
+  public async create(data: SaveLogRequest): Promise<any> {
     const startNow = Date.now();
     // 站点放进缓存
     const site = await this.siteModel.findById(data.siteId);
@@ -278,6 +279,7 @@ export class LogService {
    */
   public async siteIdRemove(siteId: MongooseID): Promise<any> {
     const logResult = await this.logModel.deleteMany({ siteId: siteId }).exec();
+    logger.info('删除站点', siteId, logResult);
     return logResult;
   }
 

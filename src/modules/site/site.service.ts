@@ -15,9 +15,9 @@ import { EventLogService } from '../eventLog/eventLog.service';
 import { PrefService } from '../perf/pref.service';
 import { PvLogService } from '../pv/pv.service';
 import { LogService } from '../log/log.service';
-// import { RedisServer } from '@app/processors/redis/redis.server';
 import { getSiteCacheKey } from '@app/constants/cache.contant';
 import { UserLogService } from '../user/user.service';
+import { RedisService } from '@app/processors/redis/redis.service';
 
 @Injectable()
 export class SiteService {
@@ -31,7 +31,7 @@ export class SiteService {
     private readonly pvLogService: PvLogService,
     private readonly prefLogService: PrefService,
     private readonly webLogService: LogService,
-    // private readonly cacheService: RedisServer,
+    private readonly cacheService: RedisService,
     private readonly userLogService: UserLogService,
   ) {}
 
@@ -68,10 +68,11 @@ export class SiteService {
     if (existedSite) {
       throw `${site.name}站点已存在`;
     }
+    console.log(site, '=======');
     const res = await this.siteModel.create({
       ...site,
     });
-    // this.cacheService.set(this.getCacheKey(res._id.toString()), res);
+    this.cacheService.set(this.getCacheKey(res._id.toString()), res);
     return res;
   }
 
@@ -101,7 +102,7 @@ export class SiteService {
       throw `站点${id}没有找到`;
     }
     // 删除缓存
-    // this.cacheService.delete(this.getCacheKey(id.toString()));
+    this.cacheService.del(this.getCacheKey(id.toString()));
     this.deleteSiteLog(id);
     // 缓存删除
     return site;
@@ -120,9 +121,8 @@ export class SiteService {
     if (!site) {
       throw `更新站点不存在`;
     }
-
     // 更新缓存
-    // this.cacheService.set(this.getCacheKey(id.toString()), site);
+    this.cacheService.set(this.getCacheKey(id.toString()), site);
     // 更新缓存
     return site;
   }
@@ -135,17 +135,27 @@ export class SiteService {
    */
   public async getSiteInfo(id?: string): Promise<Site | null> {
     if (!id) return null;
-    // const siteInfoCache = await this.cacheService.get<Site>(
-    //   getSiteCacheKey(id),
-    // );
-    // if (siteInfoCache) {
-    //   return siteInfoCache;
-    // } else {
-    //   const siteInfo = await this.siteModel.findById(id).exec();
-    //   if (siteInfo) {
-    //     await this.cacheService.set(getSiteCacheKey(id + ''), siteInfo);
-    //   }
-    //   return siteInfo;
-    // }
+    const siteInfoCache = await this.cacheService.get<Site>(
+      getSiteCacheKey(id),
+    );
+    if (siteInfoCache) {
+      return siteInfoCache;
+    } else {
+      const siteInfo = await this.siteModel.findById(id).exec();
+      if (siteInfo) {
+        await this.cacheService.set(getSiteCacheKey(id), siteInfo);
+      }
+      return siteInfo;
+    }
+  }
+
+  /**
+   * 根据自增id获取数据
+   * @param {number} id
+   * @return {*}  {Promise<Site>}
+   * @memberof SiteService
+   */
+  public async getByIdSiteInfo(id: number): Promise<Site> {
+    return this.siteModel.findOne({ id: id }).exec();
   }
 }

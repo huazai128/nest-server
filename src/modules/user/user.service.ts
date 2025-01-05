@@ -3,11 +3,12 @@ import { InjectModel } from '@app/transformers/model.transform';
 import { Injectable } from '@nestjs/common';
 import { UserLog } from './user.model';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
-import logger from '@app/utils/logger';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 // import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
 import { Cron } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
+import { createLogger } from '@app/utils/logger';
+const logger = createLogger({ scope: 'LogService', time: true });
 
 @Injectable()
 export class UserLogService {
@@ -72,10 +73,11 @@ export class UserLogService {
    * @memberof UserLogService
    */
   public async siteIdRemove(siteId: MongooseID) {
-    const apiResult = await this.userLogModel
+    const userResult = await this.userLogModel
       .deleteMany({ siteId: siteId })
       .exec();
-    return apiResult;
+    logger.log('站点删除后user日志删除', siteId, userResult);
+    return userResult;
   }
 
   /**

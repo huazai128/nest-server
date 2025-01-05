@@ -65,16 +65,19 @@ class ApiLogDTO extends Report {
   @IsString()
   @prop({ type: String, default: null })
   monitorId: string | null; // 用于记录用户行为，用于错误排查
+
+  @IsString()
+  @prop({ type: String, default: null })
+  queryUrl: string | null;
 }
 
 @index(
-  { ...indexOptions, params: 'text', body: 'text', url: 'text' },
+  { ...indexOptions, params: 'text', url: 'text' },
   {
     name: 'SearchIndex',
     weights: {
       ...indexWeights,
       params: 20,
-      body: 19,
       url: 6,
       traceId: 10,
     },

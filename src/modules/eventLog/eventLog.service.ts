@@ -8,14 +8,16 @@ import {
   Types,
 } from 'mongoose';
 import { EventLog } from './eventLog.model';
-import logger from '@app/utils/logger';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import {
   groupHourOption,
   handleSearchKeys,
   projectHourOption,
 } from '@app/utils/searchCommon';
-import { ChartItem } from './eventLog.interface';
+
+import { createLogger } from '@app/utils/logger';
+
+const logger = createLogger({ scope: 'EventLogService', time: true });
 
 export const KW_KEYS: Array<string> = ['logId', 'logPos', 'logData', 'logName'];
 
@@ -51,6 +53,7 @@ export class EventLogService {
     const eventResult = await this.eventModel
       .deleteMany({ siteId: siteId })
       .exec();
+    logger.log('站点删除后error日志删除', siteId, eventResult);
     return eventResult;
   }
 
