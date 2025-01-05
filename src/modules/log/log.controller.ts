@@ -10,7 +10,7 @@ import {
   projectHourOption,
 } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
-import { LogRequest } from '@app/protos/log';
+import { SaveLogRequest } from '@app/protos/log';
 
 @Controller('log')
 export class LogController {
@@ -22,8 +22,7 @@ export class LogController {
    * @memberof WeblogControll
    */
   @GrpcMethod('LogService', 'saveLog')
-  async saveLog(data: LogRequest) {
-    console.log(data, 'data=====');
+  async saveLog(data: SaveLogRequest) {
     return this.logService.create(data);
   }
 
@@ -75,6 +74,7 @@ export class LogController {
   @GrpcMethod('LogService', 'getLogsByCursor')
   getLogsByCursor(query: any) {
     const { cursor, size, sort, ...filters } = query;
+    console.log(query, 'query');
     let paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     if (query.category) {
       paginateQuery.category = query.category;
