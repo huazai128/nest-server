@@ -68,6 +68,7 @@ class APIRule {
       createdAt: 'create_at',
       updatedAt: 'update_at',
     },
+    // _id: false,
   },
 })
 export class Site {

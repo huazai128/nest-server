@@ -61,18 +61,18 @@ export class SiteService {
    * @return {*}  {Promise<MongooseDoc<Site>>}
    * @memberof SiteService
    */
-  public async createSite(site: Site): Promise<MongooseDoc<Site>> {
+  public async createSite(site: Omit<Site, 'id'>): Promise<MongooseDoc<Site>> {
     const existedSite = await this.siteModel
       .findOne({ name: site.name })
       .exec();
     if (existedSite) {
       throw `${site.name}站点已存在`;
     }
-    console.log(site, '=======');
     const res = await this.siteModel.create({
       ...site,
     });
     this.cacheService.set(this.getCacheKey(res._id.toString()), res);
+
     return res;
   }
 
@@ -114,7 +114,7 @@ export class SiteService {
    * @param {Site} data
    * @memberof SiteService
    */
-  public async update(id: MongooseID, data: Site) {
+  public async update(id: MongooseID, data: Omit<Site, 'id'>) {
     const site = await this.siteModel
       .findByIdAndUpdate(id, data, { new: true })
       .exec();

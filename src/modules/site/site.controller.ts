@@ -21,8 +21,8 @@ export class SiteController {
    * @memberof SiteController
    */
   @GrpcMethod('SiteService', 'saveSite')
-  async saveSite(data: SiteRequest): Promise<Site> {
-    return this.siteService.createSite({ ...data, id: Number(data.id) });
+  async saveSite(data: Omit<SiteRequest, 'id'>): Promise<Site> {
+    return this.siteService.createSite({ ...data });
   }
 
   /**
