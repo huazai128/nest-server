@@ -40,8 +40,6 @@ import { SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 const logger = createLogger({ scope: 'LogService', time: true });
 
-const maxSize = 1048576;
-
 @Injectable()
 export class LogService {
   constructor(

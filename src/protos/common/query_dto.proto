@@ -17,4 +17,5 @@ message QueryDTO {
   int32 page = 12;
   int32 size = 13;
   int32 total = 14;
+  string cursor = 15;
 }

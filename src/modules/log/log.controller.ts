@@ -11,6 +11,7 @@ import {
 } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
 import { SaveLogRequest } from '@app/protos/log';
+import { QueryDTO } from '@app/protos/common/query_dto';
 
 @Controller('log')
 export class LogController {
@@ -33,7 +34,7 @@ export class LogController {
    * @memberof SiteController
    */
   @GrpcMethod('LogService', 'getLogs')
-  getLogs(query: any): Promise<PaginateResult<Log>> {
+  getLogs(query: QueryDTO): Promise<PaginateResult<Log>> {
     const { page, size, sort, ...filters } = query;
     const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     if (query.category) {
@@ -74,7 +75,6 @@ export class LogController {
   @GrpcMethod('LogService', 'getLogsByCursor')
   getLogsByCursor(query: any) {
     const { cursor, size, sort, ...filters } = query;
-    console.log(query, 'query');
     let paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     if (query.category) {
       paginateQuery.category = query.category;

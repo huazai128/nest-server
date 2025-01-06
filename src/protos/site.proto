@@ -7,7 +7,7 @@ service SiteService {
   rpc getSiteList (SiteQuery) returns (stream SiteListRepeonse);
   rpc updateSite(SiteRequest) returns (stream SiteResponse);
   rpc deleteSiteId(SiteResponse) returns (stream SiteResponse);
-  rpc getByIdSiteInfo(SiteResponse) returns (stream SiteResponse);
+  rpc getByIdSiteInfo(SiteResponse) returns (stream SiteDocument);
 }
 
 message SiteDocument {
