@@ -122,7 +122,6 @@ export class LogController {
     const projectOption = projectHourOption();
     const groupOption = groupHourOption(
       {
-        // apiList: { $push: { create_at: '$create_at', hour: '$hour' } },
         count: { $sum: 1 },
       },
       query.timeSlot === 24 * 60 * 60 * 1000,

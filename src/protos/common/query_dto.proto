@@ -8,7 +8,7 @@ message QueryDTO {
   string reportsType = 3;
   string traceId = 4;
   string kw = 5;
-  int32 siteId = 6;
+  string siteId = 6;
   int64 startTime = 7;             // 请求时间
   int64 endTime = 8;            // 响应时间
   int32 timeSlot = 9;

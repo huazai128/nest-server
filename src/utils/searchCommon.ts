@@ -57,7 +57,7 @@ export function handleCommonSearchKeys<T extends SearchDTO>(
 ): FilterQuery<T> {
   const keyParams: FilterQuery<T>['$or'] = [];
   let keyAndParams: FilterQuery<T>['$and'] = [];
-  let matchFilter: FilterQuery<PipelineStage.Match['$match']> = {};
+  const matchFilter: FilterQuery<PipelineStage.Match['$match']> = {};
   if (query.keyId) {
     const trimmed = lodasd.trim(query.keyId);
     ONLY_KEYS.forEach((item) => {

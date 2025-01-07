@@ -14,7 +14,7 @@ export interface QueryDTO {
   reportsType: string;
   traceId: string;
   kw: string;
-  siteId: number;
+  siteId: string;
   /** 请求时间 */
   startTime: number;
   /** 响应时间 */
