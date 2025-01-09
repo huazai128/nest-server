@@ -10,4 +10,5 @@ message Pagination {
   bool hasNextPage = 7;                // 是否有下一页
   int32 prevPage = 8;                  // 上一页编号
   int32 nextPage = 9;                  // 下一页编号
+  string nextCursor = 10; 
 }

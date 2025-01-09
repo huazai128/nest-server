@@ -10,7 +10,7 @@ service LogService {
   // 保存走kafka, 不过两种都支持====
   rpc saveLog (SaveLogRequest) returns (stream LogResponse);
   rpc getLogs (QueryDTO) returns (stream LogList);
-  rpc cursorPaginate(QueryDTO) returns (stream LogList);
+  rpc getLogsByCursor(QueryDTO) returns (stream LogList);
   rpc getLogsChart(QueryDTO) returns (stream ChartList);
 }
 

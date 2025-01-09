@@ -34,9 +34,11 @@ import { Cron } from '@nestjs/schedule';
 import * as sizeof from 'object-sizeof';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { isDevEnv } from '@app/app.env';
-import { SaveLogRequest } from '@app/protos/log';
+import { LogList, SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';
+import { ChartItem } from '@app/protos/common/chart_item';
+import { RpcException } from '@nestjs/microservices';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -220,7 +222,7 @@ export class LogService {
    * @return {*}  {Promise<PaginateResult<Log>>}
    * @memberof LogService
    */
-  public async cursorPaginate(query: PaginateQuery<Log>) {
+  public async cursorPaginate(query: PaginateQuery<Log>): Promise<any> {
     const { cursor, limit, sort, primaryKey, select, populate } = query;
 
     let findQuery = this.logModel.find(query) as any;
@@ -303,11 +305,11 @@ export class LogService {
     return this.logModel
       .aggregate(pipeParams)
       .then((data) => {
-        return data;
+        return data as unknown as ChartItem;
       })
       .catch((err) => {
         logger.error('Log日志聚合查询错误', err);
-        Promise.reject(err);
+        throw new RpcException({ message: 'Log日志聚合查询错误', err });
       });
   }
 

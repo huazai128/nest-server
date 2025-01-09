@@ -10,8 +10,9 @@ import {
   projectHourOption,
 } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
-import { SaveLogRequest } from '@app/protos/log';
+import { LogList, SaveLogRequest } from '@app/protos/log';
 import { QueryDTO } from '@app/protos/common/query_dto';
+import { ChartItem } from '@app/protos/common/chart_item';
 
 @Controller('log')
 export class LogController {
@@ -73,7 +74,8 @@ export class LogController {
    * @memberof SiteController
    */
   @GrpcMethod('LogService', 'getLogsByCursor')
-  getLogsByCursor(query: any) {
+  getLogsByCursor(query: QueryDTO): Promise<LogList> {
+    console.log(query, 'query=========');
     const { cursor, size, sort, ...filters } = query;
     let paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     if (query.category) {
@@ -110,8 +112,9 @@ export class LogController {
    * @memberof WeblogControll
    */
   @GrpcMethod('LogService', 'getLogsChart')
-  getLogsChart(query: any): Promise<any> {
-    const matchFilter = handleSearchKeys<any>(query, KW_KEYS);
+  getLogsChart(query: QueryDTO): Promise<ChartItem> {
+    console.log(query, 'query======');
+    const matchFilter = handleSearchKeys<QueryDTO>(query, KW_KEYS);
     if (query.category) {
       matchFilter.category = query.category;
     }
