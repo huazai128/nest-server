@@ -10,6 +10,6 @@ export const protobufPackage = "";
 
 export interface ChartItem {
   count: string;
-  /** 开始时间 */
+  /** 开始时间 如果是使用Timestamp，将 Date 对象转换为 Timestamp 对象才能传输，为了减少不必要的操作，使用string。 */
   startTime: string;
 }

@@ -62,7 +62,8 @@ export class LogController {
       '-href -path -title -value -_id -params -response -body -ip_location -meta -url';
     paginateOptions.populate = {
       path: 'doce',
-      select: '-siteId -events -stackTrace -breadcrumbs -errorList -_id', //返回的数据过大导致，接口返回request content was evicted from inspector cache
+      select:
+        '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at', //返回的数据过大导致，接口返回request content was evicted from inspector cache
     };
 
     return this.logService.paginate(paginateQuery, paginateOptions);
@@ -98,7 +99,8 @@ export class LogController {
         '-href -path -title -value -params -response -body -ip_location -meta -url',
       populate: {
         path: 'doce',
-        select: '-siteId -events -stackTrace -breadcrumbs -errorList -_id', //返回的数据过大导致，接口返回request content was evicted from inspector cache
+        select:
+          '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at', //返回的数据过大导致，接口返回request content was evicted from inspector cache
       },
       ...paginateQuery,
     };
@@ -113,15 +115,18 @@ export class LogController {
    * @memberof LogController
    */
   @GrpcMethod('LogService', 'getLogsChart')
-  getLogsChart(data: LogChartQueryDTO): Promise<ChartList> {
+  @GrpcMethod('LogService', 'getLogsChart')
+  async getLogsChart(data: LogChartQueryDTO): Promise<ChartList> {
     const query = plainToClass(LogChartQueryDTO, data);
     const matchFilter = handleSearchKeys<LogChartQueryDTO>(query, KW_KEYS);
+
     if (query.category) {
       matchFilter.category = query.category;
     }
     if (query.reportsType) {
       matchFilter.reportsType = query.reportsType;
     }
+
     const isGreaterEight = query.timeSlot > 8 * 60 * 60 * 1000;
     const projectOption = projectHourOption();
     const groupOption = groupHourOption(
@@ -130,6 +135,7 @@ export class LogController {
       },
       query.timeSlot === 24 * 60 * 60 * 1000,
     );
+
     const dayPipe: PipelineStage[] = [
       { $match: matchFilter },
       { ...projectOption },
@@ -145,6 +151,7 @@ export class LogController {
       },
       { $sort: { startTime: 1 } },
     ];
+
     const pipe: PipelineStage[] = [
       { $match: matchFilter },
       {
@@ -160,23 +167,25 @@ export class LogController {
               },
             ],
           },
-          // apiList: { $push: { create_at: '$create_at' } }, //查看时间段内的数据
           count: { $sum: 1 },
         },
       },
       {
         $project: {
           _id: 0,
-          apiList: 1,
           count: 1,
           startTime: { $add: [new Date(0), '$_id'] },
         },
       },
       { $sort: { startTime: 1 } },
     ];
-    return this.logService.aggregation(isGreaterEight ? dayPipe : pipe);
-  }
 
+    // 使用批量处理优化查询
+    const results = await this.logService.aggregation(
+      isGreaterEight ? dayPipe : pipe,
+    );
+    return results;
+  }
   /**
    * 根据不同类型分页聚合统计数据
    * @param {any} query

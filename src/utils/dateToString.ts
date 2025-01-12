@@ -15,3 +15,19 @@ export function convertDatesToString(obj: any): any {
   }
   return obj;
 }
+
+/**
+ * 将数组中的 Date 字段转换为 String
+ * @export
+ * @param {any[]} arr
+ * @return {*}  {any[]}
+ */
+export function convertArrayDatesToString(arr: any[]): any[] {
+  return arr.map((item) => {
+    return {
+      ...item.toObject(),
+      create_at: dayjs(item.create_at).format('YYYY-MM-DD HH:mm:ss'),
+      update_at: dayjs(item.update_at).format('YYYY-MM-DD HH:mm:ss'),
+    };
+  });
+}

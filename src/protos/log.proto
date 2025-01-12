@@ -2,7 +2,6 @@ syntax = "proto3";
 package logproto;
 import public "common/pagination.proto";
 import "google/protobuf/struct.proto"; // 导入 google 的结构类型
-import "google/protobuf/timestamp.proto"; // 导入时间戳类型
 import public "common/query_dto.proto";
 import public "common/chart_item.proto";
 
@@ -32,8 +31,8 @@ message SaveLogRequest {
   Response response = 15;             // 响应
   string value = 16;                  // 错误信息
   string ip = 17;                     // IP 地址
-  google.protobuf.Timestamp create_at = 18; // 创建时间
-  google.protobuf.Timestamp update_at = 19; // 更新时间
+  string create_at = 18; // 创建时间
+  string update_at = 19; // 更新时间
   string traceId = 20;                // 追踪 ID
   string monitorId = 21;              // 
   string nodeId = 22;                 // 标签id

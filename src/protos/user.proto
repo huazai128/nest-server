@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package userproto;
 
-import "google/protobuf/timestamp.proto";
 
 // import public "orders/service.proto";
 
@@ -25,7 +24,7 @@ message getUsersResponse {
 message User {
     int32 id = 1;
     string name = 2;
-    google.protobuf.Timestamp createdAt = 3;
+    string createdAt = 3;
 }
 
 message Order {

@@ -38,7 +38,10 @@ import { ChartList, SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';
 import { RpcException } from '@nestjs/microservices';
-import { convertDatesToString } from '@app/utils/dateToString';
+import {
+  convertArrayDatesToString,
+  convertDatesToString,
+} from '@app/utils/dateToString';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -262,8 +265,9 @@ export class LogService {
         ? items[items.length - 1][primaryKey]
         : null;
 
+    const list = convertArrayDatesToString(items || []);
     return {
-      data: items || [],
+      data: list || [],
       pagination: {
         hasNextPage,
         nextCursor,
@@ -297,16 +301,29 @@ export class LogService {
   }
 
   /**
+   * 确保索引
+   * @memberof LogService
+   */
+  async ensureIndexes() {
+    await this.logModel.createIndexes({
+      create_at: 1,
+      category: 1,
+      reportsType: 1,
+    } as any);
+  }
+
+  /**
    * 聚合查询统计数据
    * @param {PipelineStage[]} pipeParams
    * @memberof LogService
    */
-  public async aggregation(pipeParams: PipelineStage[]) {
+  // 聚合查询统计数据
+  public async aggregation(pipeParams: PipelineStage[]): Promise<ChartList> {
     return this.logModel
       .aggregate(pipeParams)
+      .allowDiskUse(true) // 允许使用磁盘进行临时文件存储，这里还是有慎用，怕磁盘IO过大
       .then((data) => {
         const list = convertDatesToString(data);
-        console.log(list, 'data--');
         return { data: list } as unknown as ChartList;
       })
       .catch((err) => {
@@ -314,7 +331,6 @@ export class LogService {
         throw new RpcException({ message: 'Log日志聚合查询错误', err });
       });
   }
-
   /**
    *  报错错误录制
    * @param {RecordVideo} data

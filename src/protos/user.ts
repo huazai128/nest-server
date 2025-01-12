@@ -19,7 +19,7 @@ export interface getUsersResponse {
 export interface User {
   id: number;
   name: string;
-  createdAt: Date | undefined;
+  createdAt: string;
 }
 
 export interface Order {

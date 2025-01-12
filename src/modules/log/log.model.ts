@@ -54,7 +54,15 @@ export const LOG_REF_TYPE = [
 ];
 
 @index(
-  { title: 'text', href: 'text', url: 'text', value: 'text', create_at: 1 },
+  {
+    title: 'text',
+    href: 'text',
+    url: 'text',
+    value: 'text',
+    create_at: 1,
+    category: 1,
+    reportsType: 1,
+  },
   {
     name: 'SearchIndex',
     weights: {

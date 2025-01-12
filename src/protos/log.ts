@@ -56,13 +56,9 @@ export interface SaveLogRequest {
   /** IP 地址 */
   ip: string;
   /** 创建时间 */
-  createAt:
-    | Date
-    | undefined;
+  createAt: string;
   /** 更新时间 */
-  updateAt:
-    | Date
-    | undefined;
+  updateAt: string;
   /** 追踪 ID */
   traceId: string;
   /**  */

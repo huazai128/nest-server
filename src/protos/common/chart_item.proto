@@ -1,8 +1,8 @@
 syntax = "proto3";
-import "google/protobuf/timestamp.proto"; // 导入时间戳类型
 
 
 message ChartItem {
   string count = 1;
-  string startTime = 2; // 开始时间
+  string startTime = 2; // 开始时间 如果是使用Timestamp，将 Date 对象转换为 Timestamp 对象才能传输，为了减少不必要的操作，使用string。
+
 }
