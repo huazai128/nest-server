@@ -31,14 +31,14 @@ import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm'
 // import { KafkaService } from '@app/processors/kafka/kafka.service';
 import { TopicPartitionOffsetAndMetadata } from '@nestjs/microservices/external/kafka.interface';
 import { Cron } from '@nestjs/schedule';
-import * as sizeof from 'object-sizeof';
+// import * as sizeof from 'object-sizeof';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { isDevEnv } from '@app/app.env';
-import { LogList, SaveLogRequest } from '@app/protos/log';
+import { ChartList, SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';
-import { ChartItem } from '@app/protos/common/chart_item';
 import { RpcException } from '@nestjs/microservices';
+import { convertDatesToString } from '@app/utils/dateToString';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -305,7 +305,9 @@ export class LogService {
     return this.logModel
       .aggregate(pipeParams)
       .then((data) => {
-        return data as unknown as ChartItem;
+        const list = convertDatesToString(data);
+        console.log(list, 'data--');
+        return { data: list } as unknown as ChartList;
       })
       .catch((err) => {
         logger.error('Log日志聚合查询错误', err);

@@ -16,10 +16,10 @@ export interface QueryDTO {
   kw: string;
   siteId: string;
   /** 请求时间 */
-  startTime: number;
+  startTime: string;
   /** 响应时间 */
-  endTime: number;
-  timeSlot: number;
+  endTime: string;
+  timeSlot: string;
   keyId: string;
   keywordParmas: { [key: string]: any } | undefined;
   page: number;

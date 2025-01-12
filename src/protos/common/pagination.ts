@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 
-export const protobufPackage = '';
+export const protobufPackage = "";
 
 export interface Pagination {
   /** 文档总数 */
@@ -26,7 +26,6 @@ export interface Pagination {
   /** 上一页编号 */
   prevPage: number;
   /** 下一页编号 */
-  nextPage?: number;
-
-  nextCursor?: string;
+  nextPage: number;
+  nextCursor: string;
 }

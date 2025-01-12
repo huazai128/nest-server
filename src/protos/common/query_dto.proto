@@ -9,9 +9,9 @@ message QueryDTO {
   string traceId = 4;
   string kw = 5;
   string siteId = 6;
-  int64 startTime = 7;             // 请求时间
-  int64 endTime = 8;            // 响应时间
-  int32 timeSlot = 9;
+  string startTime = 7;             // 请求时间
+  string endTime = 8;               // 响应时间
+  string timeSlot = 9;
   string keyId = 10;
   google.protobuf.Struct keywordParmas = 11;
   int32 page = 12;

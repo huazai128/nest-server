@@ -10,6 +10,6 @@ export const protobufPackage = "";
 
 export interface ChartItem {
   count: string;
-  /** 创建时间 */
-  startTime: Date | undefined;
+  /** 开始时间 */
+  startTime: string;
 }

@@ -10,9 +10,9 @@ import {
   projectHourOption,
 } from '@app/utils/searchCommon';
 import { GrpcMethod } from '@nestjs/microservices';
-import { LogList, SaveLogRequest } from '@app/protos/log';
-import { QueryDTO } from '@app/protos/common/query_dto';
-import { ChartItem } from '@app/protos/common/chart_item';
+import { ChartList, LogList, SaveLogRequest } from '@app/protos/log';
+import { LogChartQueryDTO, LogPaginateQueryDTO } from './log.dto';
+import { plainToClass } from 'class-transformer';
 
 @Controller('log')
 export class LogController {
@@ -30,14 +30,15 @@ export class LogController {
 
   /**
    * 获取所有日志
-   * @param {SitePaginateDTO} query
-   * @return {*}
-   * @memberof SiteController
+   * @param {LogPaginateQueryDTO} params
+   * @return {*}  {Promise<PaginateResult<Log>>}
+   * @memberof LogController
    */
   @GrpcMethod('LogService', 'getLogs')
-  getLogs(query: QueryDTO): Promise<PaginateResult<Log>> {
+  getLogs(params: LogPaginateQueryDTO): Promise<PaginateResult<Log>> {
+    const query = plainToClass(LogPaginateQueryDTO, params);
     const { page, size, sort, ...filters } = query;
-    const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
+    const paginateQuery = handleSearchKeys<LogPaginateQueryDTO>(query, KW_KEYS);
     if (query.category) {
       paginateQuery.category = query.category;
     }
@@ -68,14 +69,14 @@ export class LogController {
   }
 
   /**
-   * 获取所有日志
-   * @param {SitePaginateDTO} query
-   * @return {*}
-   * @memberof SiteController
+   * 根据游标获取日志
+   * @param {LogPaginateQueryDTO} data
+   * @return {*}  {Promise<LogList>}
+   * @memberof LogController
    */
   @GrpcMethod('LogService', 'getLogsByCursor')
-  getLogsByCursor(query: QueryDTO): Promise<LogList> {
-    console.log(query, 'query=========');
+  getLogsByCursor(data: LogPaginateQueryDTO): Promise<LogList> {
+    const query = plainToClass(LogPaginateQueryDTO, data);
     const { cursor, size, sort, ...filters } = query;
     let paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
     if (query.category) {
@@ -106,15 +107,15 @@ export class LogController {
   }
 
   /**
-   * 获取图表数据
-   * @param {any} query
-   * @return {*}  {Promise<any>}
-   * @memberof WeblogControll
+   * 获取日志图表数据
+   * @param {LogChartQueryDTO} data
+   * @return {*}  {Promise<ChartItem>}
+   * @memberof LogController
    */
   @GrpcMethod('LogService', 'getLogsChart')
-  getLogsChart(query: QueryDTO): Promise<ChartItem> {
-    console.log(query, 'query======');
-    const matchFilter = handleSearchKeys<QueryDTO>(query, KW_KEYS);
+  getLogsChart(data: LogChartQueryDTO): Promise<ChartList> {
+    const query = plainToClass(LogChartQueryDTO, data);
+    const matchFilter = handleSearchKeys<LogChartQueryDTO>(query, KW_KEYS);
     if (query.category) {
       matchFilter.category = query.category;
     }

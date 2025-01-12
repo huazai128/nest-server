@@ -1,10 +1,8 @@
 syntax = "proto3";
-
 import "google/protobuf/timestamp.proto"; // 导入时间戳类型
 
 
 message ChartItem {
   string count = 1;
-  google.protobuf.Timestamp startTime = 18; // 创建时间
-
+  string startTime = 2; // 开始时间
 }
