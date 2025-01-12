@@ -266,6 +266,7 @@ export class LogService {
         : null;
 
     const list = convertArrayDatesToString(items || []);
+    console.log('list', list);
     return {
       data: list || [],
       pagination: {

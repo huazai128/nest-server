@@ -24,6 +24,14 @@ export function convertDatesToString(obj: any): any {
  */
 export function convertArrayDatesToString(arr: any[]): any[] {
   return arr.map((item) => {
+    console.log(item.doce.toObject(), '=======');
+    if (item.doce) {
+      return {
+        ...item.toObject(),
+        create_at: dayjs(item.create_at).format('YYYY-MM-DD HH:mm:ss'),
+        update_at: dayjs(item.update_at).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    }
     return {
       ...item.toObject(),
       create_at: dayjs(item.create_at).format('YYYY-MM-DD HH:mm:ss'),

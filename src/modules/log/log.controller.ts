@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, UseInterceptors } from '@nestjs/common';
 import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
 import { KW_KEYS } from '@app/constants/value.constant';
 import { LogService } from './log.service';
@@ -13,8 +13,10 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { ChartList, LogList, SaveLogRequest } from '@app/protos/log';
 import { LogChartQueryDTO, LogPaginateQueryDTO } from './log.dto';
 import { plainToClass } from 'class-transformer';
+import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 
 @Controller('log')
+@UseInterceptors(LoggingInterceptor)
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
@@ -63,7 +65,7 @@ export class LogController {
     paginateOptions.populate = {
       path: 'doce',
       select:
-        '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at', //返回的数据过大导致，接口返回request content was evicted from inspector cache
+        '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at -onModel', //返回的数据过大导致，接口返回request content was evicted from inspector cache
     };
 
     return this.logService.paginate(paginateQuery, paginateOptions);
@@ -100,7 +102,7 @@ export class LogController {
       populate: {
         path: 'doce',
         select:
-          '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at', //返回的数据过大导致，接口返回request content was evicted from inspector cache
+          '-siteId -events -stackTrace -breadcrumbs -errorList -_id -create_at -update_at -onModel', //返回的数据过大导致，接口返回request content was evicted from inspector cache
       },
       ...paginateQuery,
     };
