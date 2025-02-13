@@ -38,10 +38,7 @@ import { ChartList, SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';
 import { RpcException } from '@nestjs/microservices';
-import {
-  convertArrayDatesToString,
-  convertDatesToString,
-} from '@app/utils/dateToString';
+import { convertDatesToString } from '@app/utils/dateToString';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -265,8 +262,17 @@ export class LogService {
         ? items[items.length - 1][primaryKey]
         : null;
 
-    const list = convertArrayDatesToString(items || []);
-    console.log('list', list);
+    const list = items.map((item) => {
+      const { doce, ...obj } = item.toObject();
+      console.log(obj.doce, '====dasd');
+      return {
+        ...obj,
+        ...doce,
+        create_at: dayjs(item.create_at).format('YYYY-MM-DD HH:mm:ss'),
+        update_at: dayjs(item.update_at).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
+    console.log(list, 'list====');
     return {
       data: list || [],
       pagination: {
@@ -322,7 +328,7 @@ export class LogService {
   public async aggregation(pipeParams: PipelineStage[]): Promise<ChartList> {
     return this.logModel
       .aggregate(pipeParams)
-      .allowDiskUse(true) // 允许使用磁盘进行临时文件存储，这里还是有慎用，怕磁盘IO过大
+      .allowDiskUse(true) // 允许使用磁盘进行临时文件存储
       .then((data) => {
         const list = convertDatesToString(data);
         return { data: list } as unknown as ChartList;
