@@ -31,44 +31,50 @@ import {
   TransportCategory,
 } from '@app/constants/enum.contant';
 
+// 定义内容类型接口
 export type Content = { name: string };
 
+// 定义日志引用类型枚举
 export enum RefType {
-  ApiLog = 'ApiLog',
-  EventLog = 'EventLog',
-  ErrorLog = 'ErrorLog',
-  PrefLog = 'PrefLog',
-  PvLog = 'PvLog',
-  CustomLog = 'CustomLog',
-  UserLog = 'UserLog',
+  ApiLog = 'ApiLog', // API日志
+  EventLog = 'EventLog', // 事件日志
+  ErrorLog = 'ErrorLog', // 错误日志
+  PrefLog = 'PrefLog', // 性能日志
+  PvLog = 'PvLog', // 页面访问日志
+  CustomLog = 'CustomLog', // 自定义日志
+  UserLog = 'UserLog', // 用户行为日志
 }
 
+// 日志引用类型常量
 export const LOG_REF_TYPE = [
   RefType.ApiLog,
   RefType.EventLog,
   RefType.ErrorLog,
-  RefType.EventLog,
   RefType.PrefLog,
   RefType.PvLog,
   RefType.UserLog,
 ];
 
+// 优化搜索索引配置
 @index(
   {
     title: 'text',
     href: 'text',
     url: 'text',
     value: 'text',
-    create_at: 1,
+    create_at: -1, // 修改为降序,提高最新数据查询效率
     category: 1,
     reportsType: 1,
   },
   {
     name: 'SearchIndex',
     weights: {
-      url: 6,
-      value: 5,
+      url: 6, // url权重
+      value: 5, // 值权重
+      title: 4, // 添加标题权重
+      href: 3, // 添加href权重
     },
+    background: true, // 后台创建索引,避免阻塞
   },
 )
 @plugin(AutoIncrementID, {
@@ -91,7 +97,7 @@ export const LOG_REF_TYPE = [
   },
 })
 export class Log {
-  @prop({ unique: true }) // 设置唯一索引
+  @prop({ unique: true, index: true }) // 添加索引提升查询性能
   id: number;
 
   @IsIn([...MetricsTypes, ...MechanismTypes])
@@ -117,6 +123,7 @@ export class Log {
     enum: TransportCategory,
     required: true,
     default: TransportCategory.API,
+    index: true, // 添加索引提升分类查询性能
   })
   category: TransportCategory;
 
@@ -162,7 +169,7 @@ export class Log {
   @prop({
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
-    default: undefined,
+    default: null, // 修改默认值为null
   })
   params: object | null;
 
@@ -185,11 +192,11 @@ export class Log {
   update_at?: Date;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, index: true }) // 添加索引提升追踪查询性能
   traceId: string | null;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
   monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 

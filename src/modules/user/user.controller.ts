@@ -11,44 +11,68 @@ import { UserLogService } from './user.service';
 import { TransportCategory } from '@app/constants/enum.contant';
 import { GrpcMethod } from '@nestjs/microservices';
 
+// 定义搜索关键字列表
 const KW_KEYS: Array<string> = ['content', 'communityId'];
 
+/**
+ * 用户日志控制器
+ */
 @Controller('userLog')
 export class UserLogController {
   constructor(private readonly userLogService: UserLogService) {}
 
+  /**
+   * 获取错误日志列表(分页)
+   * @param query 查询参数
+   * @returns 分页结果
+   */
   @GrpcMethod('UserLogService', 'getErrorLogs')
   getErrorLogs(query: any): Promise<PaginateResult<UserLog>> {
-    const { page, size, sort, ...filters } = query;
-    const paginateOptions: PaginateOptions = { page, limit: size };
-    const paginateQuery = handleSearchKeys<any>(query, KW_KEYS);
-    paginateQuery.category = TransportCategory.USER;
-    if (!isUndefined(sort)) {
-      paginateOptions.sort = { _id: sort };
-    } else {
-      paginateOptions.sort = { _id: -1 };
-    }
-    paginateOptions.select = '-events -breadcrumbs -errorList';
+    const { page, size, sort } = query;
+    // 设置分页选项
+    const paginateOptions: PaginateOptions = {
+      page,
+      limit: size,
+      sort: !isUndefined(sort) ? { _id: sort } : { _id: -1 },
+      select: '-events -breadcrumbs -errorList', // 排除不需要的字段
+    };
+
+    // 构建查询条件
+    const paginateQuery = {
+      ...handleSearchKeys<any>(query, KW_KEYS),
+      category: TransportCategory.USER,
+    };
+
     return this.userLogService.paginate(paginateQuery, paginateOptions);
   }
 
+  /**
+   * 获取错误列表(聚合统计)
+   * @param query 查询参数
+   * @returns 聚合结果
+   */
   @GrpcMethod('UserLogService', 'getErrorList')
   getErrorList(query: any) {
-    const matchFilter = handleSearchKeys<any>(query, KW_KEYS);
-    matchFilter.category = TransportCategory.USER;
+    // 构建基础查询条件
+    const matchFilter = {
+      ...handleSearchKeys<any>(query, KW_KEYS),
+      category: TransportCategory.USER,
+    };
+
     const isGreaterEight = query.timeSlot > 8 * 60 * 60 * 1000;
-    const projectOption = projectHourOption({ value: 1 });
-    const groupOption = groupHourOption(
-      {
-        valueList: { $addToSet: { value: 'value' } },
-        count: { $sum: 1 },
-      },
-      query.timeSlot === 24 * 60 * 60 * 1000,
-    );
+    const isDayPeriod = query.timeSlot === 24 * 60 * 60 * 1000;
+
+    // 按小时聚合的管道
     const dayPipe: PipelineStage[] = [
       { $match: matchFilter },
-      { ...projectOption },
-      { ...groupOption },
+      projectHourOption({ value: 1 }),
+      groupHourOption(
+        {
+          valueList: { $addToSet: { value: 'value' } },
+          count: { $sum: 1 },
+        },
+        isDayPeriod,
+      ),
       {
         $project: {
           _id: 0,
@@ -60,7 +84,9 @@ export class UserLogController {
       },
       { $sort: { startTime: 1 } },
     ];
-    const pipe: PipelineStage[] = [
+
+    // 按时间段聚合的管道
+    const periodPipe: PipelineStage[] = [
       { $match: matchFilter },
       {
         $group: {
@@ -92,13 +118,14 @@ export class UserLogController {
       },
       { $sort: { startTime: 1 } },
     ];
-    return this.userLogService.aggregate(isGreaterEight ? dayPipe : pipe);
+
+    return this.userLogService.aggregate(isGreaterEight ? dayPipe : periodPipe);
   }
 
   /**
-   * 根据ID获取错误信息, 要放在最后
-   * @param {QueryParamsResult} { params }
-   * @memberof ErrorLogController
+   * 根据ID获取错误详情
+   * @param params 包含id的参数对象
+   * @returns 错误详情
    */
   @GrpcMethod('UserLogService', 'getErrorInfo')
   getErrorInfo(params) {

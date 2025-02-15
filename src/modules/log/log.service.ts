@@ -42,6 +42,11 @@ import { convertDatesToString } from '@app/utils/dateToString';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
+/**
+ * 日志服务
+ * @export
+ * @class LogService
+ */
 @Injectable()
 export class LogService {
   constructor(
@@ -264,7 +269,6 @@ export class LogService {
 
     const list = items.map((item) => {
       const { doce, ...obj } = item.toObject();
-      console.log(obj.doce, '====dasd');
       return {
         ...obj,
         ...doce,
@@ -272,7 +276,6 @@ export class LogService {
         update_at: dayjs(item.update_at).format('YYYY-MM-DD HH:mm:ss'),
       };
     });
-    console.log(list, 'list====');
     return {
       data: list || [],
       pagination: {

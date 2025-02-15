@@ -17,6 +17,11 @@ interface Alarm {
   markdown: object;
 }
 
+/**
+ * 告警服务
+ * @export
+ * @class HelperServiceAlarn
+ */
 @Injectable()
 export class HelperServiceAlarn {
   constructor(

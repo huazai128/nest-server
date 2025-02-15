@@ -24,7 +24,6 @@ export function convertDatesToString(obj: any): any {
  */
 export function convertArrayDatesToString(arr: any[]): any[] {
   return arr.map((item) => {
-    console.log(item.doce.toObject(), '=======');
     if (item.doce) {
       return {
         ...item.toObject(),
