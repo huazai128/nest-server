@@ -14,17 +14,13 @@ export const protobufPackage = "logproto";
 
 export interface SaveLogRequest {
   /** 唯一索引 */
-  id: number;
+  id: string;
   /** 报告类型 */
   reportsType: string;
   /** 站点 ID */
   siteId: string;
   /** 模型引用类型 */
   onModel: string;
-  /** 内容引用 */
-  doce:
-    | { [key: string]: any }
-    | undefined;
   /** 日志类别 */
   category: string;
   /** 用户 ID */
@@ -127,6 +123,44 @@ export interface SaveLogRequest {
   content: string;
   /** 元数据 */
   meta: Meta | undefined;
+  Id: string;
+  lang: string;
+  /** 可空字段 */
+  uaResult: string;
+  /** 可空字段 */
+  winScreen: string;
+  /** 可空字段 */
+  docScreen: string;
+  /** 可空字段 */
+  referrer: string;
+  /** 可空字段 */
+  prevHref: string;
+  /** 可空字段 */
+  jumpType: string;
+  type: number;
+  /** 可空字段 */
+  effectiveType: string;
+  /** 可空字段 */
+  mode: string;
+  /** 可空字段 */
+  ipLocation: string;
+  tagText: string;
+  /** 可空字段 */
+  tagName: string;
+  /** 可空字段 */
+  nodeDom: string;
+  /** 数组 */
+  classList: string[];
+  /** 可空字段 */
+  logName: string;
+  /** 可空字段 */
+  logData: string;
+  /** 可空字段 */
+  logPos: string;
+  /** 可空字段 */
+  logId: string;
+  /** 可空字段 */
+  errorDetail: string;
 }
 
 export interface Meta {

@@ -3,7 +3,7 @@ import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
 import { KW_KEYS } from '@app/constants/value.constant';
 import { LogService } from './log.service';
 import { Log } from './log.model';
-import { isUndefined } from 'lodash';
+import { isUndefined, omitBy, isNil } from 'lodash';
 import {
   groupHourOption,
   handleSearchKeys,
@@ -14,7 +14,19 @@ import { ChartList, LogList, SaveLogRequest } from '@app/protos/log';
 import { LogChartQueryDTO, LogPaginateQueryDTO } from './log.dto';
 import { plainToClass } from 'class-transformer';
 import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
+import { createLogger } from '@app/utils/logger';
+import { getUaInfo } from '@app/utils/util';
 
+const logger = createLogger({
+  scope: 'LogController',
+  time: true,
+});
+
+/**
+ * 日志控制器
+ * @export
+ * @class LogController
+ */
 @Controller('log')
 @UseInterceptors(LoggingInterceptor)
 export class LogController {
@@ -27,7 +39,11 @@ export class LogController {
    */
   @GrpcMethod('LogService', 'saveLog')
   async saveLog(data: SaveLogRequest) {
-    return this.logService.create(data);
+    const cleanedData = omitBy(data, isNil);
+    //
+    cleanedData.ua_result = getUaInfo(cleanedData.ua);
+    logger.info(`日志接收数据${cleanedData.reportsType}`, cleanedData);
+    return this.logService.create(cleanedData);
   }
 
   /**
