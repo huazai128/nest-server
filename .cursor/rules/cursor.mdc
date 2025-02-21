@@ -1,0 +1,113 @@
+---
+description: Nest.js, Mongoose, Redis, and Typegoose coding standards and best practices
+globs: *
+---
+
+
+# Nest.js, Mongoose, Redis, Typegoose, TypeScript, and gRPC Server Development Standards
+
+基础规范:
+  - 使用 2 空格缩进。
+  - 优先使用 `const` 声明变量，`let` 仅在需要可变时使用。
+  - 显式声明函数返回类型，以增强可读性和可维护性。
+
+Typegoose 规范:
+  - 使用 Typegoose 定义 Mongoose 模型，确保使用装饰器（如 `@ObjectType`、`@prop`）来定义模型属性。
+  - 明确声明每个属性的类型和验证规则，避免使用 `any`。
+  - 使用 `@pre` 和 `@post` 钩子处理数据的预处理和后处理。
+  示例:
+    code: |
+      import { prop, getModelForClass } from '@typegoose/typegoose';
+
+      class User {
+        @prop({ required: true })
+        username: string;
+
+        @prop({ required: true, unique: true })
+        email: string;
+      }
+
+      const UserModel = getModelForClass(User);
+
+Mongoose 规范:
+  - 遵循 Mongoose 的最佳实践，使用 Schema 定义模型。
+  - 使用中间件（middleware）处理常见操作，如验证和数据清理。
+  - 尽量使用静态方法和实例方法来封装复杂的数据库操作。
+
+Redis 规范:
+  - 使用 Redis 作为缓存层，缓存频繁访问的数据，提升性能。
+  - 针对数据的使用场景设计合理的缓存策略（如过期时间）。
+  - 使用 Redis 事务（MULTI/EXEC）处理多个操作的原子性。
+  示例:
+    code: |
+      import { Injectable, Inject } from '@nestjs/common';
+      import { Redis } from 'ioredis';
+
+      @Injectable()
+      export class CacheService {
+        constructor(@Inject('REDIS_CLIENT') private readonly redisClient: Redis) {}
+
+        async set(key: string, value: any, ttl: number): Promise<void> {
+          await this.redisClient.set(key, JSON.stringify(value), 'EX', ttl);
+        }
+
+        async get<T>(key: string): Promise<T | null> {
+          const value = await this.redisClient.get(key);
+          return value ? JSON.parse(value) : null;
+        }
+      }
+
+gRPC 规范:
+  - 使用 Protocol Buffers (protobuf) 定义 gRPC 服务和消息格式。
+  - 确保服务的接口文档清晰且易于理解。
+  - 在 Nest.js 中使用 `@GrpcMethod` 装饰器定义 gRPC 服务方法。
+  示例:
+    code: |
+      import { Controller } from '@nestjs/common';
+      import { GrpcMethod } from '@nestjs/microservices';
+
+      @Controller()
+      export class UserController {
+        @GrpcMethod('UserService', 'GetUser')
+        getUser(data: { id: string }): { username: string } {
+          // 业务逻辑
+          return { username: 'exampleUser' };
+        }
+      }
+
+代码结构和风格:
+  - 遵循 Nest.js 的模块化结构，使用 `@Module` 装饰器组织代码。
+  - 将控制器、服务和模块分开，确保职责清晰。
+  - 使用语义化的文件和目录命名，以提高可读性。
+
+命名约定:
+  - 使用小写字母和短杠作为目录名称（例如，`users-module`）。
+  - 控制器和服务名称应采用 PascalCase，文件名统一使用 kebab-case。
+  - 路由路径应使用小写字母和斜杠（例如，`/users`）。
+
+版本控制:
+  - 遵循分支命名约定：`feature/<功能名称>`、`bugfix/<错误描述>`。
+  - 提交信息应简洁明了，包含变更的目的和影响，使用动词开头。
+
+性能优化:
+  - 使用 Redis 实现数据的懒加载和缓存，减少数据库压力。
+  - 优化 Mongoose 查询，使用 `lean()` 方法提高查询性能。
+  - 定期监控和分析数据库和 gRPC 服务的性能，调整索引和查询策略。
+
+安全性:
+  - 对所有用户输入进行验证，以防止 SQL 注入和 XSS 攻击。
+  - 确保使用 HTTPS 与任何 API 进行安全通信，保护用户数据。
+  - 对敏感数据进行加密存储，确保用户隐私安全。
+
+日志管理:
+  - 使用 Nest.js 提供的日志服务，记录重要事件和错误。
+  - 定期监控和分析日志，以便于排查问题和优化性能。
+
+测试:
+  - 编写单元测试和集成测试，确保代码质量。
+  - 使用 Jest 作为测试框架，遵循 Nest.js 的测试规范。
+  - 针对 gRPC 服务编写测试，确保接口的稳定性和正确性。
+
+无障碍访问:
+  - 确保遵循无障碍访问标准（a11y），使用 ARIA 角色和标签。
+  - 支持文本缩放和高对比度，以提高可访问性，确保所有用户均能顺利使用应用。
