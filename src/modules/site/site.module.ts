@@ -11,6 +11,11 @@ import { LogModule } from '../log/log.module';
 import { UserLogModule } from '../user/user.module';
 import { ErrorLogModule } from '../error/error.module';
 
+/**
+ * 站点模块
+ * 负责站点相关功能的管理,包括站点的CRUD操作
+ * 依赖多个日志模块来记录站点相关的各类日志
+ */
 @Module({
   imports: [
     ApiLogModule,

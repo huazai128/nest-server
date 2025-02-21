@@ -17,27 +17,39 @@ import {
   IsDefined,
   IsUrl,
   IsArray,
+  IsOptional,
 } from 'class-validator';
 import { PublishState, ReportStatus } from '@app/constants/enum.contant';
 
+// 站点发布状态枚举值
 export const SITE_PUBLISH_STATES = [
-  PublishState.Draft,
-  PublishState.Published,
-  PublishState.Recycle,
-] as const;
-export const SITE_REPOST_STATES = [
-  ReportStatus.NotReport,
-  ReportStatus.Report,
+  PublishState.Draft, // 草稿
+  PublishState.Published, // 已发布
+  PublishState.Recycle, // 回收站
 ] as const;
 
+// 站点上报状态枚举值
+export const SITE_REPOST_STATES = [
+  ReportStatus.NotReport, // 不上报
+  ReportStatus.Report, // 上报
+] as const;
+
+/**
+ * API告警规则配置类
+ */
 class APIRule {
   @IsNotEmpty({ message: '告警规则的接口名称不能为空' })
-  @prop({ type: String, required: true })
+  @IsString()
+  @prop({ type: String, required: true, trim: true })
   apiUrlPattern: string; // 指定接口名称，传'*'时对所有接口生效
 
-  @prop({ type: String })
+  @IsOptional()
+  @IsString()
+  @prop({ type: String, trim: true })
   key?: string; // 指定需要检查的接口返回字段
 
+  @IsOptional()
+  @IsArray()
   @prop({
     type: () => [Schema.Types.Mixed],
     default: undefined,
@@ -45,14 +57,19 @@ class APIRule {
   })
   enums?: any[]; // 指定枚举值，接口对应字段如果在enums中不上报
 
-  @prop({ type: Boolean })
+  @IsOptional()
+  @prop({ type: Boolean, default: false })
   allowEmpty?: boolean; // true 空值不上报 false 空值上报
 
-  @prop({ type: Boolean })
+  @IsOptional()
+  @prop({ type: Boolean, default: false })
   ignore?: boolean; // true此api不上报
 }
 
-@index({ name: 'text', reportUrl: 'text' })
+/**
+ * 站点模型定义
+ */
+@index({ name: 'text', reportUrl: 'text' }) // 为name和reportUrl字段创建文本索引
 @plugin(AutoIncrementID, {
   field: 'id',
   incrementBy: 1,
@@ -60,7 +77,7 @@ class APIRule {
   trackerCollection: 'identitycounters',
   trackerModelName: 'identitycounter',
 })
-@plugin(paginate)
+@plugin(paginate) // 添加分页插件
 @modelOptions({
   schemaOptions: {
     toObject: { getters: true },
@@ -68,52 +85,87 @@ class APIRule {
       createdAt: 'create_at',
       updatedAt: 'update_at',
     },
-    // _id: false,
   },
 })
 export class Site {
   @prop({ unique: true })
-  id?: number;
+  id?: number; // 站点唯一标识ID
 
   @IsDefined()
   @IsString()
-  @IsNotEmpty({ message: '站点名称不能为空？' })
-  @prop({ required: true, validate: /\S+/, text: true, index: true }) // 添加索引
-  name: string;
+  @IsNotEmpty({ message: '站点名称不能为空' })
+  @prop({
+    required: true,
+    validate: /\S+/,
+    text: true,
+    index: true,
+    trim: true,
+  })
+  name: string; // 站点名称
 
   @IsDefined()
   @IsIn(SITE_REPOST_STATES)
   @IsInt()
-  @prop({ enum: ReportStatus, default: ReportStatus.Report })
-  isApi: ReportStatus;
+  @prop({
+    enum: ReportStatus,
+    default: ReportStatus.Report,
+    index: true,
+  })
+  isApi: ReportStatus; // API上报状态
 
   @IsDefined()
   @IsString()
-  @IsNotEmpty({ message: '上报告警接口不能为空？' })
+  @IsNotEmpty({ message: '上报告警接口URL不能为空' })
   @IsUrl()
-  @prop({ required: true, validate: /\S+/, text: true })
-  reportUrl: string;
+  @prop({
+    required: true,
+    validate: /\S+/,
+    text: true,
+    trim: true,
+  })
+  reportUrl: string; // 告警上报接口URL
 
   @IsDefined()
   @IsIn(SITE_PUBLISH_STATES)
   @IsInt()
-  @prop({ enum: PublishState, default: PublishState.Published, index: true })
-  state: PublishState;
+  @prop({
+    enum: PublishState,
+    default: PublishState.Published,
+    index: true,
+  })
+  state: PublishState; // 站点发布状态
 
-  // API上报告警屏蔽规则
-  @prop({ default: [], type: () => [APIRule], _id: false })
-  apiRules?: APIRule[];
+  @IsOptional()
+  @IsArray()
+  @prop({
+    default: [],
+    type: () => [APIRule],
+    _id: false,
+  })
+  apiRules?: APIRule[]; // API上报告警屏蔽规则列表
 
-  @prop({ default: Date.now, index: true, immutable: true })
-  create_at?: Date;
+  @prop({
+    default: Date.now,
+    index: true,
+    immutable: true,
+  })
+  create_at?: Date; // 创建时间
 
   @prop({ default: Date.now })
-  update_at?: Date;
+  update_at?: Date; // 更新时间
 
-  // 录屏白名单
+  @IsOptional()
   @IsArray()
-  @prop({ default: [], type: () => [Number] })
-  recordWhiteList?: number[];
+  @prop({
+    default: [],
+    type: () => [Number],
+    validate: {
+      validator: (v: number[]) => v.every((n) => Number.isInteger(n) && n > 0),
+      message: '白名单ID必须为正整数',
+    },
+  })
+  recordWhiteList?: number[]; // 录屏白名单ID列表
 }
 
+// 导出Site Provider用于依赖注入
 export const SiteProvider = getProviderByTypegoose(Site);
