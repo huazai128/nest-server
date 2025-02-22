@@ -19,6 +19,7 @@ import { getSiteCacheKey } from '@app/constants/cache.contant';
 import { UserLogService } from '../user/user.service';
 import { RedisService } from '@app/processors/redis/redis.service';
 import { Cron } from '@nestjs/schedule';
+import { MeasureAsyncTime } from '@app/decorators/async.decorator';
 
 /**
  * 站点服务类 - 处理站点相关的业务逻辑
@@ -52,6 +53,7 @@ export class SiteService {
    * 删除站点相关的所有日志记录
    * @param siteId 站点ID
    */
+  @MeasureAsyncTime()
   private async deleteSiteLog(siteId: MongooseID): Promise<void> {
     // 将待删除的站点ID添加到Redis中等待定时任务处理
     await this.cacheService.set(
@@ -64,6 +66,7 @@ export class SiteService {
    * 定时任务：每天0点执行删除站点日志，防止白天删除时，访问量大导致日志删除失败
    */
   @Cron('0 0 0 * * *')
+  @MeasureAsyncTime()
   private async handleDeleteSiteLogs() {
     const keys = await this.cacheService.keys('delete_site_logs:*');
     for (const key of keys) {
@@ -90,6 +93,7 @@ export class SiteService {
    * @throws 站点名称已存在时抛出错误
    * @returns 创建的站点文档
    */
+  @MeasureAsyncTime()
   public async createSite(site: Omit<Site, 'id'>): Promise<MongooseDoc<Site>> {
     // 检查站点名称是否已存在
     const existedSite = await this.siteModel
@@ -115,6 +119,7 @@ export class SiteService {
    * @param paginateOptions 分页选项
    * @returns 分页后的站点列表
    */
+  @MeasureAsyncTime()
   public paginate(
     paginateQuery: PaginateQuery<Site>,
     paginateOptions: PaginateOptions,
@@ -128,6 +133,7 @@ export class SiteService {
    * @throws 站点不存在时抛出错误
    * @returns 被删除的站点文档
    */
+  @MeasureAsyncTime()
   public async deleteId(id: MongooseID): Promise<MongooseDoc<Site>> {
     const site = await this.siteModel.findByIdAndDelete(id).exec();
     if (!site) {
@@ -148,6 +154,7 @@ export class SiteService {
    * @throws 站点不存在时抛出错误
    * @returns 更新后的站点文档
    */
+  @MeasureAsyncTime()
   public async update(
     id: MongooseID,
     data: Omit<Site, 'id'>,
@@ -169,6 +176,7 @@ export class SiteService {
    * @param id 站点ID
    * @returns 站点信息或null
    */
+  @MeasureAsyncTime()
   public async getSiteInfo(id?: string): Promise<Site | null> {
     if (!id) return null;
 
@@ -192,6 +200,7 @@ export class SiteService {
    * @param id 自增ID
    * @returns 站点信息
    */
+  @MeasureAsyncTime()
   public async getByIdSiteInfo(id: number): Promise<Site | null> {
     return this.siteModel.findOne({ id }).exec();
   }

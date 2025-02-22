@@ -5,6 +5,7 @@ import { MongooseID, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { decodeBase64, decodeMd5 } from '@app/utils/util';
 import { LoginInfo } from '@app/interfaces/auth.interface';
 import { LoginRequest, ValidateUserRequest } from '@app/protos/auth';
+import { MeasureAsyncTime } from '@app/decorators/async.decorator';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
    * @return {*}
    * @memberof AuthService
    */
+  @MeasureAsyncTime()
   public async validateUser({ userId }: ValidateUserRequest) {
     return await this.getFindUserId(userId);
   }
@@ -26,6 +28,7 @@ export class AuthService {
    * @return {*}
    * @memberof AuthService
    */
+  @MeasureAsyncTime()
   public async getFindUserId(userId: number) {
     return await this.authModel.findOne({ userId: userId }).exec();
   }
@@ -36,6 +39,7 @@ export class AuthService {
    * @return {*}  {Promise<LoginInfo>}
    * @memberof AuthService
    */
+  @MeasureAsyncTime()
   public async login(auth: LoginRequest): Promise<LoginInfo> {
     const existAuth = await this.authModel.findOne(
       { account: auth.account },
@@ -57,6 +61,7 @@ export class AuthService {
    * @return {*}  {(Promise<Auth | null>)}
    * @memberof AuthService
    */
+  @MeasureAsyncTime()
   public async findById(id: MongooseID): Promise<Auth | null> {
     const userInfo = await this.authModel.findById(id);
     return userInfo;
@@ -68,6 +73,7 @@ export class AuthService {
    * @return {*}
    * @memberof AuthService
    */
+  @MeasureAsyncTime()
   public async createUser(auth: LoginRequest) {
     const newPassword = decodeMd5(decodeBase64(auth.password));
     const existedAuth = await this.authModel

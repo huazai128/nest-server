@@ -198,6 +198,10 @@ export class Log {
   @IsString()
   @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
   monitorId: string | null; // 用于记录用户行为，用于错误排查
+
+  @IsString()
+  @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
+  pageId: string | null; // 用于当前页面
 }
 
 export const LogProvider = getProviderByTypegoose(Log);

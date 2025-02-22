@@ -39,6 +39,7 @@ import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';
 import { RpcException } from '@nestjs/microservices';
 import { convertDatesToString } from '@app/utils/dateToString';
+import { MeasureAsyncTime } from '@app/decorators/async.decorator';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -71,6 +72,7 @@ export class LogService {
    * 删除index
    * @memberof ApiLogService
    */
+  @MeasureAsyncTime()
   async checkAndDropIndex() {
     try {
       const indexNames = [
@@ -97,6 +99,7 @@ export class LogService {
    * @return {*}  {Promise<any>}
    * @memberof LogService
    */
+  @MeasureAsyncTime()
   public async create(data: SaveLogRequest): Promise<any> {
     const startNow = Date.now();
     // 站点放进缓存
@@ -213,7 +216,8 @@ export class LogService {
    * @return {*}  {Promise<PaginateResult<Log>>}
    * @memberof LogService
    */
-  public paginate(
+  @MeasureAsyncTime()
+  public async paginate(
     paginateQuery: PaginateQuery<Log>,
     paginateOptions: PaginateOptions,
   ): Promise<PaginateResult<Log>> {
@@ -227,6 +231,7 @@ export class LogService {
    * @return {*}  {Promise<PaginateResult<Log>>}
    * @memberof LogService
    */
+  @MeasureAsyncTime()
   public async cursorPaginate(query: PaginateQuery<Log>): Promise<any> {
     const { cursor, limit, sort, primaryKey, select, populate } = query;
 
@@ -291,6 +296,7 @@ export class LogService {
    * @return {*}
    * @memberof PvLogService
    */
+  @MeasureAsyncTime()
   public async siteIdRemove(siteId: MongooseID): Promise<any> {
     const logResult = await this.logModel.deleteMany({ siteId: siteId }).exec();
     logger.info('删除站点', siteId, logResult);
@@ -303,6 +309,7 @@ export class LogService {
    * @return {*}
    * @memberof PvLogService
    */
+  @MeasureAsyncTime()
   public async batchDelete(ids: MongooseID[]): Promise<any> {
     const logResult = await this.logModel
       .deleteMany({ _id: { $in: ids } })
@@ -314,6 +321,7 @@ export class LogService {
    * 确保索引
    * @memberof LogService
    */
+  @MeasureAsyncTime()
   async ensureIndexes() {
     await this.logModel.createIndexes({
       create_at: 1,
@@ -328,6 +336,7 @@ export class LogService {
    * @memberof LogService
    */
   // 聚合查询统计数据
+  @MeasureAsyncTime()
   public async aggregation(pipeParams: PipelineStage[]): Promise<ChartList> {
     return this.logModel
       .aggregate(pipeParams)
@@ -347,7 +356,8 @@ export class LogService {
    * @return {*}
    * @memberof LogService
    */
-  public saveErrorRecord(data: any): any {
+  @MeasureAsyncTime()
+  public async saveErrorRecord(data: any): Promise<any> {
     return this.errorLogService.saveRecordData(data);
   }
 
@@ -358,10 +368,11 @@ export class LogService {
    * @return {*}
    * @memberof LogService
    */
-  public aggregationPathOrUrl(
+  @MeasureAsyncTime()
+  public async aggregationPathOrUrl(
     pipeParams: PipelineStage[],
     paginateOptions: PaginateOptions,
-  ): any {
+  ): Promise<any> {
     const aggregateQuery = this.logModel.aggregate(pipeParams);
     return this.logModel.aggregatePaginate(aggregateQuery, paginateOptions);
   }
@@ -371,21 +382,22 @@ export class LogService {
    * @private
    * @memberof LogService
    */
-  private deleteThirtyDayData = async () => {
+  @MeasureAsyncTime()
+  private async deleteThirtyDayData() {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 3);
     const res = await this.logModel
       .deleteMany({ create_at: { $lt: thirtyDaysAgo } })
       .exec();
     logger.info('删除结果', res);
-  };
+  }
 
   /**
    * 调度任务
    * @private
    * @memberof LogService
    */
-  @Cron('0 */4 * * *') // 每小时凌晨
+  @Cron('0 */4 * * *') // 每小时
   private handleScheduleJob() {
     logger.info('触发时间', dayjs().format('YYYY-MM-DD HH:mm:ss'));
     this.deleteThirtyDayData();
@@ -452,12 +464,14 @@ export class LogService {
    * @return {*}
    * @memberof LogService
    */
+  @MeasureAsyncTime()
   public async handleOffsets(
     topicPartitions: TopicPartitionOffsetAndMetadata[],
   ) {
     // return await this.kafkaService.commitOffsets(topicPartitions);
   }
 
+  @MeasureAsyncTime()
   public async handleMemoryData(
     query: PaginateQuery<Log>,
     option?: QueryOptions<any>,

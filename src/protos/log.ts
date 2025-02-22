@@ -100,19 +100,19 @@ export interface SaveLogRequest {
   /** 总时间 */
   total: number;
   /** 结束时间 */
-  endTime: number;
+  endTime: string;
   /** 交互时间 */
-  interactionTime: number;
+  interactionTime: string;
   /** 加载时间 */
-  loadedTime: number;
+  loadedTime: string;
   /** 正在加载时间 */
-  loadingTime: number;
+  loadingTime: string;
   /** 查询 URL */
   queryUrl: string;
   /** 请求时间 */
-  requestTime: number;
+  requestTime: string;
   /** 响应时间 */
-  responseTime: number;
+  responseTime: string;
   /** 状态 */
   status: number;
   /** 状态文本 */
@@ -126,7 +126,7 @@ export interface SaveLogRequest {
   Id: string;
   lang: string;
   /** 可空字段 */
-  uaResult: string;
+  ua: string;
   /** 可空字段 */
   winScreen: string;
   /** 可空字段 */
@@ -161,20 +161,31 @@ export interface SaveLogRequest {
   logId: string;
   /** 可空字段 */
   errorDetail: string;
+  stackTrace: { [key: string]: any }[];
+  breadcrumbs: BehaviorItem[];
+  errorUid: string;
+  pageId: string;
+  speed: string;
+  costTime: string;
+}
+
+export interface BehaviorItem {
+  type: string;
+  monitorId: string;
 }
 
 export interface Meta {
   body: { [key: string]: any } | undefined;
-  endTime: number;
-  interactionTime: number;
-  loadedTime: number;
-  loadingTime: number;
+  endTime: string;
+  interactionTime: string;
+  loadedTime: string;
+  loadingTime: string;
   method: string;
   params: { [key: string]: any } | undefined;
   queryUrl: string;
-  requestTime: number;
+  requestTime: string;
   response: Response | undefined;
-  responseTime: number;
+  responseTime: string;
   status: number;
   statusText: string;
   url: string;
@@ -215,6 +226,9 @@ export interface Response {
 }
 
 export interface LogResponse {
+  status: number;
+  message: string;
+  result: string;
 }
 
 export interface LogList {
