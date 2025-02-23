@@ -164,4 +164,22 @@ export class Report {
 
   @prop({ type: Object, default: null })
   ip_location: Partial<IPLocation> | null;
+
+  @IsString()
+  @prop({
+    type: String,
+    default: null,
+    index: true,
+    description: '监控ID,用于记录用户行为和错误排查',
+  })
+  monitorId: string | null;
+
+  @IsString()
+  @prop({
+    type: String,
+    default: null,
+    index: true,
+    description: '页面ID,用于标识当前页面',
+  })
+  pageId: string | null;
 }

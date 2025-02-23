@@ -175,8 +175,6 @@ export class LogService {
             log.doce = await this.pvLogService.create(data as unknown as PvLog);
             break;
           case TransportCategory.PREF:
-            if (log.reportsType == MetricsName.CDR) {
-            }
             // 性能上报 perf
             log.onModel = RefType.PrefLog;
             log.doce = await this.prefLogService.create(
