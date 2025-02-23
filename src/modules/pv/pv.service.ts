@@ -12,6 +12,10 @@ import {
 } from '@app/utils/searchCommon';
 import { handleTime } from '@app/utils/util';
 
+/**
+ * PV日志服务
+ * 处理页面访问相关的统计数据
+ */
 @Injectable()
 export class PvLogService {
   constructor(
@@ -19,26 +23,24 @@ export class PvLogService {
   ) {}
 
   /**
-   * 新增pv
-   * @param {PvLog} data
-   * @return {*}  {Promise<Types.ObjectId>}
-   * @memberof PvLogService
+   * 创建新的PV记录
+   * @param {PvLog} data - PV日志数据
+   * @returns {Promise<Types.ObjectId>} 创建的记录ID
    */
   public async create(data: PvLog): Promise<Types.ObjectId> {
     try {
       const res = await this.pvModel.create(data);
       return res._id;
     } catch (error) {
-      logger.error('Pv 保存失败', JSON.stringify(data), error);
-      throw new Error(`Pv 保存失败 ${error}`);
+      logger.error('PV记录保存失败', JSON.stringify(data), error);
+      throw new Error(`PV记录保存失败: ${error}`);
     }
   }
 
   /**
-   * 根据站点ID删除相关站点
-   * @param {MongooseID} siteId
-   * @return {*}
-   * @memberof PvLogService
+   * 删除指定站点的所有PV记录
+   * @param {MongooseID} siteId - 站点ID
+   * @returns {Promise} 删除结果
    */
   public async siteIdRemove(siteId: MongooseID) {
     const pvResult = await this.pvModel.deleteMany({ siteId: siteId }).exec();
@@ -46,10 +48,9 @@ export class PvLogService {
   }
 
   /**
-   * 批量删除
-   * @param {MongooseID[]} ids
-   * @return {*}
-   * @memberof PvLogService
+   * 批量删除PV记录
+   * @param {MongooseID[]} ids - 要删除的记录ID数组
+   * @returns {Promise} 删除结果
    */
   public async batchDelete(ids: MongooseID[]) {
     const pvResult = await this.pvModel
@@ -59,10 +60,9 @@ export class PvLogService {
   }
 
   /**
-   * 聚合数据
-   * @param {PipelineStage[]} pipeParams
-   * @return {*}
-   * @memberof PvLogService
+   * 执行聚合管道查询
+   * @param {PipelineStage[]} pipeParams - 聚合管道参数
+   * @returns {Promise} 聚合结果
    */
   public async aggregate(pipeParams: PipelineStage[]) {
     return this.pvModel
@@ -71,16 +71,16 @@ export class PvLogService {
         return data;
       })
       .catch((err) => {
-        logger.error('Pv聚合错误', err);
+        logger.error('PV聚合查询失败', err);
         return Promise.reject(err);
       });
   }
 
   /**
-   * 分页获取路由链接数据
-   * @param {MongooseID} siteId
-   * @param {PaginateOptions} paginateOptions
-   * @memberof PvLogService
+   * 分页获取路由访问统计数据
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {PaginateOptions} paginateOptions - 分页选项
+   * @returns {Promise} 分页后的路由访问数据
    */
   public async getRoutePaths(
     matchFilter: PipelineStage.Match['$match'],
@@ -109,17 +109,16 @@ export class PvLogService {
         return res;
       })
       .catch((err) => {
-        logger.error('Pv 路由', err);
+        logger.error('路由访问统计查询失败', err);
         return Promise.reject(err);
       });
   }
 
   /**
-   * 根据日期获取当天、昨天、7天前的数据包含pv、uv、访问页面数
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @param {TimeInfo} { startTime, endTime }
-   * @return {*}
-   * @memberof PvLogService
+   * 获取指定时间段的PV统计数据(今天/昨天/上周)
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {TimeInfo} timeInfo - 时间范围信息
+   * @returns {Promise} 各时间段的统计数据
    */
   public async getSingleDayData(
     matchFilter: PipelineStage.Match['$match'],
@@ -139,12 +138,10 @@ export class PvLogService {
   }
 
   /**
-   * 根据日期统计pv、uv、访问量数据
-   * @template T
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @param {boolean} [isDay]
-   * @return {*}  {T}
-   * @memberof PvLogService
+   * 生成日期统计聚合管道
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {boolean} isDay - 是否按天统计
+   * @returns {T} 聚合管道数组
    */
   public dayAggregate<T>(
     matchFilter: PipelineStage.Match['$match'],
@@ -179,11 +176,9 @@ export class PvLogService {
   }
 
   /**
-   * 通用处理逻辑
-   * @private
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @return {*}
-   * @memberof PvLogService
+   * 处理通用统计逻辑
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @returns {Promise} 统计结果
    */
   private async handleCommon(matchFilter: PipelineStage.Match['$match']) {
     const commonPipe: PipelineStage[] = [
@@ -209,9 +204,10 @@ export class PvLogService {
   }
 
   /**
-   * 聚合每一天设备相关统计数据
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @memberof PvLogService
+   * 获取设备相关统计数据
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {string} type - 设备类型(browser/os/screen)
+   * @returns {Promise} 设备统计数据
    */
   public getTerminalDataOneDay(
     matchFilter: PipelineStage.Match['$match'],
@@ -233,13 +229,12 @@ export class PvLogService {
     }
     const pipe: PipelineStage[] = [
       { $match: matchFilter },
-      // 日期处理成YYYY-MM-DD 根据这里相同的值，统计每一天的数据
       {
         $project: {
           ...projectQuery,
         },
       },
-      { $group: { _id: { name: '$name' }, count: { $sum: 1 } } }, // 根据用户和时间统计每个用户的PV
+      { $group: { _id: { name: '$name' }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       {
         $group: {
@@ -254,10 +249,10 @@ export class PvLogService {
   }
 
   /**
-   * 聚合分页统计页面路由，并获取总数
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @param {PaginateOptions} paginateOptions
-   * @memberof PvLogService
+   * 聚合分页统计页面路由
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {PaginateOptions} paginateOptions - 分页选项
+   * @returns {Promise} 分页统计结果
    */
   public async aggregateStatisticsPath(
     matchFilter: PipelineStage.Match['$match'],
@@ -272,21 +267,18 @@ export class PvLogService {
 
   /**
    * 获取路由总数
-   * @private
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @return {*}
-   * @memberof PvLogService
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @returns {Promise<number>} 路由总数
    */
   private getPathCount(matchFilter: PipelineStage.Match['$match']) {
     return this.pvModel.countDocuments(matchFilter);
   }
 
   /**
-   *  通用处理单天、单月、年的统计数据数据
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @param {TimeInfo} timeInfo
-   * @return {*}
-   * @memberof PvLogService
+   * 获取指定时间段的统计数据
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {TimeInfo} timeInfo - 时间范围信息
+   * @returns {Promise} 统计数据
    */
   public async commonSingleDayData(
     matchFilter: PipelineStage.Match['$match'],
@@ -306,11 +298,9 @@ export class PvLogService {
   }
 
   /**
-   * 通用处理单天、单月、年的统计数据数据
-   * @private
-   * @param {PipelineStage.Match['$match']} matchFilter
-   * @return {*}
-   * @memberof PvLogService
+   * 处理单个时间段的统计数据
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @returns {Promise} 统计结果
    */
   private handleAggragateData(matchFilter: PipelineStage.Match['$match']) {
     const pipeLine: PipelineStage[] = [
@@ -346,10 +336,10 @@ export class PvLogService {
   }
 
   /**
-   * 分页获取浏览器信息
-   * @param {MongooseID} siteId
-   * @param {PaginateOptions} paginateOptions
-   * @memberof PvLogService
+   * 分页获取浏览器信息统计
+   * @param {PipelineStage.Match['$match']} matchFilter - 匹配条件
+   * @param {PaginateOptions} paginateOptions - 分页选项
+   * @returns {Promise} 浏览器统计数据
    */
   public async getBrowserInfo(
     matchFilter: PipelineStage.Match['$match'],
@@ -387,7 +377,7 @@ export class PvLogService {
         return res;
       })
       .catch((err) => {
-        logger.error('Pv 路由', err);
+        logger.error('浏览器统计查询失败', err);
         return Promise.reject(err);
       });
   }

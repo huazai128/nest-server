@@ -39,19 +39,36 @@ export class PvLog extends Report {
   @prop({ unique: true })
   id: number;
 
-  @prop({ default: Date.now, index: true, immutable: true })
-  create_at?: Date;
+  @prop({
+    default: Date.now,
+    index: true,
+    immutable: true,
+    required: true,
+  })
+  create_at: Date;
 
-  @prop({ default: Date.now })
-  update_at?: Date;
+  @prop({
+    default: Date.now,
+    required: true,
+  })
+  update_at: Date;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({
+    type: String,
+    default: null,
+    trim: true,
+    index: true,
+  })
   traceId: string | null;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
   monitorId: string | null; // 用于记录用户行为，用于错误排查
+
+  @IsString()
+  @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
+  pageId: string | null; // 用于当前页面
 }
 
 export const PvLogProvider = getProviderByTypegoose(PvLog);

@@ -8,7 +8,6 @@ import {
   IsDefined,
   IsUrl,
   IsOptional,
-  IsNumber,
   IsNumberString,
   IsIP,
 } from 'class-validator';
@@ -73,8 +72,12 @@ export const indexWeights: mongoose.IndexOptions['weights'] = {
 };
 
 @modelOptions({
-  // https://typegoose.github.io/typegoose/docs/api/decorators/model-options/#allowmixed
   options: { allowMixed: Severity.ALLOW },
+  schemaOptions: {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 })
 export class Report {
   @IsIn([...MetricsTypes, ...MechanismTypes])
@@ -96,48 +99,44 @@ export class Report {
   ua_result: Partial<IResult> | null;
 
   @IsString()
-  @prop({ type: String, default: null })
-  winScreen: string | null;
+  @prop({ type: String, trim: true })
+  winScreen: string;
 
   @IsString()
-  @prop({ type: String, default: null })
-  docScreen: string | null;
+  @prop({ type: String, trim: true })
+  docScreen: string;
 
-  @IsNumber()
   @IsNumberString()
   @IsOptional()
-  @prop({ type: String, default: null, index: true })
-  userId: string | null;
+  @prop({ type: String, index: true, sparse: true })
+  userId: string;
 
   @IsString()
-  @prop({ type: String, default: null, validate: /\S+/, text: true })
-  title: string | null;
+  @prop({ type: String, trim: true, validate: /\S+/, text: true })
+  title: string;
 
   @IsString()
-  @prop({ type: String, default: null, index: true })
-  path: string | null;
+  @prop({ type: String, trim: true, index: true })
+  path: string;
 
-  @IsString()
   @IsUrl()
   @IsOptional()
-  @prop({ type: String, default: null, index: true, text: true })
-  href: string | null;
+  @prop({ type: String, trim: true, index: true, text: true })
+  href: string;
 
-  @IsString()
   @IsUrl()
   @IsOptional()
-  @prop({ type: String, default: null, index: true, text: true })
-  referrer: string | null;
+  @prop({ type: String, trim: true, index: true, text: true })
+  referrer: string;
 
-  @IsString()
   @IsUrl()
   @IsOptional()
-  @prop({ type: String, default: null, index: true, text: true })
-  prevHref: string | null;
+  @prop({ type: String, trim: true, index: true, text: true })
+  prevHref: string;
 
   @IsString()
-  @prop({ type: String, default: null })
-  jumpType: string | null;
+  @prop({ type: String, trim: true })
+  jumpType: string;
 
   @IsIn(LOG_TYPE)
   @IsInt()
@@ -146,17 +145,17 @@ export class Report {
   type: UserType;
 
   @IsString()
-  @prop({ type: String, default: null })
-  effectiveType: string | null;
+  @prop({ type: String, trim: true })
+  effectiveType: string;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, trim: true })
   mode: string;
 
   @IsIP()
   @IsOptional()
-  @prop({ default: null, type: String })
-  ip: string | null;
+  @prop({ type: String, trim: true })
+  ip: string;
 
   @IsIn([LOG_CATEGORY])
   @IsString()
