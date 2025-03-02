@@ -92,51 +92,51 @@ export class ResourcePref {
 export class NTiming {
   @IsNumber()
   @prop({ type: Number, default: null })
-  FP: number | null;
+  fp: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  TTI: number | null;
+  tti: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  DomReady: number | null;
+  domReady: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  Load: number | null;
+  load: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  FirseByte: number | null;
+  firseByte: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  DNS: number | null;
+  dns: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  TCP: number | null;
+  tcp: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  SSL: number | null;
+  ssl: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  TTFB: number | null;
+  ttfb: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  Trans: number | null;
+  trans: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  DomParse: number | null;
+  domParse: number | null;
 
   @IsNumber()
   @prop({ type: Number, default: null })
-  Res: number | null;
+  res: number | null;
 }
 
 export class PaintInfo {
@@ -187,7 +187,6 @@ export class PrefDto extends Report {
   @IsOptional()
   @prop({ type: PaintInfo, _id: false, default: null })
   fpTime: Partial<PaintInfo> | null;
-
   // 资源加载命中缓存率
   @IsString()
   @prop({ type: Number, default: 0 })
