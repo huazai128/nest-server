@@ -12,6 +12,28 @@ import { type QueryDTO } from "./common/query_dto";
 
 export const protobufPackage = "logproto";
 
+export interface NTiming {
+  fp: number;
+  tti: number;
+  domReady: number;
+  load: number;
+  firseByte: number;
+  dns: number;
+  tcp: number;
+  ssl: number;
+  ttfb: number;
+  trans: number;
+  domParse: number;
+  res: number;
+}
+
+export interface PaintInfo {
+  duration: number;
+  entryType: string;
+  name: string;
+  startTime: number;
+}
+
 export interface SaveLogRequest {
   /** 唯一索引 */
   id: string;
@@ -62,43 +84,15 @@ export interface SaveLogRequest {
   /** 标签id */
   nodeId: string;
   /**  */
-  duration: number;
-  /**  */
-  entryType: string;
-  /**  */
-  startTime: number;
-  /**  */
   fmpTime: number;
   /**  */
   cacheRate: string;
-  /** 请求信息 */
-  requestInfo:
-    | RequestInfo
+  /** 资源信息 */
+  resourcePrefs: RequestInfo[];
+  /** 性能计时信息 */
+  ntTiming:
+    | NTiming
     | undefined;
-  /** DNS 时间 */
-  dns: number;
-  /** DOM 解析时间 */
-  domParse: number;
-  /** DOM 准备时间 */
-  domReady: number;
-  /** 首字节时间 */
-  firstByte: number;
-  /** 首次图像可见时间 */
-  fp: number;
-  /** 加载时间 */
-  load: number;
-  /** 资源时间 */
-  res: number;
-  /** 是否使用 SSL */
-  ssl: boolean;
-  /** TCP 时间 */
-  tcp: number;
-  /** 传输时间 */
-  trans: number;
-  /** TTFB（首次字节时间） */
-  ttfb: number;
-  /** 总时间 */
-  total: number;
   /** 结束时间 */
   endTime: string;
   /** 交互时间 */
@@ -167,6 +161,12 @@ export interface SaveLogRequest {
   pageId: string;
   speed: string;
   costTime: string;
+  /** FP timing object */
+  fpTime:
+    | PaintInfo
+    | undefined;
+  /** FCP timing value */
+  fcpTime: PaintInfo | undefined;
 }
 
 export interface BehaviorItem {
