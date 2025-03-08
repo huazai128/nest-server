@@ -78,14 +78,6 @@ export class Meta {
   @IsString()
   @prop({ type: String, default: null })
   conponentName: string | null;
-
-  @IsString()
-  @prop({ type: String, default: null })
-  traceId: string | null;
-
-  @IsString()
-  @prop({ type: String, default: null })
-  monitorId: string | null; // 用于记录用户行为，用于错误排查
 }
 
 export class StackTrace {

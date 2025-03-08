@@ -31,7 +31,6 @@ import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm'
 // import { KafkaService } from '@app/processors/kafka/kafka.service';
 import { TopicPartitionOffsetAndMetadata } from '@nestjs/microservices/external/kafka.interface';
 import { Cron } from '@nestjs/schedule';
-// import * as sizeof from 'object-sizeof';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
 import { isDevEnv } from '@app/app.env';
 import { ChartList, SaveLogRequest } from '@app/protos/log';
@@ -145,13 +144,13 @@ export class LogService {
       );
       try {
         switch (data.category) {
-          case TransportCategory.EVENT: // 事件上报
+          case TransportCategory.EVENT: // 事件上报 done
             log.onModel = RefType.EventLog;
             log.doce = await this.eventLogService.create(
               data as unknown as EventLog,
             );
             break;
-          case TransportCategory.API: // API上报
+          case TransportCategory.API: // API上报 done
             log.onModel = RefType.ApiLog;
             log.doce = await this.apiLogService.create(
               data as unknown as ApiLog,
@@ -170,11 +169,11 @@ export class LogService {
               data as unknown as CustomLog,
             );
             break;
-          case TransportCategory.PV: // PV和UV上报
+          case TransportCategory.PV: // PV和UV上报 done
             log.onModel = RefType.PvLog;
             log.doce = await this.pvLogService.create(data as unknown as PvLog);
             break;
-          case TransportCategory.PREF:
+          case TransportCategory.PREF: // 性能上报 done
             // 性能上报 perf
             log.onModel = RefType.PrefLog;
             log.doce = await this.prefLogService.create(

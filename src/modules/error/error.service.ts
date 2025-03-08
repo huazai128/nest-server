@@ -79,6 +79,7 @@ export class ErrorLogService implements OnModuleInit {
       if (errorInfo) {
         eventData.errorDetail = JSON.stringify(errorInfo);
       }
+      logger.info('Error 保存', eventData);
       const res = await this.errorModel.create({ ...eventData });
       return res._id;
     } catch (error) {

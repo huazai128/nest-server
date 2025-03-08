@@ -7,32 +7,32 @@ import public "common/chart_item.proto";
 
 service LogService {
   // 保存走kafka, 不过两种都支持====
-  rpc saveLog (SaveLogRequest) returns (stream LogResponse);
-  rpc getLogs (QueryDTO) returns (stream LogList);
-  rpc getLogsByCursor(QueryDTO) returns (stream LogList);
-  rpc getLogsChart(QueryDTO) returns (stream ChartList);
+  rpc saveLog (SaveLogRequest) returns (stream LogResponse);  // 保存日志
+  rpc getLogs (QueryDTO) returns (stream LogList);  // 获取日志列表
+  rpc getLogsByCursor(QueryDTO) returns (stream LogList);  // 通过游标获取日志列表
+  rpc getLogsChart(QueryDTO) returns (stream ChartList);  // 获取日志图表数据
 }
 
 message NTiming {
-  double fp = 1;
-  double tti = 2;
-  double domReady = 3;
-  double load = 4;
-  double firseByte = 5;
-  double dns = 6;
-  double tcp = 7;
-  double ssl = 8;
-  double ttfb = 9;
-  double trans = 10;
-  double domParse = 11;
-  double res = 12;
+  double fp = 1;                // First Paint 首次绘制时间
+  double tti = 2;               // Time to Interactive 可交互时间
+  double domReady = 3;          // DOM Ready 时间
+  double load = 4;              // 页面完全加载时间
+  double firseByte = 5;         // 首字节时间
+  double dns = 6;               // DNS 解析时间
+  double tcp = 7;               // TCP 连接时间
+  double ssl = 8;               // SSL 连接时间
+  double ttfb = 9;              // Time to First Byte 首字节时间
+  double trans = 10;            // 传输时间
+  double domParse = 11;         // DOM 解析时间
+  double res = 12;              // 资源加载时间
 }
 
 message PaintInfo {
-  double duration = 1;
-  string entryType = 2;
-  string name = 3;
-  double startTime = 4;
+  double duration = 1;          // 持续时间
+  string entryType = 2;         // 条目类型
+  string name = 3;              // 名称
+  double startTime = 4;         // 开始时间
 }
 
 message SaveLogRequest {
@@ -55,10 +55,10 @@ message SaveLogRequest {
   string create_at = 17;             // 创建时间
   string update_at = 18;             // 更新时间
   string traceId = 19;               // 追踪 ID
-  string monitorId = 20;             // 
+  string monitorId = 20;             // 监控 ID
   string nodeId = 21;                // 标签id
-  double fmpTime = 22;               // 
-  string cacheRate = 23;             // 
+  double fmpTime = 22;               // First Meaningful Paint 首次有意义绘制时间
+  string cacheRate = 23;             // 缓存命中率
   repeated RequestInfo resourcePrefs = 24;      // 资源信息
   NTiming ntTiming = 25;            // 性能计时信息
   string endTime = 26;               // 结束时间
@@ -73,93 +73,101 @@ message SaveLogRequest {
   string errorType = 35;             // 错误类型
   string content = 36;               // 内容
   Meta meta = 37;                    // 元数据
-  string _id = 38;                   
-  string lang = 39;
-  string ua = 40;                    // 可空字段
-  string winScreen = 41;             // 可空字段
-  string docScreen = 42;             // 可空字段
-  string referrer = 43;              // 可空字段
-  string prevHref = 44;              // 可空字段
-  string jumpType = 45;              // 可空字段
-  int32 type = 46;
-  string effectiveType = 47;         // 可空字段
-  string mode = 48;                  // 可空字段
-  string ip_location = 49;           // 可空字段
-  string tagText = 50;
-  string tagName = 51;               // 可空字段
-  string nodeDom = 52;               // 可空字段
-  repeated string classList = 53;     // 数组
-  string logName = 54;               // 可空字段
-  string logData = 55;               // 可空字段
-  string logPos = 56;                // 可空字段
-  string logId = 57;                 // 可空字段
-  string errorDetail = 58;           // 可空字段
-  repeated google.protobuf.Struct stackTrace = 59;
-  repeated BehaviorItem breadcrumbs = 60;
-  string errorUid = 61;
-  string pageId = 62;
-  string speed = 63;
-  string costTime = 64;
+  string _id = 38;                   // MongoDB ID
+  string lang = 39;                  // 语言
+  string ua = 40;                    // User Agent 用户代理
+  string winScreen = 41;             // 窗口屏幕信息
+  string docScreen = 42;             // 文档屏幕信息
+  string referrer = 43;              // 来源页面
+  string prevHref = 44;              // 上一页URL
+  string jumpType = 45;              // 跳转类型
+  int32 type = 46;                   // 类型
+  string effectiveType = 47;         // 网络连接类型
+  string mode = 48;                  // 模式
+  string ip_location = 49;           // IP地理位置
+  string tagText = 50;               // 标签文本
+  string tagName = 51;               // 标签名称
+  string nodeDom = 52;               // DOM节点
+  repeated string classList = 53;     // CSS类名列表
+  string logName = 54;               // 日志名称
+  string logData = 55;               // 日志数据
+  string logPos = 56;                // 日志位置
+  string logId = 57;                 // 日志ID
+  string errorDetail = 58;           // 错误详情
+  repeated StackTrace stackTrace = 59;  // 堆栈跟踪
+  repeated BehaviorItem breadcrumbs = 60;  // 用户行为痕迹
+  string errorUid = 61;              // 错误唯一ID
+  string pageId = 62;                // 页面ID
+  string speed = 63;                 // 速度
+  string costTime = 64;              // 耗时
   PaintInfo fpTime = 65;             // FP timing object
-  PaintInfo fcpTime = 66;               // FCP timing value
+  PaintInfo fcpTime = 66;            // FCP timing value
 }
 
-message  BehaviorItem {
-  string type = 1;
-  string monitorId = 2;
+message BehaviorItem {
+  string type = 1;                   // 行为类型
+  string monitorId = 2;              // 监控ID
 }
 
 message Meta {
-  google.protobuf.Struct body = 1;
-  string endTime = 2;
-  string interactionTime = 3;
-  string loadedTime = 4;
-  string loadingTime = 5;
-  string method = 6;
-  google.protobuf.Struct params = 7;
-  string queryUrl = 8;
-  string requestTime = 9;
-  Response response = 10;
-  string responseTime = 11;
-  int32 status = 12;
-  string statusText = 13;
-  string url = 14;
+  google.protobuf.Struct body = 1;   // 请求体
+  string endTime = 2;                // 结束时间
+  string interactionTime = 3;        // 交互时间
+  string loadedTime = 4;             // 加载完成时间
+  string loadingTime = 5;            // 加载中时间
+  string method = 6;                 // 请求方法
+  google.protobuf.Struct params = 7; // 请求参数
+  string queryUrl = 8;               // 查询URL
+  string requestTime = 9;            // 请求时间
+  Response response = 10;            // 响应信息
+  string responseTime = 11;          // 响应时间
+  int32 status = 12;                 // 状态码
+  string statusText = 13;            // 状态文本
+  string url = 14;                   // URL
+  string col = 15;                   // 列号
+  string file = 16;                  // 文件名
+  string row = 17;                   // 行号
 }
-
 
 message RequestInfo {
-  double contentDownload = 1; // 内容下载
-  double dnsLookup = 2;       // DNS 查找
-  double initialConnect = 3;  // 初始连接
-  string initiatorType = 4;   // 发起者类型
-  bool isCache = 5;           // 是否缓存
-  string name = 6;            // 请求 URL
-  double requestDuration = 7; // 请求时长
-  double responseEnd = 8;     // 响应结束时间
-  bool ssl = 9;               // 是否使用 SSL
-  double startTime = 10;      // 开始时间
-  double timeToFirstByte = 11; // TTFB（首次字节时间）
-  double transferSize = 12;   // 传输大小
+  double contentDownload = 1;        // 内容下载时间
+  double dnsLookup = 2;              // DNS 查找时间
+  double initialConnect = 3;         // 初始连接时间
+  string initiatorType = 4;          // 发起者类型
+  bool isCache = 5;                  // 是否使用缓存
+  string name = 6;                   // 请求 URL
+  double requestDuration = 7;        // 请求持续时间
+  double responseEnd = 8;            // 响应结束时间
+  bool ssl = 9;                      // 是否使用 SSL
+  double startTime = 10;             // 开始时间
+  double timeToFirstByte = 11;       // TTFB（首次字节时间）
+  double transferSize = 12;          // 传输大小
 }
 
-// 响应消息定义
 message Response {
-  int32 status = 1;
-  string message = 2;
-  google.protobuf.Struct result = 3;
+  int32 status = 1;                  // 状态码
+  string message = 2;                // 消息
+  string result = 3;                 // 结果
 }
 
 message LogResponse {
-  int32 status = 1;
-  string message = 2;
-  string result = 3;
+  int32 status = 1;                  // 状态码
+  string message = 2;                // 消息
+  google.protobuf.Struct result = 3; // 结果数据
 }
 
 message LogList {
-  repeated SaveLogRequest data = 1;   // 文档列表
-  Pagination pagination = 2;            // 分页信息
+  repeated SaveLogRequest data = 1;   // 日志列表数据
+  Pagination pagination = 2;          // 分页信息
 }
 
 message ChartList {
-  repeated ChartItem data = 1;   // 文档列表
+  repeated ChartItem data = 1;        // 图表数据列表
+}
+
+message StackTrace {
+  int32 colno = 1;                   // 列号
+  string filename = 2;               // 文件名
+  string functionName = 3;           // 函数名
+  string lineno = 4;                 // 行号
 }

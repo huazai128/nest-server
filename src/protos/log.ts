@@ -13,24 +13,40 @@ import { type QueryDTO } from "./common/query_dto";
 export const protobufPackage = "logproto";
 
 export interface NTiming {
+  /** First Paint 首次绘制时间 */
   fp: number;
+  /** Time to Interactive 可交互时间 */
   tti: number;
+  /** DOM Ready 时间 */
   domReady: number;
+  /** 页面完全加载时间 */
   load: number;
+  /** 首字节时间 */
   firseByte: number;
+  /** DNS 解析时间 */
   dns: number;
+  /** TCP 连接时间 */
   tcp: number;
+  /** SSL 连接时间 */
   ssl: number;
+  /** Time to First Byte 首字节时间 */
   ttfb: number;
+  /** 传输时间 */
   trans: number;
+  /** DOM 解析时间 */
   domParse: number;
+  /** 资源加载时间 */
   res: number;
 }
 
 export interface PaintInfo {
+  /** 持续时间 */
   duration: number;
+  /** 条目类型 */
   entryType: string;
+  /** 名称 */
   name: string;
+  /** 开始时间 */
   startTime: number;
 }
 
@@ -79,13 +95,13 @@ export interface SaveLogRequest {
   updateAt: string;
   /** 追踪 ID */
   traceId: string;
-  /**  */
+  /** 监控 ID */
   monitorId: string;
   /** 标签id */
   nodeId: string;
-  /**  */
+  /** First Meaningful Paint 首次有意义绘制时间 */
   fmpTime: number;
-  /**  */
+  /** 缓存命中率 */
   cacheRate: string;
   /** 资源信息 */
   resourcePrefs: RequestInfo[];
@@ -116,50 +132,62 @@ export interface SaveLogRequest {
   /** 内容 */
   content: string;
   /** 元数据 */
-  meta: Meta | undefined;
+  meta:
+    | Meta
+    | undefined;
+  /** MongoDB ID */
   Id: string;
+  /** 语言 */
   lang: string;
-  /** 可空字段 */
+  /** User Agent 用户代理 */
   ua: string;
-  /** 可空字段 */
+  /** 窗口屏幕信息 */
   winScreen: string;
-  /** 可空字段 */
+  /** 文档屏幕信息 */
   docScreen: string;
-  /** 可空字段 */
+  /** 来源页面 */
   referrer: string;
-  /** 可空字段 */
+  /** 上一页URL */
   prevHref: string;
-  /** 可空字段 */
+  /** 跳转类型 */
   jumpType: string;
+  /** 类型 */
   type: number;
-  /** 可空字段 */
+  /** 网络连接类型 */
   effectiveType: string;
-  /** 可空字段 */
+  /** 模式 */
   mode: string;
-  /** 可空字段 */
+  /** IP地理位置 */
   ipLocation: string;
+  /** 标签文本 */
   tagText: string;
-  /** 可空字段 */
+  /** 标签名称 */
   tagName: string;
-  /** 可空字段 */
+  /** DOM节点 */
   nodeDom: string;
-  /** 数组 */
+  /** CSS类名列表 */
   classList: string[];
-  /** 可空字段 */
+  /** 日志名称 */
   logName: string;
-  /** 可空字段 */
+  /** 日志数据 */
   logData: string;
-  /** 可空字段 */
+  /** 日志位置 */
   logPos: string;
-  /** 可空字段 */
+  /** 日志ID */
   logId: string;
-  /** 可空字段 */
+  /** 错误详情 */
   errorDetail: string;
-  stackTrace: { [key: string]: any }[];
+  /** 堆栈跟踪 */
+  stackTrace: StackTrace[];
+  /** 用户行为痕迹 */
   breadcrumbs: BehaviorItem[];
+  /** 错误唯一ID */
   errorUid: string;
+  /** 页面ID */
   pageId: string;
+  /** 速度 */
   speed: string;
+  /** 耗时 */
   costTime: string;
   /** FP timing object */
   fpTime:
@@ -170,41 +198,69 @@ export interface SaveLogRequest {
 }
 
 export interface BehaviorItem {
+  /** 行为类型 */
   type: string;
+  /** 监控ID */
   monitorId: string;
 }
 
 export interface Meta {
-  body: { [key: string]: any } | undefined;
+  /** 请求体 */
+  body:
+    | { [key: string]: any }
+    | undefined;
+  /** 结束时间 */
   endTime: string;
+  /** 交互时间 */
   interactionTime: string;
+  /** 加载完成时间 */
   loadedTime: string;
+  /** 加载中时间 */
   loadingTime: string;
+  /** 请求方法 */
   method: string;
-  params: { [key: string]: any } | undefined;
+  /** 请求参数 */
+  params:
+    | { [key: string]: any }
+    | undefined;
+  /** 查询URL */
   queryUrl: string;
+  /** 请求时间 */
   requestTime: string;
-  response: Response | undefined;
+  /** 响应信息 */
+  response:
+    | Response
+    | undefined;
+  /** 响应时间 */
   responseTime: string;
+  /** 状态码 */
   status: number;
+  /** 状态文本 */
   statusText: string;
+  /** URL */
   url: string;
+  /** 列号 */
+  col: string;
+  /** 文件名 */
+  file: string;
+  /** 行号 */
+  row: string;
 }
 
 export interface RequestInfo {
-  /** 内容下载 */
+  /** 内容下载时间 */
   contentDownload: number;
-  /** DNS 查找 */
+  /** DNS 查找时间 */
   dnsLookup: number;
-  /** 初始连接 */
+  /** 初始连接时间 */
   initialConnect: number;
   /** 发起者类型 */
   initiatorType: string;
-  /** 是否缓存 */
+  /** 是否使用缓存 */
   isCache: boolean;
   /** 请求 URL */
   name: string;
-  /** 请求时长 */
+  /** 请求持续时间 */
   requestDuration: number;
   /** 响应结束时间 */
   responseEnd: number;
@@ -218,35 +274,54 @@ export interface RequestInfo {
   transferSize: number;
 }
 
-/** 响应消息定义 */
 export interface Response {
+  /** 状态码 */
   status: number;
+  /** 消息 */
   message: string;
-  result: { [key: string]: any } | undefined;
-}
-
-export interface LogResponse {
-  status: number;
-  message: string;
+  /** 结果 */
   result: string;
 }
 
+export interface LogResponse {
+  /** 状态码 */
+  status: number;
+  /** 消息 */
+  message: string;
+  /** 结果数据 */
+  result: { [key: string]: any } | undefined;
+}
+
 export interface LogList {
-  /** 文档列表 */
+  /** 日志列表数据 */
   data: SaveLogRequest[];
   /** 分页信息 */
   pagination: Pagination | undefined;
 }
 
 export interface ChartList {
-  /** 文档列表 */
+  /** 图表数据列表 */
   data: ChartItem[];
+}
+
+export interface StackTrace {
+  /** 列号 */
+  colno: number;
+  /** 文件名 */
+  filename: string;
+  /** 函数名 */
+  functionName: string;
+  /** 行号 */
+  lineno: string;
 }
 
 export interface LogService {
   /** 保存走kafka, 不过两种都支持==== */
   saveLog(request: SaveLogRequest): Observable<LogResponse>;
+  /** 获取日志列表 */
   getLogs(request: QueryDTO): Observable<LogList>;
+  /** 通过游标获取日志列表 */
   getLogsByCursor(request: QueryDTO): Observable<LogList>;
+  /** 获取日志图表数据 */
   getLogsChart(request: QueryDTO): Observable<ChartList>;
 }

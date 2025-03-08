@@ -47,6 +47,7 @@ export class ApiLogService implements OnModuleInit {
    */
   async create(apiLog: ApiLog): Promise<Types.ObjectId> {
     try {
+      logger.info('Api上报', apiLog);
       const res = await this.apiModel.create(apiLog);
       return res._id;
     } catch (error) {

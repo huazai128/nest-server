@@ -182,4 +182,8 @@ export class Report {
     description: '页面ID,用于标识当前页面',
   })
   pageId: string | null;
+
+  @IsString()
+  @prop({ type: String, default: null, index: true }) // 添加索引提升追踪查询性能
+  traceId: string | null;
 }
