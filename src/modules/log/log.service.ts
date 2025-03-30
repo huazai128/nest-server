@@ -156,7 +156,7 @@ export class LogService {
               data as unknown as ApiLog,
             );
             break;
-          case TransportCategory.ERROR: // 错误上报
+          case TransportCategory.ERROR: // 错误上报 done
             log.onModel = RefType.ErrorLog;
             this.errorLogService.handleErrorAlert(data as unknown as ErrorLog);
             log.doce = await this.errorLogService.create(
@@ -180,7 +180,7 @@ export class LogService {
               data as unknown as PrefLog,
             );
             break;
-          case TransportCategory.USER:
+          case TransportCategory.USER: // 用户反馈上报 done
             await this.userLogService.create(data as unknown as UserLog);
             break;
         }

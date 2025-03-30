@@ -10,8 +10,6 @@ import { createLogger } from '@app/utils/logger';
 
 const logger = createLogger({ scope: 'HelperServiceAlarn', time: true });
 
-const url =
-  'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=6eba2924-3284-4039-9255-9f5d9642a482';
 interface Alarm {
   msgtype: string;
   markdown: object;
@@ -140,11 +138,7 @@ export class HelperServiceAlarn {
                   `,
       },
     };
-    const isTest =
-      userLog.mode == 'test' ||
-      userLog.mode == 'dev' ||
-      userLog?.content === '白屏检测自动反馈';
-    this.sendAlarm(userLog.siteId + '', data, isTest ? undefined : url);
+    this.sendAlarm(userLog.siteId + '', data);
   }
 
   /**
@@ -180,7 +174,7 @@ export class HelperServiceAlarn {
    */
   private async sendAlarm(id: string, data: Alarm, reportUrl?: string) {
     const siteInfo = await this.cacheService.get<Site>(getSiteCacheKey(id));
-    // logger.info(`告警：`, JSON.stringify(data))
+    logger.info(`告警：`, JSON.stringify(data));
     if (siteInfo?.reportUrl) {
       this.httpService.axiosRef
         .post(

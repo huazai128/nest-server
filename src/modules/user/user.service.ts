@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { UserLog } from './user.model';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
-// import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
+import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
 import { Cron } from '@nestjs/schedule';
 import * as dayjs from 'dayjs';
 import { createLogger } from '@app/utils/logger';
@@ -14,7 +14,7 @@ const logger = createLogger({ scope: 'LogService', time: true });
 export class UserLogService {
   constructor(
     @InjectModel(UserLog) private readonly userLogModel: MongooseModel<UserLog>,
-    // private readonly alarnService: HelperServiceAlarn,
+    private readonly alarnService: HelperServiceAlarn,
   ) {}
 
   /**
@@ -25,7 +25,8 @@ export class UserLogService {
    */
   async create(data: UserLog): Promise<Types.ObjectId> {
     try {
-      // this.alarnService.sendUserLogAlarm(data);
+      this.alarnService.sendUserLogAlarm(data);
+      console.log('UserLog 保存', data);
       const res = await this.userLogModel.create(data);
       return res._id;
     } catch (error) {

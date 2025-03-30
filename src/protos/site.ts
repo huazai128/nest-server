@@ -31,6 +31,8 @@ export interface SiteDocument {
   recordWhiteList: string[];
   /** 系统id */
   Id: string;
+  /** 反馈URL */
+  feedbackUrl: string;
 }
 
 export interface SiteRequest {
@@ -39,6 +41,7 @@ export interface SiteRequest {
   isApi: number;
   reportUrl: string;
   state: number;
+  feedbackUrl: string;
 }
 
 export interface SiteResponse {

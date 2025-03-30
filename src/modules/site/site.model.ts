@@ -126,6 +126,18 @@ export class Site {
   reportUrl: string; // 告警上报接口URL
 
   @IsDefined()
+  @IsString()
+  @IsNotEmpty({ message: '用户反馈接口URL不能为空' })
+  @IsUrl()
+  @prop({
+    required: true,
+    validate: /\S+/,
+    text: true,
+    trim: true,
+  })
+  feedbackUrl?: string; // 反馈接口URL
+
+  @IsDefined()
   @IsIn(SITE_PUBLISH_STATES)
   @IsInt()
   @prop({

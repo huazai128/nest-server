@@ -194,7 +194,11 @@ export interface SaveLogRequest {
     | PaintInfo
     | undefined;
   /** FCP timing value */
-  fcpTime: PaintInfo | undefined;
+  fcpTime:
+    | PaintInfo
+    | undefined;
+  /** 唯一ID ，用于用户自定上报id，如团队id、项目id等 */
+  oId: string;
 }
 
 export interface BehaviorItem {

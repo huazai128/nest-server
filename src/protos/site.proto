@@ -21,6 +21,7 @@ message SiteDocument {
   string update_at = 8;                // 更新时间
   repeated string recordWhiteList = 9; // 白名单记录
   string _id = 10;                     // 系统id
+  string feedbackUrl = 11;             // 反馈URL
 }
 
 message SiteRequest {
@@ -29,6 +30,7 @@ message SiteRequest {
   int32 isApi = 3;
   string reportUrl = 4;
   int32 state = 5;
+  string feedbackUrl = 6;
 }
 
 message SiteResponse {

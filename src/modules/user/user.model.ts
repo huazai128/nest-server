@@ -58,7 +58,7 @@ export class UserLog extends Report {
 
   @IsNumber()
   @prop({ type: String, default: null, text: true, index: true })
-  communityId: string;
+  oId: string;
 
   /**
    * 额外信息依照不同项目存储不同内容，在后台用户日志上报页面显示，支持换行符

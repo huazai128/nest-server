@@ -102,6 +102,7 @@ message SaveLogRequest {
   string costTime = 64;              // 耗时
   PaintInfo fpTime = 65;             // FP timing object
   PaintInfo fcpTime = 66;            // FCP timing value
+  string oId = 67;                   // 唯一ID ，用于用户自定上报id，如团队id、项目id等
 }
 
 message BehaviorItem {
