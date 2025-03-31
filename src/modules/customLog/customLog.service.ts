@@ -37,6 +37,7 @@ export class CustomLogService {
    */
   async create(data: CustomLog): Promise<Types.ObjectId> {
     try {
+      logger.log('Custom保存', JSON.stringify(data));
       const res = await this.customModel.create(data);
       return res._id;
     } catch (error) {
