@@ -1,12 +1,7 @@
 import { MongooseModel, MongooseID } from '@app/interfaces/mongoose.interface';
 import { InjectModel } from '@app/transformers/model.transform';
 import { Injectable } from '@nestjs/common';
-import {
-  PaginateOptions,
-  PaginateResult,
-  PipelineStage,
-  Types,
-} from 'mongoose';
+import { PaginateOptions, PipelineStage, Types } from 'mongoose';
 import { EventLog } from './eventLog.model';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import {
@@ -17,8 +12,10 @@ import {
 
 import { createLogger } from '@app/utils/logger';
 
+// 创建日志记录器
 const logger = createLogger({ scope: 'EventLogService', time: true });
 
+// 定义事件日志搜索关键字
 export const KW_KEYS: Array<string> = ['logId', 'logPos', 'logData', 'logName'];
 
 @Injectable()
@@ -28,9 +25,9 @@ export class EventLogService {
   ) {}
 
   /**
-   * 删除事件上报
-   * @param {EventLog} eventData
-   * @return {*}  {Promise<Types.ObjectId>}
+   * 创建事件上报
+   * @param {EventLog} eventData - 事件数据
+   * @return {Promise<Types.ObjectId>} 返回创建的事件ID
    * @memberof EventLogService
    */
   async create(eventData: EventLog): Promise<Types.ObjectId> {
@@ -45,22 +42,22 @@ export class EventLogService {
 
   /**
    * 根据站点ID删除相关事件上报
-   * @param {MongooseID} siteId
-   * @return {*}
+   * @param {MongooseID} siteId - 站点ID
+   * @return {Promise<any>} 删除结果
    * @memberof EventLogService
    */
   public async siteIdRemove(siteId: MongooseID) {
     const eventResult = await this.eventModel
       .deleteMany({ siteId: siteId })
       .exec();
-    logger.log('站点删除后error日志删除', siteId, eventResult);
+    logger.log('站点删除后event日志删除', siteId, eventResult);
     return eventResult;
   }
 
   /**
-   * 批量删除
-   * @param {MongooseID[]} ids
-   * @return {*}
+   * 批量删除事件日志
+   * @param {MongooseID[]} ids - 要删除的事件ID数组
+   * @return {Promise<any>} 删除结果
    * @memberof EventLogService
    */
   public async batchDelete(ids: MongooseID[]) {
@@ -71,9 +68,9 @@ export class EventLogService {
   }
 
   /**
-   * 聚合数据
-   * @param {any} query
-   * @return {*}
+   * 聚合数据查询
+   * @param {any} query - 查询参数
+   * @return {Promise<any>} 聚合结果
    * @memberof EventLogService
    */
   public async aggregate(query: any) {
@@ -90,10 +87,10 @@ export class EventLogService {
   }
 
   /**
-   * 分页查询
-   * @param {PaginateQuery<ErrorLog>} paginateQuery
-   * @param {PaginateOptions} paginateOptions
-   * @return {*}
+   * 分页查询事件日志
+   * @param {PaginateQuery<EventLog>} paginateQuery - 分页查询条件
+   * @param {PaginateOptions} paginateOptions - 分页选项
+   * @return {Promise<any>} 分页结果
    * @memberof EventLogService
    */
   public async paginate(
@@ -104,9 +101,9 @@ export class EventLogService {
   }
 
   /**
-   * 根据上报ID 分类聚合聚合数据
-   * @param {any} query
-   * @return {*}
+   * 根据上报ID分类聚合数据并分页
+   * @param {any} query - 查询参数
+   * @return {Promise<any>} 分页聚合结果
    * @memberof EventLogService
    */
   public async paginateAggregate(query: any) {
@@ -118,16 +115,20 @@ export class EventLogService {
   }
 
   /**
-   * 通用处理聚合
+   * 通用处理聚合查询
    * @private
-   * @param {any} query
-   * @return {*}
+   * @param {any} query - 查询参数
+   * @return {PipelineStage[]} 聚合管道配置
    * @memberof EventLogService
    */
-  private handleAggregateQuery(query: any) {
+  private handleAggregateQuery(query: any): PipelineStage[] {
+    // 处理搜索关键字
     const matchFilter = handleSearchKeys<any>(query, KW_KEYS);
+    // 判断时间段是否大于8小时
     const isGreaterEight = query.timeSlot > 8 * 60 * 60 * 1000;
+    // 获取投影选项
     const projectOption = projectHourOption();
+    // 获取分组选项
     const groupOption = groupHourOption(
       {
         apiList: { $push: { create_at: '$create_at', hour: '$hour' } },
@@ -135,6 +136,8 @@ export class EventLogService {
       },
       query.timeSlot === 24 * 60 * 60 * 1000,
     );
+
+    // 按天聚合的管道配置
     const dayPipe: PipelineStage[] = [
       { $match: matchFilter },
       { ...projectOption },
@@ -150,6 +153,8 @@ export class EventLogService {
       },
       { $sort: { startTime: 1 } },
     ];
+
+    // 按时间段聚合的管道配置
     const pipe: PipelineStage[] = [
       { $match: matchFilter },
       {
@@ -165,7 +170,7 @@ export class EventLogService {
               },
             ],
           },
-          apiList: { $push: { create_at: '$create_at' } }, //查看时间段内的数据
+          apiList: { $push: { create_at: '$create_at' } }, // 查看时间段内的数据
           count: { $sum: 1 },
         },
       },
@@ -179,6 +184,8 @@ export class EventLogService {
       },
       { $sort: { startTime: 1 } },
     ];
+
+    // 根据时间段长度选择合适的管道配置
     return isGreaterEight ? dayPipe : pipe;
   }
 }

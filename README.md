@@ -1,26 +1,71 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Project Name
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 重要提示 ⚠️
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+**Node.js v22 兼容性警告**：
+目前本项目在 Node.js v22 版本下存在编译问题。建议使用 Node.js v20 LTS 版本进行开发。
+nodev22 版本运行这里会报错 issues: https://github.com/protobufjs/protobuf.js/issues/2025
+
+## 项目描述
+
+基于 Nest.js 框架开发的服务端应用，集成了以下主要技术栈：
+
+- Nest.js - 企业级 Node.js Web 框架
+- Mongoose/Typegoose - MongoDB ODM
+- Redis - 缓存层
+- gRPC - 微服务通信
+
+## 系统要求
+
+- Node.js v20 LTS（不推荐 v22）
+- MongoDB 4.4+
+- Redis 6+
+
+## 安装
+
+```bash
+# 安装依赖
+yarn install
+```
+
+## 环境配置
+
+在项目根目录创建 `.env` 文件：
+
+```env
+# 应用配置
+PORT=3000
+NODE_ENV=development
+
+# 数据库配置
+MONGODB_URI=mongodb://localhost:27017/your-database
+REDIS_URL=redis://localhost:6379
+```
+
+## 运行
+
+```bash
+# 开发环境
+yarn run start:dev
+
+# 生产环境
+yarn run start:prod
+```
+
+## 测试
+
+```bash
+# 单元测试
+yarn run test
+
+# E2E 测试
+yarn run test:e2e
+
+# 测试覆盖率
+yarn run test:cov
+```
+
+## 项目结构
 
 ## Description
 
