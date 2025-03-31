@@ -2,9 +2,10 @@
 
 ## 重要提示 ⚠️
 
-**Node.js v22 兼容性警告**：
-目前本项目在 Node.js v22 版本下存在编译问题。建议使用 Node.js v20 LTS 版本进行开发。
-nodev22 版本运行这里会报错 issues: https://github.com/protobufjs/protobuf.js/issues/2025
+**Node.js 版本要求**：
+- 推荐使用 Node.js v20 LTS
+- 如果使用 Node.js v22，请确保版本 ≥ v22.8.0
+- 在 Node.js v22.8.0 之前的版本中存在 protobuf.js 相关的编译问题 (参考: https://github.com/protobufjs/protobuf.js/issues/2025)
 
 ## 项目描述
 
@@ -17,7 +18,9 @@ nodev22 版本运行这里会报错 issues: https://github.com/protobufjs/protob
 
 ## 系统要求
 
-- Node.js v20 LTS（不推荐 v22）
+- Node.js: 
+  - v20 LTS (推荐)
+  - v22.8.0 及以上版本
 - MongoDB 4.4+
 - Redis 6+
 
@@ -46,7 +49,8 @@ REDIS_URL=redis://localhost:6379
 
 ```bash
 # 开发环境
-yarn run start:dev
+$ yarn run proto
+$ yarn run start:dev
 
 # 生产环境
 yarn run start:prod

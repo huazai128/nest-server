@@ -163,7 +163,7 @@ export class LogService {
               data as unknown as ErrorLog,
             );
             break;
-          case TransportCategory.CUSTOM: // 自定义上报
+          case TransportCategory.CUSTOM: // 自定义上报、react上报
             log.onModel = RefType.CustomLog;
             log.doce = await this.customLogService.create(
               data as unknown as CustomLog,
@@ -185,11 +185,6 @@ export class LogService {
             break;
         }
         if (!Object.is(data.category, TransportCategory.USER)) {
-          const resp = data.response as any;
-          if (resp) {
-            // 防止打印数据量过大
-            log.response = resp;
-          }
           this.logModel.create(log);
         }
         logger.info('日志保存总耗时：', `${Date.now() - startNow}ms`);
