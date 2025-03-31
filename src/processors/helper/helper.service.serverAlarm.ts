@@ -1,8 +1,8 @@
-import { HttpService } from '@nestjs/axios'
-import { Injectable } from '@nestjs/common'
-import logger from '@app/utils/logger'
-import { isProdEnv } from '@app/app.env'
-import { ALARM_URL } from '@app/config'
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import logger from '@app/utils/logger';
+import { isProdEnv } from '@app/app.env';
+import { ALARM_URL } from '@app/config';
 
 @Injectable()
 export class HelperServiceServerAlarm {
@@ -14,7 +14,7 @@ export class HelperServiceServerAlarm {
    */
   async sendDBConnectAlarm(data: { title: string; content: string }) {
     // 开发环境不上报
-    if (!isProdEnv) return
+    if (!isProdEnv) return;
     this.httpService.axiosRef
       .post(
         ALARM_URL,
@@ -34,7 +34,10 @@ export class HelperServiceServerAlarm {
         },
       )
       .catch((error) => {
-        logger.error(`日志上报系统告警错误:${ALARM_URL}`, JSON.stringify(error))
-      })
+        logger.error(
+          `日志上报系统告警错误:${ALARM_URL}`,
+          JSON.stringify(error),
+        );
+      });
   }
 }

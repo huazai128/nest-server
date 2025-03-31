@@ -138,7 +138,7 @@ export class HelperServiceAlarn {
                   `,
       },
     };
-    this.sendAlarm(userLog.siteId + '', data);
+    this.sendAlarm(userLog.siteId + '', data, true);
   }
 
   /**
@@ -172,13 +172,15 @@ export class HelperServiceAlarn {
    * @param {Alarm} data
    * @memberof HelperServiceAlarn
    */
-  private async sendAlarm(id: string, data: Alarm, reportUrl?: string) {
+  private async sendAlarm(id: string, data: Alarm, isUseReport?: boolean) {
     const siteInfo = await this.cacheService.get<Site>(getSiteCacheKey(id));
     logger.info(`告警：`, JSON.stringify(data));
-    if (siteInfo?.reportUrl) {
+    if ((isUseReport && siteInfo?.feedbackUrl) || siteInfo?.reportUrl) {
       this.httpService.axiosRef
         .post(
-          reportUrl || siteInfo.reportUrl,
+          isUseReport && siteInfo?.feedbackUrl
+            ? siteInfo.feedbackUrl
+            : siteInfo.reportUrl,
           {
             ...data,
           },

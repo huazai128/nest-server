@@ -1,17 +1,17 @@
-import { HttpService } from '@nestjs/axios'
-import { Injectable } from '@nestjs/common'
-import { lookup } from 'geoip-lite'
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { lookup } from 'geoip-lite';
 
-type IP = string
+type IP = string;
 export interface IPLocation {
-  country: string
-  country_code: string
-  region: string
-  region_code: string
-  city: string
-  zip: string
-  latitude: number
-  longitude: number
+  country: string;
+  country_code: string;
+  region: string;
+  region_code: string;
+  city: string;
+  zip: string;
+  latitude: number;
+  longitude: number;
 }
 
 @Injectable()
@@ -27,7 +27,9 @@ export class HelperServiceIp {
    */
   private queryLocationApi(ip: IP): Promise<IPLocation> {
     return this.httpService.axiosRef
-      .get<any>(`http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,zip`)
+      .get<any>(
+        `http://ip-api.com/json/${ip}?fields=status,message,country,countryCode,region,regionName,city,zip`,
+      )
       .then((response) => {
         return response.data?.status !== 'success'
           ? Promise.reject(response.data.message)
@@ -40,13 +42,13 @@ export class HelperServiceIp {
               zip: response.data.zip,
               latitude: response.data.lat,
               longitude: response.data.lon,
-            })
+            });
       })
       .catch((error) => {
-        const message = error?.response?.data || error?.message || error
+        const message = error?.response?.data || error?.message || error;
         // logger.warn('queryLocationByIPAPI failed!', message)
-        return Promise.reject(message)
-      })
+        return Promise.reject(message);
+      });
   }
 
   /**
@@ -71,13 +73,13 @@ export class HelperServiceIp {
               zip: response.data.postal,
               latitude: response.data.latitude,
               longitude: response.data.longitude,
-            })
+            });
       })
       .catch((error) => {
-        const message = error?.response?.data || error?.message || error
+        const message = error?.response?.data || error?.message || error;
         // logger.warn('queryLocationByAPICo failed!', message)
-        return Promise.reject(message)
-      })
+        return Promise.reject(message);
+      });
   }
 
   /**
@@ -88,8 +90,8 @@ export class HelperServiceIp {
    * @memberof HelperServiceIp
    */
   private quertyLocationLite(ip: IP): Promise<IPLocation | null> {
-    const res = lookup(ip)
-    if (!res) return Promise.resolve(null)
+    const res = lookup(ip);
+    if (!res) return Promise.resolve(null);
     return Promise.resolve({
       country: res.country,
       country_code: res.country,
@@ -99,7 +101,7 @@ export class HelperServiceIp {
       zip: res.metro + '',
       latitude: res.ll[0],
       longitude: res.ll[1],
-    })
+    });
   }
 
   /**
@@ -111,6 +113,6 @@ export class HelperServiceIp {
   public queryLocation(ip: IP): Promise<IPLocation | null> {
     return this.queryLocationApi(ip)
       .catch(() => this.queryLocationByAPICo(ip))
-      .catch(() => this.quertyLocationLite(ip))
+      .catch(() => this.quertyLocationLite(ip));
   }
 }
