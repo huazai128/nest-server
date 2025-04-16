@@ -26,7 +26,6 @@ export class UserLogService {
   async create(data: UserLog): Promise<Types.ObjectId> {
     try {
       this.alarnService.sendUserLogAlarm(data);
-      console.log('UserLog 保存', data);
       const res = await this.userLogModel.create(data);
       return res._id;
     } catch (error) {

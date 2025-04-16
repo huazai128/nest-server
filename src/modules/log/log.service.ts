@@ -1,4 +1,4 @@
-import { MetricsName, TransportCategory } from '@app/constants/enum.contant';
+import { TransportCategory } from '@app/constants/enum.contant';
 import { MongooseID, MongooseModel } from '@app/interfaces/mongoose.interface';
 import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import { InjectModel } from '@app/transformers/model.transform';
@@ -39,6 +39,8 @@ import * as dayjs from 'dayjs';
 import { RpcException } from '@nestjs/microservices';
 import { convertDatesToString } from '@app/utils/dateToString';
 import { MeasureAsyncTime } from '@app/decorators/async.decorator';
+import { RecordService } from '../record/record.service';
+import { Record } from '../record/record.model';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -61,6 +63,7 @@ export class LogService {
     private readonly ipService: HelperServiceIp,
     private readonly userLogService: UserLogService,
     private readonly alarnService: HelperServiceAlarn,
+    private readonly recordService: RecordService,
   ) {}
 
   onModuleInit() {

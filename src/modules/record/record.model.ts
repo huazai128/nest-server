@@ -7,8 +7,9 @@ import {
   plugin,
   index,
   Severity,
+  getModelForClass,
 } from '@typegoose/typegoose';
-import { IsNumber, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
 
 @index(
@@ -38,8 +39,8 @@ import * as paginate from 'mongoose-paginate-v2';
     },
   },
 })
-export class UserLog extends Report {
-  @prop({ unique: true }) // 设置唯一索引
+export class Record extends Report {
+  @prop({ unique: true })
   id: number;
 
   @prop({ default: Date.now, immutable: true })
@@ -49,27 +50,17 @@ export class UserLog extends Report {
   update_at?: Date;
 
   @IsString()
-  @prop({ type: String, default: null })
-  events: string | null;
+  @prop({ required: true })
+  monitorId: string;
 
   @IsString()
-  @prop({ type: String, default: null, text: true, index: true })
-  content: string;
-
-  @IsNumber()
-  @prop({ type: String, default: null, text: true, index: true })
-  oId: string; // 用户上报系统中id 如团队id 等；
-
-  /**
-   * 额外信息依照不同项目存储不同内容，在后台用户日志上报页面显示，支持换行符
-   */
-  @IsString()
-  @prop({ type: Object, default: null })
-  extraInfo: object | null;
+  @prop({ required: true, type: String, text: true, index: true })
+  events: string;
 
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;
 }
 
-export const UserLogProvider = getProviderByTypegoose(UserLog);
+export const RecordModel = getModelForClass(Record);
+export const RecordProvider = getProviderByTypegoose(Record);

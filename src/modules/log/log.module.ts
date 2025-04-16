@@ -11,6 +11,7 @@ import { ErrorLogModule } from '../error/error.module';
 import { PvLogModule } from '../pv/pv.module';
 import { PrefModule } from '../perf/pref.module';
 import { UserLogModule } from '../user/user.module';
+import { RecordModule } from '../record/record.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserLogModule } from '../user/user.module';
     PvLogModule,
     PrefModule,
     UserLogModule,
+    RecordModule,
   ],
   controllers: [LogController],
   providers: [LogProvider, SiteProvider, LogService],

@@ -9,6 +9,7 @@ import { PvLogModule } from './pv/pv.module';
 import { CustomLogModule } from './customLog/customLog.module';
 import { ApiLogModule } from './api/api.module';
 import { UserLogModule } from './user/user.module';
+import { RecordModule } from './record/record.module';
 
 export default [
   AuthModule,
@@ -22,4 +23,5 @@ export default [
   CustomLogModule,
   ApiLogModule,
   UserLogModule,
+  RecordModule,
 ];
