@@ -112,7 +112,7 @@ export class LogService {
     }
     // 录屏上报信息
     if (data.category === TransportCategory.RV) {
-      this.saveErrorRecord(data as any);
+      this.recordService.create(data as unknown as Record);
       logger.info('录屏保存耗时：', `${Date.now() - startNow}ms`);
       return data;
     } else {

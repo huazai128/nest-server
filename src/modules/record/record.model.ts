@@ -8,9 +8,11 @@ import {
   index,
   Severity,
   getModelForClass,
+  Ref,
 } from '@typegoose/typegoose';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
+import { Site } from '../site/site.model';
 
 @index(
   { ...indexOptions },
@@ -49,17 +51,29 @@ export class Record extends Report {
   @prop({ default: Date.now })
   update_at?: Date;
 
+  @IsNotEmpty()
   @IsString()
   @prop({ required: true })
   monitorId: string;
 
+  @IsNotEmpty()
   @IsString()
   @prop({ required: true, type: String, text: true, index: true })
   events: string;
 
+  @IsNotEmpty()
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;
+
+  @IsNotEmpty()
+  @IsString()
+  @prop({ type: String, default: null })
+  pageId: string | null;
+
+  @IsNotEmpty()
+  @prop({ ref: () => Site, required: true, index: true })
+  siteId: Ref<Site>;
 }
 
 export const RecordModel = getModelForClass(Record);
