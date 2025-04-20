@@ -112,7 +112,7 @@ export class LogService {
     }
     // 录屏上报信息
     if (data.category === TransportCategory.RV) {
-      this.recordService.create(data as unknown as Record);
+      this.recordService.create(data as unknown as Record); // 录屏上报 done
       logger.info('录屏保存耗时：', `${Date.now() - startNow}ms`);
       return data;
     } else {
@@ -136,15 +136,6 @@ export class LogService {
         meta: data.meta,
         traceId: data.traceId,
       };
-      // TODO: ip查询地址比较耗时暂时去掉，后续替换其他查询服务, 这里还可以缓存起来，防止多次请求导致限流。
-      log.ip_location =
-        !isDevEnv && data.ip
-          ? await this.ipService.queryLocation(data.ip)
-          : null;
-      logger.info(
-        '上报数据:',
-        JSON.stringify({ ...log, content: data?.content }),
-      );
       try {
         switch (data.category) {
           case TransportCategory.EVENT: // 事件上报 done
@@ -463,14 +454,70 @@ export class LogService {
   public async handleOffsets(
     topicPartitions: TopicPartitionOffsetAndMetadata[],
   ) {
-    // return await this.kafkaService.commitOffsets(topicPartitions);
+    // 注释掉的代码：return await this.kafkaService.commitOffsets(topicPartitions);
+    // 该方法用于处理Kafka消息的偏移量提交，目前未启用Kafka服务
   }
 
+  /**
+   * 处理内存数据
+   * @param {PaginateQuery<Log>} query
+   * @param {QueryOptions<any>} option
+   * @return {*}
+   * @memberof LogService
+   */
   @MeasureAsyncTime()
   public async handleMemoryData(
     query: PaginateQuery<Log>,
     option?: QueryOptions<any>,
   ) {
     return this.logModel.find(query, option).exec();
+  }
+
+  /**
+   * 处理IP地址, 获取IP地址信息
+   * @param {string} ip
+   * @return {*}
+   * @memberof LogService
+   */
+  @MeasureAsyncTime()
+  public async hadnleIPLocation(ip: string) {
+    try {
+      const res = await this.ipService.queryLocation(ip);
+      logger.info('handleIPLocation', res);
+      // 确保返回非null值，防止TypeError: May not write null values to stream
+      if (!res) {
+        return {
+          ip,
+          country: '未知',
+          country_code: '',
+          province: '未知',
+          region: '未知',
+          region_code: '',
+          city: '未知',
+          zip: '',
+          latitude: 0,
+          longitude: 0,
+        };
+      }
+      return {
+        ip,
+        ...res,
+        province: res.region || '未知',
+      };
+    } catch (error) {
+      logger.error('handleIPLocation error:', error);
+      return {
+        ip,
+        country: '未知',
+        country_code: '',
+        province: '未知',
+        region: '未知',
+        region_code: '',
+        city: '未知',
+        zip: '',
+        latitude: 0,
+        longitude: 0,
+      }; // 返回默认值，确保不影响grpc流程
+    }
   }
 }

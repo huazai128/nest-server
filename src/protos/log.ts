@@ -12,6 +12,34 @@ import { type QueryDTO } from "./common/query_dto";
 
 export const protobufPackage = "logproto";
 
+export interface IPLocationRequest {
+  /** IP 地址 */
+  ip: string;
+}
+
+export interface IPLocationResponse {
+  /** IP 地址 */
+  ip: string;
+  /** 国家 */
+  country: string;
+  /** 省份 */
+  province: string;
+  /** 城市 */
+  city: string;
+  /** 国家代码 */
+  countryCode: string;
+  /** 地区 */
+  region: string;
+  /** 地区代码 */
+  regionCode: string;
+  /** 邮政编码 */
+  zip: string;
+  /** 纬度 */
+  latitude: number;
+  /** 经度 */
+  longitude: number;
+}
+
 export interface NTiming {
   /** First Paint 首次绘制时间 */
   fp: number;
@@ -332,4 +360,6 @@ export interface LogService {
   getLogsByCursor(request: QueryDTO): Observable<LogList>;
   /** 获取日志图表数据 */
   getLogsChart(request: QueryDTO): Observable<ChartList>;
+  /** 处理IP地理位置 */
+  handleIPLocation(request: IPLocationRequest): Observable<IPLocationResponse>;
 }

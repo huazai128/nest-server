@@ -153,7 +153,6 @@ export class LogController {
       },
       query.timeSlot === 24 * 60 * 60 * 1000,
     );
-
     const dayPipe: PipelineStage[] = [
       { $match: matchFilter },
       { ...projectOption },
@@ -202,6 +201,7 @@ export class LogController {
     const results = await this.logService.aggregation(
       isGreaterEight ? dayPipe : pipe,
     );
+    logger.info('getLogsChart', results);
     return results;
   }
   /**
@@ -258,6 +258,12 @@ export class LogController {
   //   return offset;
   // }
 
+  /**
+   * 获取内存数据
+   * @param {any} query
+   * @return {*}
+   * @memberof LogController
+   */
   @GrpcMethod('LogService', 'getMemoryData')
   getMemoryData({ ...query }: any) {
     const matchFilter = handleSearchKeys<any>(query, KW_KEYS);
@@ -309,5 +315,16 @@ export class LogController {
       { $sort: { startTime: 1 } },
     ];
     return this.logService.aggregation(pipe);
+  }
+
+  /**
+   * 处理IP地址
+   * @param {string} ip
+   * @return {*}
+   * @memberof LogController
+   */
+  @GrpcMethod('LogService', 'handleIPLocation')
+  handleIPLocation({ ip }: { ip: string }) {
+    return this.logService.hadnleIPLocation(ip);
   }
 }
