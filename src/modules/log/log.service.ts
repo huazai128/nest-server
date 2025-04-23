@@ -32,7 +32,6 @@ import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm'
 import { TopicPartitionOffsetAndMetadata } from '@nestjs/microservices/external/kafka.interface';
 import { Cron } from '@nestjs/schedule';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
-import { isDevEnv } from '@app/app.env';
 import { ChartList, SaveLogRequest } from '@app/protos/log';
 import { createLogger } from '@app/utils/logger';
 import * as dayjs from 'dayjs';

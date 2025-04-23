@@ -40,8 +40,8 @@ export class LogController {
   @GrpcMethod('LogService', 'saveLog')
   async saveLog(data: SaveLogRequest) {
     const cleanedData = omitBy(data, isNil);
-    //
-    cleanedData.ua_result = getUaInfo(cleanedData.ua);
+    const uaInfo = getUaInfo(cleanedData.ua);
+    cleanedData.ua_result = uaInfo && JSON.stringify(uaInfo);
     logger.info(`日志接收数据${cleanedData.reportsType}`, cleanedData);
     return this.logService.create(cleanedData);
   }

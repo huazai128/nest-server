@@ -126,16 +126,9 @@ message SaveLogRequest {
   string oId = 67;                   // 唯一ID ，用于用户自定上报id，如团队id、项目id等
   string componentName = 68;          // 组件名称
   string events = 69;                 // 录制视频数据 
-  UAResult ua_result = 70;              // ua解析结果
+  string ua_result = 70;              // ua解析结果
 }
-message UAResult {
-  string ua = 1;
-  google.protobuf.Struct browser = 2;
-  google.protobuf.Struct cpu = 3;
-  google.protobuf.Struct device = 4;
-  google.protobuf.Struct engine = 5;
-  google.protobuf.Struct os = 6;
-}
+
 
 
 message BehaviorItem {

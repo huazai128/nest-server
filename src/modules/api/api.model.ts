@@ -56,7 +56,7 @@ class ApiLogDTO extends Report {
 
   @IsString()
   @prop({ type: Object, default: null })
-  params: Object | null;
+  params: object | null;
 
   @IsString()
   @prop({ type: String, default: null })

@@ -16,7 +16,6 @@ import {
   TransportCategory,
   UserType,
 } from '@app/constants/enum.contant';
-import { IResult } from 'ua-parser-js';
 import mongoose from 'mongoose';
 import { IPLocation } from '@app/processors/helper/helper.service.ip';
 import { Site } from '@app/modules/site/site.model';
@@ -95,8 +94,8 @@ export class Report {
   @prop({ enum: Language, default: Language.Chinese })
   lang: Language;
 
-  @prop({ default: null, type: Object })
-  ua_result: Partial<IResult> | null;
+  @prop({ default: null, type: String })
+  ua_result: string | null;
 
   @IsString()
   @prop({ type: String, trim: true })

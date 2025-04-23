@@ -232,16 +232,7 @@ export interface SaveLogRequest {
   /** 录制视频数据 */
   events: string;
   /** ua解析结果 */
-  uaResult: UAResult | undefined;
-}
-
-export interface UAResult {
-  ua: string;
-  browser: { [key: string]: any } | undefined;
-  cpu: { [key: string]: any } | undefined;
-  device: { [key: string]: any } | undefined;
-  engine: { [key: string]: any } | undefined;
-  os: { [key: string]: any } | undefined;
+  uaResult: string;
 }
 
 export interface BehaviorItem {
