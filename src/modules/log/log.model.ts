@@ -55,28 +55,29 @@ export const LOG_REF_TYPE = [
   RefType.UserLog,
 ];
 
-// 优化搜索索引配置
+// 1. 分离text索引
 @index(
+  { title: 'text', href: 'text', url: 'text', value: 'text' },
   {
-    title: 'text',
-    href: 'text',
-    url: 'text',
-    value: 'text',
-    create_at: -1, // 修改为降序,提高最新数据查询效率
-    category: 1,
-    reportsType: 1,
-  },
-  {
-    name: 'SearchIndex',
+    name: 'TextSearchIndex',
     weights: {
-      url: 6, // url权重
-      value: 5, // 值权重
-      title: 4, // 添加标题权重
-      href: 3, // 添加href权重
+      url: 6,
+      value: 5,
+      title: 4,
+      href: 3,
     },
-    background: true, // 后台创建索引,避免阻塞
+    background: true,
   },
 )
+// 2. 针对游标分页的查询优化
+@index({ id: 1 }) // 主键索引
+// 3. 常用查询条件的组合索引
+@index({ category: 1, create_at: -1 })
+@index({ siteId: 1, create_at: -1 })
+@index({ reportsType: 1, create_at: -1 })
+// 4. 针对分组查询的索引
+@index({ userId: 1 })
+@index({ monitorId: 1 })
 @plugin(AutoIncrementID, {
   field: 'id',
   incrementBy: 1,

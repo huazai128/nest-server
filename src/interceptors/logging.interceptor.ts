@@ -35,8 +35,11 @@ export class LoggingInterceptor implements NestInterceptor {
     const now = Date.now();
     return call$.pipe(
       tap((response) => {
-        logger.debug('--- res：', response);
-        logger.debug('--- time：', `${Date.now() - now}ms`);
+        logger.debug(`${handler.name}--- res：`, response);
+        logger.debug(
+          '--- time：',
+          `${handler.name}方法耗时：${Date.now() - now}ms`,
+        );
       }),
     );
   }

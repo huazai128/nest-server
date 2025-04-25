@@ -218,59 +218,57 @@ export class LogService {
    */
   @MeasureAsyncTime()
   public async cursorPaginate(query: PaginateQuery<Log>): Promise<any> {
-    const { cursor, limit, sort, primaryKey, select, populate } = query;
+    const { cursor, limit, sort, primaryKey, select, populate, ...filters } =
+      query;
 
-    let findQuery = this.logModel.find(query) as any;
+    // 1. 使用投影优化
+    const projection = select
+      ? select.split(' ').reduce((acc, field) => {
+          acc[field] = 1;
+          return acc;
+        }, {})
+      : {};
 
-    if (select) {
-      findQuery = findQuery.select(select);
-    }
-
-    if (populate) {
-      findQuery = findQuery.populate(populate);
-    }
-
-    if (sort) {
-      findQuery = findQuery.sort(sort);
-    }
-
-    // 如果有cursor,就从cursor之后开始查询
+    // 2. 构建高效的查询条件
+    const queryConditions = { ...filters };
     if (cursor) {
-      const lastItem = await this.logModel.findOne({
-        id: cursor,
-      });
-      if (lastItem) {
-        const compare = sort[primaryKey] === 1 ? 'gt' : 'lt';
-        findQuery = findQuery
-          .where(primaryKey)
-          [compare](lastItem[primaryKey] as any);
-      }
+      queryConditions[primaryKey] =
+        sort?.[primaryKey] === 1 ? { $gt: cursor } : { $lt: cursor };
     }
 
-    // 查询多一条用于判断是否还有下一页
-    const docs = await findQuery.limit(limit + 1).exec();
+    // 3. 使用高效的查询方式
+    const docs = await this.logModel
+      .find(queryConditions)
+      .select(projection)
+      .sort(sort || { [primaryKey]: -1 })
+      .limit(limit + 1)
+      .lean()
+      .exec();
 
+    // 4. 处理结果
     const hasNextPage = docs.length > limit;
     const items = hasNextPage ? docs.slice(0, -1) : docs;
-    const nextCursor =
-      hasNextPage && items.length > 0
-        ? items[items.length - 1][primaryKey]
-        : null;
 
-    const list = items.map((item) => {
-      const { doce, ...obj } = item.toObject();
-      return {
-        ...obj,
-        ...doce,
-        create_at: dayjs(item.create_at).format('YYYY-MM-DD HH:mm:ss'),
-        update_at: dayjs(item.update_at).format('YYYY-MM-DD HH:mm:ss'),
-      };
-    });
+    // 5. 优化数据转换
+    const list = items.map(({ doce, create_at, update_at, ...rest }) => ({
+      ...rest,
+      ...(doce || {}),
+      create_at: create_at
+        ? dayjs(create_at).format('YYYY-MM-DD HH:mm:ss')
+        : null,
+      update_at: update_at
+        ? dayjs(update_at).format('YYYY-MM-DD HH:mm:ss')
+        : null,
+    }));
+
     return {
-      data: list || [],
+      data: list,
       pagination: {
         hasNextPage,
-        nextCursor,
+        nextCursor:
+          hasNextPage && items.length > 0
+            ? items[items.length - 1][primaryKey]
+            : null,
       },
     };
   }
@@ -455,6 +453,8 @@ export class LogService {
   ) {
     // 注释掉的代码：return await this.kafkaService.commitOffsets(topicPartitions);
     // 该方法用于处理Kafka消息的偏移量提交，目前未启用Kafka服务
+    // 此方法目前为空实现，因为Kafka服务未启用
+    return;
   }
 
   /**
