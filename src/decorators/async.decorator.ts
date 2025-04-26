@@ -33,6 +33,7 @@ export function MeasureAsyncTime() {
     descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
+    const className = target.constructor.name;
 
     descriptor.value = async function (...args: any[]) {
       const startTime = Date.now();
@@ -40,6 +41,7 @@ export function MeasureAsyncTime() {
         // 重写原方法，拦截所有await操作
         let awaitCount = 0;
         const awaitLocations = new Map<number, string>();
+        const awaitMethods = new Map<number, string>();
 
         const handler = {
           get: (target: any, prop: string | symbol) => {
@@ -48,16 +50,22 @@ export function MeasureAsyncTime() {
               const stack = new Error().stack;
               const location =
                 stack?.split('\n')[2]?.trim() || 'unknown location';
+
+              // 提取调用方法名
+              const methodMatch = location.match(/at\s+(\w+)\s+/);
+              const methodName = methodMatch ? methodMatch[1] : 'unknown';
+
               awaitCount++;
               const currentAwaitCount = awaitCount;
               awaitLocations.set(currentAwaitCount, location);
+              awaitMethods.set(currentAwaitCount, methodName);
 
               const awaitStartTime = Date.now();
               return value.then((result: any) => {
                 const awaitEndTime = Date.now();
                 const awaitDuration = awaitEndTime - awaitStartTime;
                 Logger.info(
-                  `Method ${propertyKey} await #${currentAwaitCount} at ${awaitLocations.get(currentAwaitCount)} took ${awaitDuration}ms`,
+                  `[${className}.${propertyKey}] await #${currentAwaitCount} method: ${awaitMethods.get(currentAwaitCount)} at ${awaitLocations.get(currentAwaitCount)} took ${awaitDuration}ms`,
                 );
                 return result;
               });
@@ -72,13 +80,16 @@ export function MeasureAsyncTime() {
         const duration = endTime - startTime;
 
         Logger.info(
-          `Method ${propertyKey} completed in ${duration}ms with ${awaitCount} await operations`,
+          `[${className}.${propertyKey}] completed in ${duration}ms with ${awaitCount} await operations`,
         );
         return result;
       } catch (error) {
         const endTime = Date.now();
         const duration = endTime - startTime;
-        Logger.error(`Method ${propertyKey} failed after ${duration}ms`, error);
+        Logger.error(
+          `[${className}.${propertyKey}] failed after ${duration}ms`,
+          error,
+        );
         throw error;
       }
     };

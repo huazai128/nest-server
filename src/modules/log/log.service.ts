@@ -40,6 +40,8 @@ import { convertDatesToString } from '@app/utils/dateToString';
 import { MeasureAsyncTime } from '@app/decorators/async.decorator';
 import { RecordService } from '../record/record.service';
 import { Record } from '../record/record.model';
+import { getSiteCacheKey } from '@app/constants/cache.contant';
+import { RedisService } from '@app/processors/redis/redis.service';
 
 const logger = createLogger({ scope: 'LogService', time: true });
 
@@ -63,6 +65,7 @@ export class LogService {
     private readonly userLogService: UserLogService,
     private readonly alarnService: HelperServiceAlarn,
     private readonly recordService: RecordService,
+    private readonly cacheService: RedisService,
   ) {}
 
   onModuleInit() {
@@ -104,7 +107,8 @@ export class LogService {
   public async create(data: SaveLogRequest): Promise<any> {
     const startNow = Date.now();
     // 站点放进缓存
-    const site = await this.siteModel.findById(data.siteId);
+    const site = await this.getSiteInfo(data.siteId);
+    logger.info('站点信息获取耗时', `${Date.now() - startNow}ms`);
     if (!site) {
       logger.error('站点已删除或者不存在');
       return '站点已删除或者不存在';
@@ -236,14 +240,23 @@ export class LogService {
         sort?.[primaryKey] === 1 ? { $gt: cursor } : { $lt: cursor };
     }
 
-    // 3. 使用高效的查询方式
-    const docs = await this.logModel
+    // 3. 使用高效的查询方式并添加populate
+    let queryBuilder = this.logModel
       .find(queryConditions)
       .select(projection)
       .sort(sort || { [primaryKey]: -1 })
-      .limit(limit + 1)
-      .lean()
-      .exec();
+      .limit(limit + 1);
+
+    // 添加populate支持
+    if (populate) {
+      if (typeof populate === 'object' && populate.path) {
+        queryBuilder = queryBuilder.populate(populate);
+      } else if (typeof populate === 'string') {
+        queryBuilder = queryBuilder.populate(populate);
+      }
+    }
+
+    const docs = await queryBuilder.lean().exec();
 
     // 4. 处理结果
     const hasNextPage = docs.length > limit;
@@ -518,5 +531,36 @@ export class LogService {
         longitude: 0,
       }; // 返回默认值，确保不影响grpc流程
     }
+  }
+
+  /**
+   * 获取站点缓存键值
+   * @param id 站点ID
+   * @returns 缓存键值
+   */
+  private getCacheKey = (id: string): string => {
+    return getSiteCacheKey(id);
+  };
+
+  /**
+   * 获取站点信息
+   * @param id 站点ID
+   * @returns 站点信息
+   */
+  public async getSiteInfo(id?: string): Promise<Site | null> {
+    if (!id) return null;
+    // 尝试从缓存获取
+    const cacheKey = this.getCacheKey(id);
+    const siteInfoCache = await this.cacheService.get<Site>(cacheKey);
+    if (siteInfoCache) {
+      return siteInfoCache;
+    }
+
+    // 缓存未命中，从数据库获取并设置缓存
+    const siteInfo = await this.siteModel.findById(id).exec();
+    if (siteInfo) {
+      await this.cacheService.set(cacheKey, siteInfo);
+    }
+    return siteInfo;
   }
 }
