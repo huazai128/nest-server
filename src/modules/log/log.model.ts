@@ -78,6 +78,8 @@ export const LOG_REF_TYPE = [
 // 4. 针对分组查询的索引
 @index({ userId: 1 })
 @index({ monitorId: 1 })
+// 针对聚合常用的过滤和分组字段建立复合索引
+@index({ siteId: 1, category: 1, reportsType: 1, create_at: 1 })
 @plugin(AutoIncrementID, {
   field: 'id',
   incrementBy: 1,
@@ -163,6 +165,7 @@ export class Log {
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
     default: null,
+    select: false,
   })
   body: object | null;
 
@@ -171,10 +174,11 @@ export class Log {
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
     default: null, // 修改默认值为null
+    select: false,
   })
   params: object | null;
 
-  @prop({ type: () => Response, _id: false, default: null })
+  @prop({ type: () => Response, _id: false, default: null, select: false })
   response: Response | null;
 
   @IsString()

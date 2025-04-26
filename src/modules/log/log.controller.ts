@@ -162,7 +162,6 @@ export class LogController {
    * @return {*}  {Promise<ChartList>} 图表数据列表
    * @memberof LogController
    */
-  @GrpcMethod('LogService', 'getLogsChart')
   @GrpcMethod('LogService', 'getLogsChart') // 重复的装饰器，可能是错误
   async getLogsChart(data: LogChartQueryDTO): Promise<ChartList> {
     // 转换查询参数为DTO对象
