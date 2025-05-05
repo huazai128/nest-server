@@ -4,6 +4,9 @@ import { existsSync, mkdirSync, createWriteStream, unlinkSync } from 'fs-extra';
 import AdmZip from 'adm-zip';
 import { Readable } from 'stream';
 import { Observable } from 'rxjs';
+import { Cron } from '@nestjs/schedule';
+import { removeFilesExceptLatest3 } from '@app/utils/clean-old-files';
+
 @Injectable()
 export class ExpansionServiceUpload {
   // 上传文件存放目录
@@ -58,5 +61,14 @@ export class ExpansionServiceUpload {
         next: (chunk) => observer.next(chunk),
       });
     });
+  }
+
+  /**
+   * 清理过期文件
+   * @memberof ExpansionServiceUpload
+   */
+  @Cron('0 0 * * *')
+  public async cleanOldFiles() {
+    await removeFilesExceptLatest3(join(process.cwd(), 'public/expansion'));
   }
 }

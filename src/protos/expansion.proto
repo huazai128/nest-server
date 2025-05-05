@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package expansion;
+
+service ExpansionService {
+  // 流式上传大文件 - 将文件分割成多个小块进行传输
+  rpc uploadZipFileStream(stream FileChunk) returns (UploadResponse);
+}
+
+// 文件块信息
+message FileChunk {
+  bytes content = 1;       // 文件块内容
+  string filename = 2;     // 文件名
+  int32 chunkIndex = 3;    // 块索引
+  int32 totalChunks = 4;   // 总块数
+  string fileId = 5;       // 文件唯一标识
+}
+
+// 上传响应
+message UploadResponse {
+  bool success = 1;        // 是否成功
+  string message = 2;      // 响应消息
+  string fileUrl = 3;      // 文件URL
+  string fileId = 4;       // 文件ID
+}

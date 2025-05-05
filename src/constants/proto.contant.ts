@@ -1,8 +1,15 @@
-export const PROTOPACKAGE = ['userproto', 'authproto', 'siteproto', 'logproto'];
+export const PROTOPACKAGE = [
+  'userproto',
+  'authproto',
+  'siteproto',
+  'logproto',
+  'expansion',
+];
 
 export const PROTOPATH = [
   'user.proto',
   'auth.proto',
   'site.proto',
   'log.proto',
+  'expansion.proto',
 ];
