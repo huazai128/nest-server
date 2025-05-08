@@ -1,13 +1,15 @@
-import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
+import { Controller, UseInterceptors } from '@nestjs/common';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { ExpansionServiceUpload } from './expansion.service.upload';
 import { createLogger } from '@app/utils/logger';
 import { Observable } from 'rxjs';
 import { FileChunk, UploadResponse } from '@app/protos/expansion';
+import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 
 const logger = createLogger({ scope: 'ExpansionController', time: true });
 
 @Controller()
+@UseInterceptors(LoggingInterceptor) // 使用日志拦截器记录请求和响应
 export class ExpansionController {
   constructor(private readonly uploadService: ExpansionServiceUpload) {}
 
@@ -91,7 +93,7 @@ export class ExpansionController {
    * @return {Promise<any>} 上传结果
    * @memberof ExpansionController
    */
-  @GrpcMethod('ExpansionService', 'uploadZipFileStream')
+  @GrpcStreamMethod('ExpansionService', 'uploadZipFileStream')
   public async uploadZipFileStream(
     fileChunks: Observable<FileChunk>,
   ): Promise<UploadResponse> {

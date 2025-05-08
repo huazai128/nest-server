@@ -10,6 +10,7 @@ import { CustomLogModule } from './customLog/customLog.module';
 import { ApiLogModule } from './api/api.module';
 import { UserLogModule } from './user/user.module';
 import { RecordModule } from './record/record.module';
+import { ExpansionModule } from './expansion/expansion.module';
 
 export default [
   AuthModule,
@@ -24,4 +25,5 @@ export default [
   ApiLogModule,
   UserLogModule,
   RecordModule,
+  ExpansionModule,
 ];
