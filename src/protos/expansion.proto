@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package expansion;
+package expansionproto;
 
 service ExpansionService {
   // 流式上传大文件 - 将文件分割成多个小块进行传输
@@ -13,7 +13,7 @@ message FileChunk {
   string filename = 2;     // 文件名
   int32 chunkIndex = 3;    // 块索引
   int32 totalChunks = 4;   // 总块数
-  string fileId = 5;       // 文件唯一标识
+  string siteId = 5;       // 文件唯一标识
 }
 
 // 上传响应

@@ -3,7 +3,7 @@ export const PROTOPACKAGE = [
   'authproto',
   'siteproto',
   'logproto',
-  'expansion',
+  'expansionproto',
 ];
 
 export const PROTOPATH = [

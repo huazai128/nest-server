@@ -7,7 +7,7 @@
 /* eslint-disable */
 import { Observable } from "rxjs";
 
-export const protobufPackage = "expansion";
+export const protobufPackage = "expansionproto";
 
 /** 文件块信息 */
 export interface FileChunk {
@@ -20,7 +20,7 @@ export interface FileChunk {
   /** 总块数 */
   totalChunks: number;
   /** 文件唯一标识 */
-  fileId: string;
+  siteId: string;
 }
 
 /** 上传响应 */
