@@ -115,15 +115,36 @@ export class SiteService {
 
   /**
    * 分页获取站点列表
-   * @param paginateQuery 查询条件
-   * @param paginateOptions 分页选项
-   * @returns 分页后的站点列表
    */
   @MeasureAsyncTime()
-  public paginate(
+  public async paginate(
     paginateQuery: PaginateQuery<Site>,
     paginateOptions: PaginateOptions,
   ): Promise<PaginateResult<Site>> {
+    // 添加默认投影，只返回必要字段
+    const defaultProjection = {
+      id: 1,
+      name: 1,
+      state: 1,
+      isApi: 1,
+      reportUrl: 1,
+      feedbackUrl: 1,
+      create_at: 1,
+      update_at: 1,
+      _id: 0, // 不返回 _id
+    };
+
+    // 合并投影
+    paginateOptions.select = {
+      ...defaultProjection,
+      ...((paginateOptions.select as Record<string, number>) || {}),
+    };
+
+    // 添加默认排序
+    if (!paginateOptions.sort) {
+      paginateOptions.sort = { create_at: -1 };
+    }
+
     return this.siteModel.paginate(paginateQuery, paginateOptions);
   }
 
@@ -173,35 +194,64 @@ export class SiteService {
 
   /**
    * 获取站点信息(优先从缓存获取)
-   * @param id 站点ID
-   * @returns 站点信息或null
    */
   @MeasureAsyncTime()
   public async getSiteInfo(id?: string): Promise<Site | null> {
     if (!id) return null;
 
-    // 尝试从缓存获取
     const cacheKey = this.getCacheKey(id);
-    const siteInfoCache = await this.cacheService.get<Site>(cacheKey);
-    if (siteInfoCache) {
-      return siteInfoCache;
+
+    // 使用 pipeline 优化缓存获取
+    const cachedSite = await this.cacheService.get<Site>(cacheKey);
+    if (cachedSite) {
+      return cachedSite;
     }
 
-    // 缓存未命中，从数据库获取并设置缓存
-    const siteInfo = await this.siteModel.findById(id).exec();
+    // 只查询必要字段
+    const siteInfo = await this.siteModel
+      .findById(id)
+      .select({
+        id: 1,
+        name: 1,
+        state: 1,
+        isApi: 1,
+        reportUrl: 1,
+        feedbackUrl: 1,
+        create_at: 1,
+        update_at: 1,
+        _id: 0,
+      })
+      .lean() // 使用 lean() 返回普通 JavaScript 对象，提高性能
+      .exec();
+
     if (siteInfo) {
-      await this.cacheService.set(cacheKey, siteInfo);
+      // 设置缓存，添加过期时间
+      await this.cacheService.set(cacheKey, siteInfo, 3600); // 1小时过期
     }
+
     return siteInfo;
   }
 
   /**
    * 根据自增ID获取站点信息
-   * @param id 自增ID
-   * @returns 站点信息
    */
   @MeasureAsyncTime()
   public async getByIdSiteInfo(id: number): Promise<Site | null> {
-    return this.siteModel.findOne({ id }).exec();
+    // 使用 lean() 和 select() 优化查询
+    return this.siteModel
+      .findOne({ id })
+      .select({
+        id: 1,
+        name: 1,
+        state: 1,
+        isApi: 1,
+        reportUrl: 1,
+        feedbackUrl: 1,
+        create_at: 1,
+        update_at: 1,
+        _id: 1,
+      })
+      .lean()
+      .exec();
   }
 }

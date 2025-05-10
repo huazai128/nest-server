@@ -87,6 +87,9 @@ class APIRule {
     },
   },
 })
+@index({ name: 1, state: 1 })
+@index({ create_at: -1 })
+@index({ update_at: -1 })
 export class Site {
   @prop({ unique: true })
   id?: number; // 站点唯一标识ID
