@@ -6,6 +6,14 @@ import { Readable } from 'stream';
 import { Observable } from 'rxjs';
 import { Cron } from '@nestjs/schedule';
 import { removeFilesExceptLatest3 } from '@app/utils/clean-old-files';
+import { createLogger } from '@app/utils/logger';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const logger = createLogger({
+  scope: 'ExpansionServiceUpload',
+  time: true,
+});
 
 @Injectable()
 export class ExpansionServiceUpload {
@@ -27,9 +35,13 @@ export class ExpansionServiceUpload {
     const fileName = file.originalname;
     const fileExt = fileName.split('.').pop().toLowerCase();
     if (fileExt !== 'zip') {
+      logger.error('zip 文件格式错误');
       throw 'Invalid file format. Only .zip file allowed.';
     }
-    const path = `${this.UPLOAD_DIR}/${siteId}`;
+
+    // 添加时间戳到路径中
+    const timestamp = Date.now();
+    const path = `${this.UPLOAD_DIR}/${siteId}/${timestamp}`;
 
     // 直接使用file数据（Uint8Array）创建AdmZip实例
     const zip = new AdmZip(Buffer.from(file.buffer));
@@ -61,6 +73,11 @@ export class ExpansionServiceUpload {
     return { msg: '上传成功' };
   }
 
+  /**
+   * 上传 zip 文件流
+   * @param {Observable<any>} fileChunks
+   * @returns {Observable<any>}
+   */
   uploadZipStream(fileChunks: Observable<any>) {
     return new Observable((observer) => {
       fileChunks.subscribe({
@@ -70,16 +87,28 @@ export class ExpansionServiceUpload {
   }
 
   /**
-   * 清理过期文件
+   * 清理所有 siteId 目录下的过期文件
    * @memberof ExpansionServiceUpload
    */
-  @Cron('0 0 * * *')
-  public async cleanOldFiles() {
-    const expansionPath = join(process.cwd(), 'public/expansion');
+  @Cron('0 0 * * *') // 每天凌晨执行
+  public async cleanAllSiteFiles() {
     try {
-      await removeFilesExceptLatest3(expansionPath);
+      // 读取 UPLOAD_DIR 下的所有目录（每个目录对应一个 siteId）
+      const siteDirs = await fs.promises.readdir(this.UPLOAD_DIR);
+
+      // 对每个 siteId 目录执行清理
+      for (const siteId of siteDirs) {
+        const sitePath = path.join(this.UPLOAD_DIR, siteId);
+        const stat = await fs.promises.stat(sitePath);
+
+        // 确保是目录
+        if (stat.isDirectory()) {
+          await removeFilesExceptLatest3(sitePath);
+          logger.info(`Cleaned old files for siteId: ${siteId}`);
+        }
+      }
     } catch (error) {
-      console.error('Failed to clean old files:', error);
+      logger.error('Failed to clean site files:', error);
     }
   }
 }
