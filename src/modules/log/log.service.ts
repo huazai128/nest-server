@@ -266,6 +266,8 @@ export class LogService {
     const list = items.map(({ doce, create_at, update_at, ...rest }) => ({
       ...rest,
       ...(doce || {}),
+      cId: doce?.id,
+      tId: doce?._id,
       create_at: create_at
         ? dayjs(create_at).format('YYYY-MM-DD HH:mm:ss')
         : null,

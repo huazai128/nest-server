@@ -26,7 +26,7 @@ export class Meta {
 
   @IsString()
   @IsUrl()
-  @prop({ type: String, default: null, text: true })
+  @prop({ type: String, default: null, index: true })
   file: string | null;
 
   @IsNumber()
@@ -39,13 +39,14 @@ export class Meta {
 
   @IsString()
   @IsUrl()
-  @prop({ type: String, default: null, text: true })
+  @prop({ type: String, default: null, index: true })
   url: string | null;
 
   @prop({
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
     default: undefined,
+    select: false, // 默认不查询此字段，提高查询性能
   })
   body: object | null;
 
@@ -58,25 +59,26 @@ export class Meta {
   responseTime: number;
 
   @IsNumber()
-  @prop({ type: Number, default: 0 })
+  @prop({ type: Number, default: 0, index: true })
   status: number;
 
   @IsString()
   @prop({ type: String, default: null })
   statusText: string | null;
 
-  @prop({ type: () => Response, _id: false, default: null })
+  @prop({ type: () => Response, _id: false, default: null, select: false }) // 默认不查询此字段
   response: Response | null;
 
   @prop({
     allowMixed: Severity.ALLOW,
     type: () => mongoose.Schema.Types.Mixed,
     default: undefined,
+    select: false, // 默认不查询此字段
   })
   params: object | null;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, index: true })
   conponentName: string | null;
 }
 
@@ -86,7 +88,7 @@ export class StackTrace {
   colno: number;
 
   @IsUrl()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, index: true })
   filename: string | null;
 
   @IsString()
@@ -100,14 +102,14 @@ export class StackTrace {
 
 export class ErrorDto extends Report {
   @IsArray()
-  @prop({ _id: false, default: [] })
+  @prop({ _id: false, default: [], select: false }) // 默认不查询此字段，按需加载
   breadcrumbs: Array<BreadcrumbsType>;
 
   @prop({ _id: false, default: {}, type: () => Meta })
   meta: Meta;
 
   @IsArray()
-  @prop({ _id: false, default: [], type: () => [StackTrace] })
+  @prop({ _id: false, default: [], type: () => [StackTrace], select: false }) // 默认不查询此字段
   stackTrace: Array<StackTrace>;
 
   @IsString()
@@ -115,15 +117,15 @@ export class ErrorDto extends Report {
   errorType: string | null;
 
   @IsString()
-  @prop({ type: String, default: null, index: true, text: true })
+  @prop({ type: String, default: null, index: true })
   value: string | null;
 
   @IsString()
-  @prop({ type: String, default: null, text: true })
+  @prop({ type: String, default: null, select: false }) // 默认不查询此字段
   errorDetail: string | null;
 
   @IsString()
-  @prop({ type: String, default: null })
+  @prop({ type: String, default: null, select: false }) // 默认不查询此字段
   events: string | null;
 }
 
@@ -144,8 +146,15 @@ export class ErrorDto extends Report {
       file: 10,
       value: 4,
     },
+    background: true, // 后台创建索引，不阻塞操作
   },
 )
+@index({ siteId: 1, create_at: -1 })
+@index({ reportsType: 1, create_at: -1 })
+@index({ errorType: 1, value: 1 })
+// 添加常用查询组合的复合索引
+@index({ siteId: 1, errorType: 1, create_at: -1 })
+@index({ siteId: 1, reportsType: 1, create_at: -1 })
 @plugin(AutoIncrementID, {
   field: 'id',
   incrementBy: 1,
@@ -162,10 +171,11 @@ export class ErrorDto extends Report {
       createdAt: 'create_at',
       updatedAt: 'update_at',
     },
+    autoIndex: true,
   },
 })
 export class ErrorLog extends ErrorDto {
-  @prop({ unique: true }) // 设置唯一索引
+  @prop({ unique: true, index: true }) // 确保id有索引
   id: number;
 
   @prop({ default: Date.now, index: true, immutable: true })

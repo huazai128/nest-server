@@ -1,4 +1,4 @@
 export interface ValueItem {
-  _id: string
-  total: number
+  _id: string;
+  total: number;
 }

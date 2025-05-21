@@ -4,6 +4,7 @@ export const PROTOPACKAGE = [
   'siteproto',
   'logproto',
   'expansionproto',
+  'errorproto',
 ];
 
 export const PROTOPATH = [
@@ -12,4 +13,5 @@ export const PROTOPATH = [
   'site.proto',
   'log.proto',
   'expansion.proto',
+  'error.proto',
 ];

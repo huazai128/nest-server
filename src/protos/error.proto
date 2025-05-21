@@ -1,0 +1,159 @@
+syntax = "proto3";
+package errorproto;
+
+import public "common/pagination.proto";
+import public "common/query_dto.proto";
+import public "common/chart_item.proto";
+
+
+service ErrorService {
+  rpc getErrorLogs (QueryDTO) returns (ErrorLogsResponse) {}
+  rpc getErrorList (ErrorListRequest) returns (ErrorListResponse) {}
+  rpc getErrorOverview (ErrorOverviewRequest) returns (ErrorOverviewResponse) {}
+  rpc getErrorValues (ErrorValuesRequest) returns (ErrorValuesResponse) {}
+  rpc getErrorCount (ErrorCountRequest) returns (ErrorCountResponse) {}
+  rpc getErrorStatisticsPaginate (ErrorStatisticsPaginateRequest) returns (ErrorStatisticsPaginateResponse) {}
+  rpc getErrorInfo (ErrorInfoRequest) returns (ErrorInfoResponse) {}
+}
+
+message PaginateOptions {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort = 3;
+}
+
+message ErrorLog {
+  string id = 1;
+  string title = 2;
+  string path = 3;
+  string href = 4;
+  string value = 5;
+  string reportsType = 6;
+  Meta meta = 7;
+  string createdAt = 8;
+  string updatedAt = 9;
+}
+
+message Meta {
+  string url = 1;
+  string body = 2;
+  string params = 3;
+  string file = 4;
+}
+
+message ErrorLogsRequest {
+  int32 page = 1;
+  int32 size = 2;
+  int32 sort = 3;
+  string type = 4;
+  string keyword = 5;
+}
+
+message ErrorLogsResponse {
+  repeated ErrorLog docs = 1;
+  int32 totalDocs = 2;
+  int32 limit = 3;
+  int32 totalPages = 4;
+  int32 page = 5;
+  int32 pagingCounter = 6;
+  bool hasPrevPage = 7;
+  bool hasNextPage = 8;
+  int32 prevPage = 9;
+  int32 nextPage = 10;
+}
+
+message ErrorListRequest {
+  string type = 1;
+  string keyword = 2;
+  string timeSlot = 3;
+}
+
+message ErrorListResponse {
+  repeated ErrorListItem items = 1;
+}
+
+message ErrorListItem {
+  string startTime = 1;
+  int32 count = 2;
+}
+
+message ErrorOverviewRequest {
+  string siteId = 1;
+}
+
+message ErrorOverviewResponse {
+  int32 totalCount = 1;
+  int32 todayCount = 2;
+  int32 yesterdayCount = 3;
+  int32 weekCount = 4;
+}
+
+message ErrorValuesRequest {
+  string siteId = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message ErrorValuesResponse {
+  repeated ErrorValueItem docs = 1;
+  int32 totalDocs = 2;
+  int32 limit = 3;
+  int32 totalPages = 4;
+  int32 page = 5;
+  int32 pagingCounter = 6;
+  bool hasPrevPage = 7;
+  bool hasNextPage = 8;
+  int32 prevPage = 9;
+  int32 nextPage = 10;
+}
+
+message ErrorValueItem {
+  string value = 1;
+  int32 count = 2;
+}
+
+message ErrorCountRequest {
+  string startTime = 1;
+  string endTime = 2;
+  string keyword = 3;
+}
+
+message ErrorCountResponse {
+  int32 count = 1;
+  int32 yesterdayCount = 2;
+  int32 weekCount = 3;
+}
+
+message ErrorStatisticsPaginateRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string keyword = 3;
+  string reportsType = 4;
+}
+
+message ErrorStatisticsPaginateResponse {
+  repeated ErrorStatisticsItem docs = 1;
+  int32 totalDocs = 2;
+  int32 limit = 3;
+  int32 totalPages = 4;
+  int32 page = 5;
+  int32 pagingCounter = 6;
+  bool hasPrevPage = 7;
+  bool hasNextPage = 8;
+  int32 prevPage = 9;
+  int32 nextPage = 10;
+}
+
+message ErrorStatisticsItem {
+  string value = 1;
+  int32 count = 2;
+  string lastOccurredAt = 3;
+}
+
+message ErrorInfoRequest {
+  int32 id = 1;
+}
+
+message ErrorInfoResponse {
+  ErrorLog error = 1;
+}
