@@ -139,7 +139,6 @@ export class ErrorLogController {
    */
   @GrpcMethod('ErrorService', 'getErrorInfo')
   getErrorInfo(params: any) {
-    console.log('params======', params);
     return this.errorLogService.getIdByInfo(Number(params.id));
   }
 }

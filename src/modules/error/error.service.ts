@@ -366,7 +366,6 @@ export class ErrorLogService implements OnModuleInit {
    */
   public async getIdByInfo(id: number) {
     const error = await this.errorModel.findOne({ id: id }).exec();
-    console.log('error======', error);
     return error;
   }
 

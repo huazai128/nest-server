@@ -5,155 +5,186 @@ import public "common/pagination.proto";
 import public "common/query_dto.proto";
 import public "common/chart_item.proto";
 
+// Import common types
+import "google/protobuf/timestamp.proto";
 
-service ErrorService {
-  rpc getErrorLogs (QueryDTO) returns (ErrorLogsResponse) {}
-  rpc getErrorList (ErrorListRequest) returns (ErrorListResponse) {}
-  rpc getErrorOverview (ErrorOverviewRequest) returns (ErrorOverviewResponse) {}
-  rpc getErrorValues (ErrorValuesRequest) returns (ErrorValuesResponse) {}
-  rpc getErrorCount (ErrorCountRequest) returns (ErrorCountResponse) {}
-  rpc getErrorStatisticsPaginate (ErrorStatisticsPaginateRequest) returns (ErrorStatisticsPaginateResponse) {}
-  rpc getErrorInfo (ErrorInfoRequest) returns (ErrorInfoResponse) {}
+// TransportCategory enum
+enum TransportCategory {
+  UNKNOWN = 0;
+  API = 1;
+  CUSTOM = 2;
+  EVENT = 3;
 }
 
-message PaginateOptions {
-  int32 page = 1;
-  int32 limit = 2;
-  string sort = 3;
+// BreadcrumbsType message
+message BreadcrumbsType {
+  TransportCategory type = 1;
+  string monitor_id = 2;
 }
 
-message ErrorLog {
-  string id = 1;
-  string title = 2;
-  string path = 3;
-  string href = 4;
-  string value = 5;
-  string reportsType = 6;
-  Meta meta = 7;
-  string createdAt = 8;
-  string updatedAt = 9;
-}
-
+// Meta message represents metadata about the error
 message Meta {
-  string url = 1;
-  string body = 2;
-  string params = 3;
-  string file = 4;
+  int32 col = 1;
+  string file = 2;
+  int32 row = 3;
+  string method = 4;
+  string url = 5;
+  bytes body = 6;
+  int32 request_time = 7;
+  int32 response_time = 8;
+  int32 status = 9;
+  string status_text = 10;
+  bytes response = 11;
+  bytes params = 12;
+  string component_name = 13;
 }
 
-message ErrorLogsRequest {
+// StackTrace message represents a stack trace entry
+message StackTrace {
+  int32 colno = 1;
+  string filename = 2;
+  string function_name = 3;
+  int32 lineno = 4;
+}
+
+// Error message represents the main error data
+message Error {
+  repeated BreadcrumbsType breadcrumbs = 1;
+  Meta meta = 2;
+  repeated StackTrace stack_trace = 3;
+  string error_type = 4;
+  string value = 5;
+  string error_detail = 6;
+  string events = 7;
+  int64 id = 8;
+  google.protobuf.Timestamp create_at = 9;
+  google.protobuf.Timestamp update_at = 10;
+  string site_id = 11;
+  string reports_type = 12;
+  repeated string recordKeys = 13;
+}
+
+// ErrorService defines the service for error handling
+service ErrorService {
+  // Get error logs with pagination
+  rpc getErrorLogs(GetErrorLogsRequest) returns (stream PaginateResponse) {}
+  
+  // Get error list with aggregation
+  rpc getErrorList(GetErrorListRequest) returns (stream ErrorListResponse) {}
+  
+  // Get error overview statistics
+  rpc getErrorOverview(GetErrorOverviewRequest) returns (stream ErrorOverviewResponse) {}
+  
+  // Get error values statistics
+  rpc getErrorValues(GetErrorValuesRequest) returns (stream ErrorValuesResponse) {}
+  
+  // Get error count for specific time period
+  rpc getErrorCount(GetErrorCountRequest) returns (stream ErrorCountResponse) {}
+  
+  // Get paginated error statistics
+  rpc getErrorStatisticsPaginate(GetErrorStatisticsPaginateRequest) returns (stream ErrorStatisticsPaginateResponse) {}
+  
+  // Get error info by ID
+  rpc getErrorInfo(GetErrorInfoRequest) returns (stream Error) {}
+}
+
+// Request messages
+message GetErrorLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  int32 sort = 3;
+  string sort = 3;
   string type = 4;
-  string keyword = 5;
+  map<string, string> filters = 5;
 }
 
-message ErrorLogsResponse {
-  repeated ErrorLog docs = 1;
-  int32 totalDocs = 2;
-  int32 limit = 3;
-  int32 totalPages = 4;
-  int32 page = 5;
-  int32 pagingCounter = 6;
-  bool hasPrevPage = 7;
-  bool hasNextPage = 8;
-  int32 prevPage = 9;
-  int32 nextPage = 10;
-}
-
-message ErrorListRequest {
+message GetErrorListRequest {
   string type = 1;
-  string keyword = 2;
-  string timeSlot = 3;
+  string time_slot = 2;
+  map<string, string> filters = 3;
+}
+
+message GetErrorOverviewRequest {
+  string site_id = 1;
+}
+
+message GetErrorValuesRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string site_id = 3;
+}
+
+message GetErrorCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  map<string, string> filters = 3;
+}
+
+message GetErrorStatisticsPaginateRequest {
+  int32 page = 1;
+  int32 size = 2;
+  string reports_type = 3;
+  map<string, string> filters = 4;
+}
+
+message GetErrorInfoRequest {
+  int64 id = 1;
+}
+
+// Response messages
+message PaginateResponse {
+  repeated Error docs = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
 }
 
 message ErrorListResponse {
-  repeated ErrorListItem items = 1;
+  repeated ErrorData data = 1;
 }
 
-message ErrorListItem {
-  string startTime = 1;
+message ErrorData {
+  google.protobuf.Timestamp start_time = 1;
   int32 count = 2;
-}
-
-message ErrorOverviewRequest {
-  string siteId = 1;
 }
 
 message ErrorOverviewResponse {
-  int32 totalCount = 1;
-  int32 todayCount = 2;
-  int32 yesterdayCount = 3;
-  int32 weekCount = 4;
-}
-
-message ErrorValuesRequest {
-  string siteId = 1;
-  int32 page = 2;
-  int32 size = 3;
+  int32 total_errors = 1;
+  int32 today_errors = 2;
+  int32 yesterday_errors = 3;
+  int32 week_ago_errors = 4;
 }
 
 message ErrorValuesResponse {
-  repeated ErrorValueItem docs = 1;
-  int32 totalDocs = 2;
-  int32 limit = 3;
-  int32 totalPages = 4;
-  int32 page = 5;
-  int32 pagingCounter = 6;
-  bool hasPrevPage = 7;
-  bool hasNextPage = 8;
-  int32 prevPage = 9;
-  int32 nextPage = 10;
+  repeated ErrorValue values = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
 }
 
-message ErrorValueItem {
+message ErrorValue {
   string value = 1;
   int32 count = 2;
-}
-
-message ErrorCountRequest {
-  string startTime = 1;
-  string endTime = 2;
-  string keyword = 3;
 }
 
 message ErrorCountResponse {
-  int32 count = 1;
-  int32 yesterdayCount = 2;
-  int32 weekCount = 3;
+  repeated ErrorCount data = 1;
 }
 
-message ErrorStatisticsPaginateRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string keyword = 3;
-  string reportsType = 4;
+message ErrorCount {
+  google.protobuf.Timestamp time = 1;
+  int32 count = 2;
 }
 
 message ErrorStatisticsPaginateResponse {
-  repeated ErrorStatisticsItem docs = 1;
-  int32 totalDocs = 2;
-  int32 limit = 3;
-  int32 totalPages = 4;
-  int32 page = 5;
-  int32 pagingCounter = 6;
-  bool hasPrevPage = 7;
-  bool hasNextPage = 8;
-  int32 prevPage = 9;
-  int32 nextPage = 10;
+  repeated ErrorStatistics docs = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
 }
 
-message ErrorStatisticsItem {
-  string value = 1;
-  int32 count = 2;
-  string lastOccurredAt = 3;
-}
-
-message ErrorInfoRequest {
-  int32 id = 1;
-}
-
-message ErrorInfoResponse {
-  ErrorLog error = 1;
-}
+message ErrorStatistics {
+  string error_type = 1;
+  string value = 2;
+  int32 count = 3;
+  google.protobuf.Timestamp last_occurrence = 4;
+} 

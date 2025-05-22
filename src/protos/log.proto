@@ -127,6 +127,9 @@ message SaveLogRequest {
   string componentName = 68;          // 组件名称
   string events = 69;                 // 录制视频数据 
   string ua_result = 70;              // ua解析结果
+  string cId = 71;                    // 关联表自增id
+  string tId = 72;                    // 关联表_id  
+  repeated string recordKeys = 73;    // 录屏uuid key 用于保持
 }
 
 

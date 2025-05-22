@@ -233,6 +233,12 @@ export interface SaveLogRequest {
   events: string;
   /** ua解析结果 */
   uaResult: string;
+  /** 关联表自增id */
+  cId: string;
+  /** 关联表_id */
+  tId: string;
+  /** 录屏uuid key 用于保持 */
+  recordKeys: string[];
 }
 
 export interface BehaviorItem {

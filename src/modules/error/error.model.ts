@@ -10,14 +10,15 @@ import {
 } from '@typegoose/typegoose';
 import { IsString, IsArray, IsNumber, IsUrl } from 'class-validator';
 import * as paginate from 'mongoose-paginate-v2';
-import { ApiLog, Response } from '../api/api.model';
-import { CustomLog } from '../customLog/customLog.model';
-import { EventLog } from '../eventLog/eventLog.model';
 import * as aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { Method } from 'axios';
 import mongoose from 'mongoose';
+import { TransportCategory } from '@app/constants/enum.contant';
 
-export type BreadcrumbsType = CustomLog | ApiLog | EventLog;
+export type BreadcrumbsType = {
+  type: TransportCategory;
+  monitorId: string;
+};
 
 export class Meta {
   @IsNumber()
@@ -124,9 +125,9 @@ export class ErrorDto extends Report {
   @prop({ type: String, default: null, select: false }) // 默认不查询此字段
   errorDetail: string | null;
 
-  @IsString()
-  @prop({ type: String, default: null, select: false }) // 默认不查询此字段
-  events: string | null;
+  @IsArray()
+  @prop({ type: [String], default: [], select: false })
+  recordKeys: string[]; // 记录的录制的key，方便查看相关录制
 }
 
 @index(

@@ -5,158 +5,202 @@
 // source: error.proto
 
 /* eslint-disable */
-import { type QueryDTO } from "./common/query_dto";
+import { Observable } from "rxjs";
 
 export const protobufPackage = "errorproto";
 
-export interface PaginateOptions {
-  page: number;
-  limit: number;
-  sort: string;
+/** TransportCategory enum */
+export enum TransportCategory {
+  UNKNOWN = 0,
+  API = 1,
+  CUSTOM = 2,
+  EVENT = 3,
+  UNRECOGNIZED = -1,
 }
 
-export interface ErrorLog {
-  id: string;
-  title: string;
-  path: string;
-  href: string;
-  value: string;
-  reportsType: string;
-  meta: Meta | undefined;
-  createdAt: string;
-  updatedAt: string;
+/** BreadcrumbsType message */
+export interface BreadcrumbsType {
+  type: TransportCategory;
+  monitorId: string;
 }
 
+/** Meta message represents metadata about the error */
 export interface Meta {
-  url: string;
-  body: string;
-  params: string;
+  col: number;
   file: string;
+  row: number;
+  method: string;
+  url: string;
+  body: Uint8Array;
+  requestTime: number;
+  responseTime: number;
+  status: number;
+  statusText: string;
+  response: Uint8Array;
+  params: Uint8Array;
+  componentName: string;
 }
 
-export interface ErrorLogsRequest {
-  page: number;
-  size: number;
-  sort: number;
-  type: string;
-  keyword: string;
+/** StackTrace message represents a stack trace entry */
+export interface StackTrace {
+  colno: number;
+  filename: string;
+  functionName: string;
+  lineno: number;
 }
 
-export interface ErrorLogsResponse {
-  docs: ErrorLog[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
-  page: number;
-  pagingCounter: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number;
-  nextPage: number;
-}
-
-export interface ErrorListRequest {
-  type: string;
-  keyword: string;
-  timeSlot: string;
-}
-
-export interface ErrorListResponse {
-  items: ErrorListItem[];
-}
-
-export interface ErrorListItem {
-  startTime: string;
-  count: number;
-}
-
-export interface ErrorOverviewRequest {
-  siteId: string;
-}
-
-export interface ErrorOverviewResponse {
-  totalCount: number;
-  todayCount: number;
-  yesterdayCount: number;
-  weekCount: number;
-}
-
-export interface ErrorValuesRequest {
-  siteId: string;
-  page: number;
-  size: number;
-}
-
-export interface ErrorValuesResponse {
-  docs: ErrorValueItem[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
-  page: number;
-  pagingCounter: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number;
-  nextPage: number;
-}
-
-export interface ErrorValueItem {
+/** Error message represents the main error data */
+export interface Error {
+  breadcrumbs: BreadcrumbsType[];
+  meta: Meta | undefined;
+  stackTrace: StackTrace[];
+  errorType: string;
   value: string;
-  count: number;
-}
-
-export interface ErrorCountRequest {
-  startTime: string;
-  endTime: string;
-  keyword: string;
-}
-
-export interface ErrorCountResponse {
-  count: number;
-  yesterdayCount: number;
-  weekCount: number;
-}
-
-export interface ErrorStatisticsPaginateRequest {
-  page: number;
-  size: number;
-  keyword: string;
+  errorDetail: string;
+  events: string;
+  id: number;
+  createAt: Date | undefined;
+  updateAt: Date | undefined;
+  siteId: string;
   reportsType: string;
+  recordKeys: string[];
 }
 
-export interface ErrorStatisticsPaginateResponse {
-  docs: ErrorStatisticsItem[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
+/** Request messages */
+export interface GetErrorLogsRequest {
   page: number;
-  pagingCounter: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number;
-  nextPage: number;
+  size: number;
+  sort: string;
+  type: string;
+  filters: { [key: string]: string };
 }
 
-export interface ErrorStatisticsItem {
+export interface GetErrorLogsRequest_FiltersEntry {
+  key: string;
   value: string;
-  count: number;
-  lastOccurredAt: string;
 }
 
-export interface ErrorInfoRequest {
+export interface GetErrorListRequest {
+  type: string;
+  timeSlot: string;
+  filters: { [key: string]: string };
+}
+
+export interface GetErrorListRequest_FiltersEntry {
+  key: string;
+  value: string;
+}
+
+export interface GetErrorOverviewRequest {
+  siteId: string;
+}
+
+export interface GetErrorValuesRequest {
+  page: number;
+  size: number;
+  siteId: string;
+}
+
+export interface GetErrorCountRequest {
+  startTime: Date | undefined;
+  endTime: Date | undefined;
+  filters: { [key: string]: string };
+}
+
+export interface GetErrorCountRequest_FiltersEntry {
+  key: string;
+  value: string;
+}
+
+export interface GetErrorStatisticsPaginateRequest {
+  page: number;
+  size: number;
+  reportsType: string;
+  filters: { [key: string]: string };
+}
+
+export interface GetErrorStatisticsPaginateRequest_FiltersEntry {
+  key: string;
+  value: string;
+}
+
+export interface GetErrorInfoRequest {
   id: number;
 }
 
-export interface ErrorInfoResponse {
-  error: ErrorLog | undefined;
+/** Response messages */
+export interface PaginateResponse {
+  docs: Error[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
+export interface ErrorListResponse {
+  data: ErrorData[];
+}
+
+export interface ErrorData {
+  startTime: Date | undefined;
+  count: number;
+}
+
+export interface ErrorOverviewResponse {
+  totalErrors: number;
+  todayErrors: number;
+  yesterdayErrors: number;
+  weekAgoErrors: number;
+}
+
+export interface ErrorValuesResponse {
+  values: ErrorValue[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface ErrorValue {
+  value: string;
+  count: number;
+}
+
+export interface ErrorCountResponse {
+  data: ErrorCount[];
+}
+
+export interface ErrorCount {
+  time: Date | undefined;
+  count: number;
+}
+
+export interface ErrorStatisticsPaginateResponse {
+  docs: ErrorStatistics[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface ErrorStatistics {
+  errorType: string;
+  value: string;
+  count: number;
+  lastOccurrence: Date | undefined;
+}
+
+/** ErrorService defines the service for error handling */
 export interface ErrorService {
-  getErrorLogs(request: QueryDTO): Promise<ErrorLogsResponse>;
-  getErrorList(request: ErrorListRequest): Promise<ErrorListResponse>;
-  getErrorOverview(request: ErrorOverviewRequest): Promise<ErrorOverviewResponse>;
-  getErrorValues(request: ErrorValuesRequest): Promise<ErrorValuesResponse>;
-  getErrorCount(request: ErrorCountRequest): Promise<ErrorCountResponse>;
-  getErrorStatisticsPaginate(request: ErrorStatisticsPaginateRequest): Promise<ErrorStatisticsPaginateResponse>;
-  getErrorInfo(request: ErrorInfoRequest): Promise<ErrorInfoResponse>;
+  /** Get error logs with pagination */
+  getErrorLogs(request: GetErrorLogsRequest): Observable<PaginateResponse>;
+  /** Get error list with aggregation */
+  getErrorList(request: GetErrorListRequest): Observable<ErrorListResponse>;
+  /** Get error overview statistics */
+  getErrorOverview(request: GetErrorOverviewRequest): Observable<ErrorOverviewResponse>;
+  /** Get error values statistics */
+  getErrorValues(request: GetErrorValuesRequest): Observable<ErrorValuesResponse>;
+  /** Get error count for specific time period */
+  getErrorCount(request: GetErrorCountRequest): Observable<ErrorCountResponse>;
+  /** Get paginated error statistics */
+  getErrorStatisticsPaginate(request: GetErrorStatisticsPaginateRequest): Observable<ErrorStatisticsPaginateResponse>;
+  /** Get error info by ID */
+  getErrorInfo(request: GetErrorInfoRequest): Observable<Error>;
 }
