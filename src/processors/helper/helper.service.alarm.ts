@@ -39,6 +39,7 @@ export class HelperServiceAlarn {
       markdown: {},
     };
     if (eventData.siteId) {
+      const errorDetail = eventData.errorDetailList?.[0] || '';
       switch (eventData.reportsType) {
         case 'js':
           data.markdown = {
@@ -51,7 +52,7 @@ export class HelperServiceAlarn {
                         file: eventData.meta?.file,
                       })}</font>
                       >错误解析后堆栈信息:<font color=\"comment\">${JSON.stringify(eventData.stackTrace)}</font>
-                      >错误代码详情:<font color=\"comment\">${eventData.errorDetail}</font>
+                      >错误代码详情:<font color=\"comment\">${errorDetail}</font>
                       `,
           };
           break;
@@ -73,7 +74,7 @@ export class HelperServiceAlarn {
                         type: eventData.type,
                       })}</font>
                       >错误解析后堆栈信息:<font color=\"comment\">${JSON.stringify(eventData.stackTrace)}</font>
-                      >错误代码详情:<font color=\"comment\">${eventData.errorDetail}</font>`,
+                      >错误代码详情:<font color=\"comment\">${errorDetail}</font>`,
           };
           break;
         case 'http-record':
@@ -110,7 +111,7 @@ export class HelperServiceAlarn {
                         conponentName: eventData.meta.conponentName,
                       })}</font>
                       >错误解析后堆栈信息:<font color=\"comment\">${eventData.stackTrace}</font>
-                      >错误代码详情:<font color=\"comment\">${eventData.errorDetail}</font>`,
+                      >错误代码详情:<font color=\"comment\">${errorDetail}</font>`,
           };
           break;
       }

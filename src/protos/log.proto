@@ -114,7 +114,7 @@ message SaveLogRequest {
   string logData = 55;               // 日志数据
   string logPos = 56;                // 日志位置
   string logId = 57;                 // 日志ID
-  string errorDetail = 58;           // 错误详情
+  repeated string errorDetailList = 58;  // 错误详情列表
   repeated StackTrace stackTrace = 59;  // 堆栈跟踪
   repeated BehaviorItem breadcrumbs = 60;  // 用户行为痕迹
   string errorUid = 61;              // 错误唯一ID

@@ -3,13 +3,10 @@ import { PaginateQuery } from '@app/interfaces/paginate.interface';
 import { InjectModel } from '@app/transformers/model.transform';
 import { Inject, Injectable, OnModuleInit, forwardRef } from '@nestjs/common';
 import { PaginateOptions, PipelineStage, Types } from 'mongoose';
-import { ErrorLog, StackTrace } from './error.model';
+import { ErrorLog } from './error.model';
 import { existsSync, readFileSync } from 'fs-extra';
 import { NullableMappedPosition, SourceMapConsumer } from 'source-map';
 import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
-import * as dayjs from 'dayjs';
-import { join } from 'path';
-import { isEmpty } from 'lodash';
 import { SiteService } from '../site/site.service';
 import { handleTime } from '@app/utils/util';
 import { TimeInfo } from '@app/interfaces/request.interface';
@@ -17,6 +14,9 @@ import { groupHourOption, projectHourOption } from '@app/utils/searchCommon';
 import { MetricsName } from '@app/constants/enum.contant';
 import { Cron } from '@nestjs/schedule';
 import { createLogger } from '@app/utils/logger';
+import * as dayjs from 'dayjs';
+import { join } from 'path';
+import { isEmpty } from 'lodash';
 
 const logger = createLogger({ scope: 'ErrorLogService', time: true });
 
@@ -72,14 +72,23 @@ export class ErrorLogService implements OnModuleInit {
    */
   async create(eventData: ErrorLog): Promise<Types.ObjectId> {
     try {
-      const errorInfo = await this.handleFileMap(
-        eventData.stackTrace,
-        eventData.siteId,
-      );
-      if (errorInfo) {
-        eventData.errorDetail = JSON.stringify(errorInfo);
+      let errorInfo: SourceInfo[] | null = null;
+      if (eventData.stackTrace?.length) {
+        errorInfo = await this.handleFileMap(
+          eventData.stackTrace,
+          eventData.siteId,
+        );
+      }
+      if (errorInfo?.length) {
+        eventData.errorDetailList = errorInfo.map((item) =>
+          JSON.stringify(item),
+        );
       }
       logger.info('Error 保存', eventData);
+      logger.info(
+        'Error 保存视频录制=========================',
+        eventData.recordKeys,
+      );
       const res = await this.errorModel.create({ ...eventData });
       return res._id;
     } catch (error) {
@@ -248,45 +257,53 @@ export class ErrorLogService implements OnModuleInit {
    * @private
    * @param {ErrorLog['stackTrace']} stackTrace
    * @param {ErrorLog['siteId']} siteId
-   * @return {*}  {(Promise<SourceInfo | null>)}
+   * @return {*}  {(Promise<SourceInfo[]>)}
    * @memberof ErrorLogService
    */
   private async handleFileMap(
     stackTrace: ErrorLog['stackTrace'],
     siteId: ErrorLog['siteId'],
-  ): Promise<SourceInfo | null> {
-    let starkFirst!: StackTrace;
+  ): Promise<SourceInfo[]> {
+    const results: SourceInfo[] = [];
     const list = stackTrace || [];
-    if (Array.isArray(list) && !!list.length && list[0] && list[0].filename) {
-      starkFirst = list[0];
+
+    if (!Array.isArray(list) || !list.length) {
+      return results;
     }
-    if (
-      starkFirst &&
-      starkFirst.filename &&
-      /\.(js)/.test(starkFirst.filename)
-    ) {
-      const ext = starkFirst.filename.split('/js/')[1];
-      if (ext) {
-        // 获取错误文件URL,如果上传到服务器云上直接拉取
-        const url = join(
-          __dirname,
-          `../../../public/sourcemap/${siteId}`,
-          `/${ext}.map`,
-        );
-        if (existsSync(url)) {
-          const rawSourceMap = JSON.parse(
-            readFileSync(url, 'utf-8').toString(),
+
+    for (const stackItem of list) {
+      if (
+        stackItem &&
+        stackItem.filename &&
+        /\.(js)/.test(stackItem.filename)
+      ) {
+        const ext = stackItem.filename.split('/js/')[1];
+        if (ext) {
+          // 获取错误文件URL,如果上传到服务器云上直接拉取
+          const url = join(
+            __dirname,
+            `../../../public/sourcemap/${siteId}`,
+            `/${ext}.map`,
           );
-          return await this.sourceMapAnalysis(
-            rawSourceMap,
-            starkFirst.lineno,
-            starkFirst.colno,
-            5,
-          );
+          if (existsSync(url)) {
+            const rawSourceMap = JSON.parse(
+              readFileSync(url, 'utf-8').toString(),
+            );
+            const sourceInfo = await this.sourceMapAnalysis(
+              rawSourceMap,
+              stackItem.lineno,
+              stackItem.colno,
+              5,
+            );
+            if (sourceInfo) {
+              results.push(sourceInfo);
+            }
+          }
         }
       }
     }
-    return null;
+
+    return results;
   }
 
   /**

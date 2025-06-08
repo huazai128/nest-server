@@ -203,8 +203,8 @@ export interface SaveLogRequest {
   logPos: string;
   /** 日志ID */
   logId: string;
-  /** 错误详情 */
-  errorDetail: string;
+  /** 错误详情列表 */
+  errorDetailList: string[];
   /** 堆栈跟踪 */
   stackTrace: StackTrace[];
   /** 用户行为痕迹 */

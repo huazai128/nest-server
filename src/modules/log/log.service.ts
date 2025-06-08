@@ -138,6 +138,8 @@ export class LogService {
         reportsType: data.reportsType,
         meta: data.meta,
         traceId: data.traceId,
+        monitorId: data.monitorId,
+        pageId: data.pageId,
       };
       try {
         switch (data.category) {

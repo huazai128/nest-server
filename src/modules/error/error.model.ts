@@ -121,9 +121,9 @@ export class ErrorDto extends Report {
   @prop({ type: String, default: null, index: true })
   value: string | null;
 
-  @IsString()
-  @prop({ type: String, default: null, select: false }) // 默认不查询此字段
-  errorDetail: string | null;
+  @IsArray()
+  @prop({ type: [String], default: [], select: false })
+  errorDetailList: string[];
 
   @IsArray()
   @prop({ type: [String], default: [], select: false })
