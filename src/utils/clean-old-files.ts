@@ -1,5 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { createLogger } from './logger';
+
+const logger = createLogger({
+  scope: 'removeFilesExceptLatest3',
+  time: true,
+});
 
 /**
  * 清除指定目录下最新3个以外的文件
@@ -23,10 +29,10 @@ export async function removeFilesExceptLatest3(dir: string): Promise<void> {
 
     for (const { filePath } of filesToDelete) {
       await fs.promises.unlink(filePath);
-      console.log(`Deleted: ${filePath}`);
+      logger.log(`Deleted: ${filePath}`);
     }
   } catch (err) {
-    console.error('removeFilesExceptLatest3 error:', err);
+    logger.error('removeFilesExceptLatest3 error:', err);
   }
 }
 

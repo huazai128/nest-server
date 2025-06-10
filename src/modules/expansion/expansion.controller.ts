@@ -145,8 +145,6 @@ export class ExpansionController {
             // 合并成完整的文件
             const completeFile = Buffer.concat(buffers);
 
-            // 调用上传服务处理完整文件
-            console.log('completeFile=====', completeFile);
             const result = await this.uploadService.uploadZip(
               {
                 buffer: completeFile,
