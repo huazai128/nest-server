@@ -54,14 +54,14 @@ message Error {
   repeated StackTrace stack_trace = 3;
   string error_type = 4;
   string value = 5;
-  string error_detail = 6;
-  string events = 7;
-  int64 id = 8;
-  google.protobuf.Timestamp create_at = 9;
-  google.protobuf.Timestamp update_at = 10;
-  string site_id = 11;
-  string reports_type = 12;
+  string events = 6;
+  string id = 7;
+  google.protobuf.Timestamp create_at = 8;
+  google.protobuf.Timestamp update_at = 9;
+  string site_id = 10;
+  string reports_type = 11;
   repeated string recordKeys = 13;
+  repeated string errorDetailList = 14;
 }
 
 // ErrorService defines the service for error handling

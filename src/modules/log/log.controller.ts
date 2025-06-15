@@ -9,13 +9,14 @@ import {
   handleSearchKeys,
   projectHourOption,
 } from '@app/utils/searchCommon';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
 import { ChartList, LogList, SaveLogRequest } from '@app/protos/log';
 import { LogChartQueryDTO, LogPaginateQueryDTO } from './log.dto';
 import { plainToClass } from 'class-transformer';
 import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 import { createLogger } from '@app/utils/logger';
 import { getUaInfo } from '@app/utils/util';
+import { Observable } from 'rxjs';
 
 // 创建日志记录器，设置作用域为LogController，并启用时间戳
 const logger = createLogger({
@@ -50,6 +51,95 @@ export class LogController {
     logger.info(`日志接收数据${cleanedData.reportsType}`, cleanedData);
     // 创建日志记录
     return this.logService.create(cleanedData);
+  }
+
+  /**
+   * 分块保存日志数据
+   * 处理大型日志数据的流式传输，将数据分块接收后合并处理
+   * @param data - 日志数据流，包含分块信息
+   * @returns Promise<any> - 返回处理结果，包含成功状态和相关信息
+   */
+  @GrpcStreamMethod('LogService', 'saveLogChunked')
+  saveLogChunked(data: Observable<SaveLogRequest>): Promise<any> {
+    logger.info('开始接收日志数据流');
+
+    return new Promise((resolve) => {
+      // 存储接收到的数据块，key为块索引，value为块数据
+      const chunks = new Map<number, string>();
+      let totalChunks = 0; // 总块数
+      let serializedData = ''; // 合并后的完整数据
+
+      // 订阅客户端发送的日志数据流
+      data.subscribe({
+        next: (chunk: any) => {
+          // 保存每个数据块
+          chunks.set(chunk.chunkIndex, chunk.data);
+          totalChunks = chunk.totalChunks;
+
+          logger.info(`接收日志数据块 ${chunk.chunkIndex + 1}/${totalChunks}`);
+        },
+        complete: async () => {
+          logger.info(`日志数据的所有块接收完成，开始合并`);
+
+          // 检查是否收到了所有块
+          if (chunks.size !== totalChunks) {
+            logger.error(
+              `日志数据块不完整: 收到 ${chunks.size}/${totalChunks}`,
+            );
+            resolve({ success: false, message: '日志数据传输不完整' });
+            return;
+          }
+
+          try {
+            // 按顺序合并所有块
+            for (let i = 0; i < totalChunks; i++) {
+              const chunk = chunks.get(i);
+              if (!chunk) {
+                throw new Error(`缺少日志数据块 ${i}`);
+              }
+              // 合并数据
+              serializedData += chunk;
+            }
+
+            // 解析合并后的JSON数据
+            const logData = JSON.parse(serializedData);
+
+            // 清理合并后的数据中的空值
+            const cleanedData = omitBy(logData, isNil);
+            // 解析用户代理信息
+            const uaInfo = getUaInfo(cleanedData.ua);
+            cleanedData.ua_result = uaInfo && JSON.stringify(uaInfo);
+
+            logger.info(
+              `合并后的日志数据${cleanedData.reportsType}`,
+              cleanedData,
+            );
+
+            // 创建日志记录
+            const result = await this.logService.create(cleanedData);
+
+            resolve({
+              success: true,
+              message: '日志保存成功',
+              data: result,
+            });
+          } catch (error) {
+            logger.error('日志数据处理错误', error);
+            resolve({
+              success: false,
+              message: `日志数据处理失败: ${error.message}`,
+            });
+          }
+        },
+        error: (err) => {
+          logger.error('日志数据流处理错误', err);
+          resolve({
+            success: false,
+            message: `日志数据流处理失败: ${err.message}`,
+          });
+        },
+      });
+    });
   }
 
   /**

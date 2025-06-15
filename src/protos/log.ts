@@ -359,9 +359,23 @@ export interface StackTrace {
   lineno: string;
 }
 
+/** 日志块传输请求消息 */
+export interface SaveLogChunkRequest {
+  /** 块索引 */
+  chunkIndex: number;
+  /** 总块数 */
+  totalChunks: number;
+  /** 数据块内容（JSON字符串） */
+  data: string;
+  /** 块传输ID，用于标识同一次传输 */
+  chunkId: string;
+}
+
 export interface LogService {
   /** 保存走kafka, 不过两种都支持==== */
   saveLog(request: SaveLogRequest): Observable<LogResponse>;
+  /** 保存日志 */
+  saveLogChunked(request: Observable<SaveLogChunkRequest>): Observable<LogResponse>;
   /** 获取日志列表 */
   getLogs(request: QueryDTO): Observable<LogList>;
   /** 通过游标获取日志列表 */

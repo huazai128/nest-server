@@ -56,14 +56,14 @@ export interface Error {
   stackTrace: StackTrace[];
   errorType: string;
   value: string;
-  errorDetail: string;
   events: string;
-  id: number;
+  id: string;
   createAt: Date | undefined;
   updateAt: Date | undefined;
   siteId: string;
   reportsType: string;
   recordKeys: string[];
+  errorDetailList: string[];
 }
 
 /** Request messages */

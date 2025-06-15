@@ -7,7 +7,8 @@ import public "common/chart_item.proto";
 
 service LogService {
   // 保存走kafka, 不过两种都支持====
-  rpc saveLog (SaveLogRequest) returns (stream LogResponse);  // 保存日志
+  rpc saveLog ( SaveLogRequest) returns (stream LogResponse);  // 保存日志
+  rpc saveLogChunked (stream SaveLogChunkRequest) returns (stream LogResponse);  // 保存日志
   rpc getLogs (QueryDTO) returns (stream LogList);  // 获取日志列表
   rpc getLogsByCursor(QueryDTO) returns (stream LogList);  // 通过游标获取日志列表
   rpc getLogsChart(QueryDTO) returns (stream ChartList);  // 获取日志图表数据
@@ -200,4 +201,12 @@ message StackTrace {
   string filename = 2;               // 文件名
   string functionName = 3;           // 函数名
   string lineno = 4;                 // 行号
+}
+
+// 日志块传输请求消息
+message SaveLogChunkRequest {
+  int32 chunkIndex = 1;         // 块索引
+  int32 totalChunks = 2;        // 总块数
+  string data = 3;              // 数据块内容（JSON字符串）
+  string chunkId = 4;           // 块传输ID，用于标识同一次传输
 }
