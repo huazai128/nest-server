@@ -353,31 +353,14 @@ export class ErrorLogService implements OnModuleInit {
   }
 
   /**
-   * 批量更新录制
-   * @param {any} { errorUUidList, events }
+   * 曾把 rrweb 正文拷到 ErrorLog.events。录屏已改走 OSS + recordKeys，不再写正文。
+   * @param {any} { errorUUidList }
    * @return {*}
    * @memberof ErrorLogService
    */
-  public saveRecordData({ errorUUidList, events }: any) {
-    logger.info('批量更新录制', JSON.stringify(errorUUidList));
-    try {
-      return this.errorModel
-        .updateMany(
-          { errorUUid: { $in: errorUUidList } },
-          { $set: { events: events } },
-        )
-        .exec()
-        .catch((error) => {
-          logger.error(
-            '批量更新录制失败：',
-            JSON.stringify(errorUUidList),
-            error,
-          );
-          throw '批量更新录制失败';
-        });
-    } catch (error) {
-      logger.error('批量更新录制失败：', error);
-    }
+  public saveRecordData({ errorUUidList }: any) {
+    logger.info('跳过 ErrorLog.events 写入，录屏请用 recordKeys / eventsUrl', JSON.stringify(errorUUidList));
+    return Promise.resolve({ acknowledged: true, modifiedCount: 0 });
   }
 
   /**

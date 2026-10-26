@@ -48,6 +48,7 @@ const LONG_TEXT_KEYS: Array<{
   { key: 'eventValue', max: LOG_FIELD_LIMITS.LOG_DATA_MAX_BYTES },
   { key: 'errorDetail', max: LOG_FIELD_LIMITS.VALUE_MAX_BYTES },
   { key: 'logUrl', max: LOG_FIELD_LIMITS.LOG_URL_MAX_BYTES },
+  { key: 'eventsUrl', max: LOG_FIELD_LIMITS.LOG_URL_MAX_BYTES },
 ];
 
 /**
@@ -284,25 +285,24 @@ export function normalizeInboundSaveLog(
     );
   }
 
-  stripSessionLogBody(data);
+  stripOffloadedBlobBody(data);
 
   return data;
 }
 
 /**
- * 会话 .log 已有 OSS 链接时丢掉正文，避免 1.5MB 再进 Mongo。
- * rrweb 的 events 不是 `# session-` / session-*.log，不会误删。
+ * 已有 OSS 链接时丢掉 events 正文（会话 .log 用 logUrl，录屏用 eventsUrl）。
  * @param {SaveLogRequest} data
  */
-export function stripSessionLogBody(data: SaveLogRequest): void {
-  const logName = data.logName;
-  const events = data.events;
-  const isSession =
-    (typeof logName === 'string' && /^session-.+\.log$/i.test(logName)) ||
-    (typeof events === 'string' && events.startsWith('# session-'));
-  if (isSession && data.logUrl && data.events) {
+export function stripOffloadedBlobBody(data: SaveLogRequest): void {
+  if ((data.logUrl || data.eventsUrl) && data.events) {
     delete (data as { events?: string }).events;
   }
+}
+
+/** @deprecated 使用 stripOffloadedBlobBody */
+export function stripSessionLogBody(data: SaveLogRequest): void {
+  stripOffloadedBlobBody(data);
 }
 
 /**

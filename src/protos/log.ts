@@ -259,6 +259,8 @@ export interface SaveLogRequest {
   otherInfo: { [key: string]: any } | undefined;
   /** 会话 .log 的阿里云 OSS 链接 */
   logUrl?: string;
+  /** rrweb 片段的阿里云 OSS 链接 */
+  eventsUrl?: string;
 }
 
 export interface BehaviorItem {

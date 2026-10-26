@@ -93,6 +93,20 @@ describe('SaveLogRequest proto field pass-through', () => {
     expect(out.events).toBe(events);
   });
 
+  it('strips rrweb body when OSS eventsUrl is present', () => {
+    const out = normalizeInboundSaveLog({
+      siteId: '507f1f77bcf86cd799439011',
+      category: 'video',
+      monitorId: 'video018f6b8c-1111-4222-8333-7f0000000008',
+      eventsUrl:
+        'https://bucket.oss-cn-hangzhou.aliyuncs.com/rrweb/a.json',
+      events: '[{"type":4}]',
+    } as any);
+
+    expect(out.eventsUrl).toContain('/rrweb/');
+    expect(out.events).toBeUndefined();
+  });
+
   it('maps list item with dual uuid fields for gRPC LogList', () => {
     const doc = {
       siteId: '507f1f77bcf86cd799439011',

@@ -164,6 +164,7 @@ message SaveLogRequest {
   google.protobuf.Struct extraInfo = 85;   // 用户反馈等扩展
   google.protobuf.Struct otherInfo = 86;   // 用户反馈结构化扩展（手机号、团队等）
   string logUrl = 87;                 // 会话 .log 的阿里云 OSS 链接
+  string eventsUrl = 88;              // rrweb 片段的阿里云 OSS 链接
 }
 
 

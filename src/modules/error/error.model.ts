@@ -137,7 +137,7 @@ export class ErrorDto extends Report {
   @prop({ type: [String], default: [], select: false })
   recordKeys: string[]; // 记录的录制的key，方便查看相关录制
 
-  /** 录屏关联写入的 rrweb JSON；会话 .log 正文改为 OSS，不在此落库 */
+  /** 历史兼容：会话 .log / rrweb 正文已改走 OSS，默认不查询 */
   @IsString()
   @prop({ type: String, default: null, select: false })
   events: string | null;

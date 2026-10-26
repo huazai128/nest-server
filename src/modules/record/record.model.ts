@@ -56,10 +56,15 @@ export class Record extends Report {
   @prop({ required: true })
   monitorId: string;
 
-  @IsNotEmpty()
+  /** 历史兼容：rrweb JSON 正文已改走 OSS，默认不查询、不建 text 索引 */
   @IsString()
-  @prop({ required: true, type: String, text: true, index: true })
-  events: string;
+  @prop({ type: String, default: null, select: false })
+  events: string | null;
+
+  /** rrweb 片段的阿里云 OSS 链接 */
+  @IsString()
+  @prop({ type: String, default: null })
+  eventsUrl: string | null;
 
   @IsNotEmpty()
   @IsString()

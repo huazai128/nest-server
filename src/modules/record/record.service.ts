@@ -20,7 +20,11 @@ export class RecordService {
    */
   async create(data: Partial<Record>): Promise<Record> {
     try {
-      logger.log('record===', data);
+      logger.log('record===', {
+        monitorId: data.monitorId,
+        eventsUrl: data.eventsUrl,
+        eventsChars: data.events ? data.events.length : 0,
+      });
       const record = await this.recordModel.create(data);
       return record;
     } catch (error) {
