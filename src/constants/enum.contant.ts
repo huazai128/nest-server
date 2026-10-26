@@ -32,36 +32,62 @@ export enum EnvStatus {
   PROD = 'prod',
 }
 
-// 上报类型
+/** 上报大类，对应 SaveLogRequest.category / 分表 */
 export enum TransportCategory {
-  PV = 'pv', //
+  /** 页面访问 */
+  PV = 'pv',
+  /** 性能指标 */
   PREF = 'perf',
+  /** 用户行为（点击 / 曝光等） */
   EVENT = 'event',
+  /** 自定义埋点 / 测速 */
   CUSTOM = 'custom',
+  /** 接口日志 */
   API = 'api',
+  /** 错误（含报错白屏） */
   ERROR = 'error',
+  /** 录屏 */
   RV = 'video',
+  /** 用户反馈 */
   USER = 'user',
 }
 
-//日志类型
+/** 细分类型，对应 SaveLogRequest.reportsType，入库枚举校验用 */
 export enum MetricsName {
+  /** 首次绘制 */
   FP = 'first-paint',
+  /** 首次内容绘制 */
   FCP = 'first-contentful-paint',
+  /** 首次有意义绘制 */
   FMP = 'first-meaning-paint',
+  /** 导航各阶段耗时 */
   NT = 'navigation-timing',
+  /** 静态资源加载瀑布 */
   RF = 'resource-flow',
+  /** 路由变化 / PV */
   RCR = 'router-change-record',
+  /** 点击行为 */
   CBR = 'click-behavior-record',
+  /** 自定义埋点 */
   CDR = 'custom-define-record',
+  /** 接口请求 */
   HT = 'http-record',
+  /** 元素曝光 */
   CE = 'change-exposure',
+  /** 同步 JS 异常 */
   JS = 'js',
+  /** 静态资源加载失败 */
   RS = 'resource',
+  /** 未捕获 Promise rejection */
   UJ = 'unhandledrejection',
+  /** 跨域脚本 Script error. */
   CS = 'cors',
+  /** React 组件错误 */
   REACT = 'react',
+  /** 历史 HTTP 类型名，与 HT 并存 */
   HTS = 'http',
+  /** 报错导致的白屏 */
+  BS = 'blank-screen',
 }
 
 export const LOG_LANGS = [Language.Chinese, Language.English];
@@ -102,4 +128,5 @@ export const MechanismTypes = [
   MetricsName.REACT,
   MetricsName.RS,
   MetricsName.UJ,
+  MetricsName.BS,
 ];

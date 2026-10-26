@@ -29,6 +29,44 @@ describe('SaveLogRequest proto field pass-through', () => {
     expect(out.otherInfo).toEqual({ team: 'A' });
   });
 
+  it('hydrates compact SDK aliases: queryUrl, ttfb, sslTime', () => {
+    const out = normalizeInboundSaveLog({
+      siteId: '507f1f77bcf86cd799439011',
+      category: 'API',
+      queryUrl: 'https://api.example.com/v1/user?id=1&name=a%20b',
+      resourcePrefs: [
+        { ttfb: 12.5, time: 40, ssl: 8.2, name: 'https://cdn.example.com/app.js' },
+      ],
+      meta: {
+        queryUrl: 'https://api.example.com/err?x=1',
+      },
+    } as any);
+
+    expect(out.url).toBe('https://api.example.com/v1/user');
+    expect(out.params).toEqual({ id: '1', name: 'a b' });
+    expect(out.resourcePrefs[0].request).toBe(12.5);
+    expect(out.resourcePrefs[0].timeToFirstByte).toBe(12.5);
+    expect(out.resourcePrefs[0].requestDuration).toBe(40);
+    expect(out.resourcePrefs[0].sslTime).toBe(8.2);
+    expect(out.meta?.url).toBe('https://api.example.com/err');
+    expect(out.meta?.params).toEqual({ x: '1' });
+  });
+
+  it('does not overwrite existing url and restores gRPC bool ssl from sslTime', () => {
+    const out = normalizeInboundSaveLog({
+      siteId: '507f1f77bcf86cd799439011',
+      category: 'PREF',
+      queryUrl: 'https://api.example.com/v1/user?id=1',
+      url: 'https://keep.example.com/already',
+      resourcePrefs: [{ ttfb: 9, ssl: true, sslTime: 4.5 }],
+    } as any);
+
+    expect(out.url).toBe('https://keep.example.com/already');
+    expect(out.params).toBeUndefined();
+    expect(out.resourcePrefs[0].request).toBe(9);
+    expect(out.resourcePrefs[0].ssl).toBe(4.5);
+  });
+
   it('maps list item with dual uuid fields for gRPC LogList', () => {
     const doc = {
       siteId: '507f1f77bcf86cd799439011',

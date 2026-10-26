@@ -194,18 +194,22 @@ message Meta {
 }
 
 message RequestInfo {
-  double contentDownload = 1;        // 内容下载时间
+  double contentDownload = 1;        // 内容下载时间（responseEnd - responseStart）
   double dnsLookup = 2;              // DNS 查找时间
   double initialConnect = 3;         // 初始连接时间
   string initiatorType = 4;          // 发起者类型
   bool isCache = 5;                  // 是否使用缓存
   string name = 6;                   // 请求 URL
-  double requestDuration = 7;        // 请求持续时间
+  double requestDuration = 7;        // 历史别名，等同 SDK time（duration）
   double responseEnd = 8;            // 响应结束时间
-  bool ssl = 9;                      // 是否使用 SSL
+  bool ssl = 9;                      // 历史字段：是否 HTTPS；耗时见 sslTime
   double startTime = 10;             // 开始时间
-  double timeToFirstByte = 11;       // TTFB（首次字节时间）
+  double timeToFirstByte = 11;       // 历史别名，等同 SDK ttfb
   double transferSize = 12;          // 传输大小
+  double ttfb = 13;                  // 首字节耗时，与 Mongo ResourcePref.ttfb 对齐
+  double time = 14;                  // 资源总耗时 duration
+  double request = 15;               // 与 ttfb 相同的入库兼容字段，可由 ttfb 回填
+  double sslTime = 16;               // SSL 握手耗时（ms）
 }
 
 message Response {

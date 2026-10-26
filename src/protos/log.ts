@@ -323,18 +323,26 @@ export interface RequestInfo {
   isCache: boolean;
   /** 请求 URL */
   name: string;
-  /** 请求持续时间 */
+  /** 请求持续时间（历史别名，等同 time） */
   requestDuration: number;
   /** 响应结束时间 */
   responseEnd: number;
-  /** 是否使用 SSL */
+  /** 是否 HTTPS（历史 bool）；耗时见 sslTime */
   ssl: boolean;
   /** 开始时间 */
   startTime: number;
-  /** TTFB（首次字节时间） */
+  /** TTFB（历史别名，等同 ttfb） */
   timeToFirstByte: number;
   /** 传输大小 */
   transferSize: number;
+  /** 首字节耗时，与 Mongo ResourcePref.ttfb 对齐 */
+  ttfb: number;
+  /** 资源总耗时 duration */
+  time: number;
+  /** 与 ttfb 相同的入库兼容字段，可由 ttfb 回填 */
+  request: number;
+  /** SSL 握手耗时（ms） */
+  sslTime: number;
 }
 
 export interface Response {

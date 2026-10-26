@@ -14,4 +14,8 @@ message LogFieldLimits {
   int32 chunk_json_max_bytes = 6;       // 4194304，分片重组后 JSON 上限
   int64 memory_metric_max = 7;          // 9007199254740991，JS 安全整数上限
   int32 grpc_string_warn_bytes = 8;     // 512000，超过则建议走 saveLogChunked
+  int32 content_max_bytes = 9;          // 16000，用户反馈 content
+  int32 log_data_max_bytes = 10;        // 32000，通用长文本 / eventValue
+  int32 node_dom_max_bytes = 11;        // 4000，节点 HTML 快照
+  int32 body_max_bytes = 12;            // 32000，请求体字符串
 }
