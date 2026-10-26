@@ -48,9 +48,20 @@ export class UserLog extends Report {
   @prop({ default: Date.now })
   update_at?: Date;
 
+  /** 历史兼容：会话 .log 正文已改走 OSS，默认不查询 */
+  @IsString()
+  @prop({ type: String, default: null, select: false })
+  events: string | null;
+
+  /** 会话 .log 文件名，如 session-traceId-user-feedback.log */
   @IsString()
   @prop({ type: String, default: null })
-  events: string | null;
+  logName: string | null;
+
+  /** 会话 .log 的阿里云 OSS 链接 */
+  @IsString()
+  @prop({ type: String, default: null })
+  logUrl: string | null;
 
   @IsString()
   @prop({ type: String, default: null, text: true, index: true })

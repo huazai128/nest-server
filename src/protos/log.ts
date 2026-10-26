@@ -257,6 +257,8 @@ export interface SaveLogRequest {
   errorDetail: string;
   extraInfo: { [key: string]: any } | undefined;
   otherInfo: { [key: string]: any } | undefined;
+  /** 会话 .log 的阿里云 OSS 链接 */
+  logUrl?: string;
 }
 
 export interface BehaviorItem {

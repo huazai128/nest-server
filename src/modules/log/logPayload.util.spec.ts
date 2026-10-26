@@ -67,6 +67,32 @@ describe('SaveLogRequest proto field pass-through', () => {
     expect(out.resourcePrefs[0].ssl).toBe(4.5);
   });
 
+  it('strips session .log body when OSS logUrl is present', () => {
+    const out = normalizeInboundSaveLog({
+      siteId: '507f1f77bcf86cd799439011',
+      category: 'ERROR',
+      logName: 'session-trace-blank-screen.log',
+      logUrl:
+        'https://bucket.oss-cn-hangzhou.aliyuncs.com/session-logs/a.log',
+      events: '# session-trace-blank-screen.log\n[1] STEP page\n',
+    } as any);
+
+    expect(out.logUrl).toContain('oss-cn-hangzhou');
+    expect(out.logName).toBe('session-trace-blank-screen.log');
+    expect(out.events).toBeUndefined();
+  });
+
+  it('keeps rrweb events when the payload is not a session .log', () => {
+    const events = '[{"type":4}]';
+    const out = normalizeInboundSaveLog({
+      siteId: '507f1f77bcf86cd799439011',
+      category: 'video',
+      events,
+    } as any);
+
+    expect(out.events).toBe(events);
+  });
+
   it('maps list item with dual uuid fields for gRPC LogList', () => {
     const doc = {
       siteId: '507f1f77bcf86cd799439011',

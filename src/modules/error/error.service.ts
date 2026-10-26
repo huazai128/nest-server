@@ -84,7 +84,12 @@ export class ErrorLogService implements OnModuleInit {
           JSON.stringify(item),
         );
       }
-      logger.info('Error 保存', eventData);
+      logger.info('Error 保存', {
+        ...eventData,
+        events: eventData.events ? `<omitted ${eventData.events.length} chars>` : undefined,
+        logUrl: eventData.logUrl,
+        logName: eventData.logName,
+      });
       logger.info(
         'Error 保存视频录制=========================',
         eventData.recordKeys,

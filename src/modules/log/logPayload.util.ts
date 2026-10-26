@@ -31,6 +31,7 @@ const INDEXED_STRING_KEYS = [
   'eventAction',
   'eventCategory',
   'ip',
+  'logName',
 ] as const;
 
 /** 长文本字段及各自入库上限，与 log_field_limits.proto 对齐 */
@@ -46,6 +47,7 @@ const LONG_TEXT_KEYS: Array<{
   { key: 'ua', max: LOG_FIELD_LIMITS.UA_MAX_BYTES },
   { key: 'eventValue', max: LOG_FIELD_LIMITS.LOG_DATA_MAX_BYTES },
   { key: 'errorDetail', max: LOG_FIELD_LIMITS.VALUE_MAX_BYTES },
+  { key: 'logUrl', max: LOG_FIELD_LIMITS.LOG_URL_MAX_BYTES },
 ];
 
 /**
@@ -282,7 +284,25 @@ export function normalizeInboundSaveLog(
     );
   }
 
+  stripSessionLogBody(data);
+
   return data;
+}
+
+/**
+ * 会话 .log 已有 OSS 链接时丢掉正文，避免 1.5MB 再进 Mongo。
+ * rrweb 的 events 不是 `# session-` / session-*.log，不会误删。
+ * @param {SaveLogRequest} data
+ */
+export function stripSessionLogBody(data: SaveLogRequest): void {
+  const logName = data.logName;
+  const events = data.events;
+  const isSession =
+    (typeof logName === 'string' && /^session-.+\.log$/i.test(logName)) ||
+    (typeof events === 'string' && events.startsWith('# session-'));
+  if (isSession && data.logUrl && data.events) {
+    delete (data as { events?: string }).events;
+  }
 }
 
 /**

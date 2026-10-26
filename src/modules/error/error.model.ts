@@ -136,6 +136,21 @@ export class ErrorDto extends Report {
   @IsArray()
   @prop({ type: [String], default: [], select: false })
   recordKeys: string[]; // 记录的录制的key，方便查看相关录制
+
+  /** 录屏关联写入的 rrweb JSON；会话 .log 正文改为 OSS，不在此落库 */
+  @IsString()
+  @prop({ type: String, default: null, select: false })
+  events: string | null;
+
+  /** 会话 .log 文件名，如 session-traceId-blank-screen.log */
+  @IsString()
+  @prop({ type: String, default: null })
+  logName: string | null;
+
+  /** 会话 .log 的阿里云 OSS 链接 */
+  @IsString()
+  @prop({ type: String, default: null })
+  logUrl: string | null;
 }
 
 @index(

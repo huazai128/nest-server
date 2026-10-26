@@ -102,7 +102,7 @@ export class UserLogService {
   public getIdByInfo(id: number) {
     return this.userLogModel
       .findOne({ id: id })
-      .select('breadcrumbs errorList events')
+      .select('breadcrumbs errorList logUrl logName')
       .exec();
   }
 
