@@ -231,14 +231,32 @@ export interface SaveLogRequest {
   componentName: string;
   /** 录制视频数据 */
   events: string;
-  /** ua解析结果 */
-  uaResult: string;
+  /** ua解析结果（proto 字段名 ua_result，keepCase） */
+  ua_result?: string;
+  /** @deprecated 使用 ua_result；仅 TS 兼容 */
+  uaResult?: string;
   /** 关联表自增id */
   cId: string;
   /** 关联表_id */
   tId: string;
   /** 录屏uuid key 用于保持 */
   recordKeys: string[];
+  /** 内存总量（字节，int64，入库前 clamp 至 JS 安全整数） */
+  totalSize: number;
+  /** 已用内存（字节） */
+  usedSize: number;
+  /** 内存上限（字节） */
+  limitSize: number;
+  errorUUid: string;
+  eventCategory: string;
+  eventAction: string;
+  eventLabel: string;
+  eventValue: string;
+  eventId: number;
+  exeTime: number;
+  errorDetail: string;
+  extraInfo: { [key: string]: any } | undefined;
+  otherInfo: { [key: string]: any } | undefined;
 }
 
 export interface BehaviorItem {
@@ -289,6 +307,7 @@ export interface Meta {
   file: string;
   /** 行号 */
   row: string;
+  conponentName: string;
 }
 
 export interface RequestInfo {
@@ -384,4 +403,22 @@ export interface LogService {
   getLogsChart(request: QueryDTO): Observable<ChartList>;
   /** 处理IP地理位置 */
   handleIPLocation(request: IPLocationRequest): Observable<IPLocationResponse>;
+  getLogsAggregation(request: QueryDTO): Observable<LogAggregationResult>;
+  getMemoryData(request: QueryDTO): Observable<ChartList>;
+}
+
+export interface LogAggregationResult {
+  docs: LogAggregationItem[];
+  totalDocs: number;
+  limit: number;
+  totalPages: number;
+  page: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface LogAggregationItem {
+  name: string;
+  key: string;
+  value: number;
 }

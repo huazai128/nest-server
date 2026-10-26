@@ -28,7 +28,6 @@ import { UserLog } from '../user/user.model';
 import { isObject } from 'lodash';
 import { stringToObjectO } from '@app/transformers/value.transform';
 import { HelperServiceAlarn } from '@app/processors/helper/helper.service.alarm';
-// import { KafkaService } from '@app/processors/kafka/kafka.service';
 import { TopicPartitionOffsetAndMetadata } from '@nestjs/microservices/external/kafka.interface';
 import { Cron } from '@nestjs/schedule';
 import { HelperServiceIp } from '@app/processors/helper/helper.service.ip';
@@ -39,11 +38,48 @@ import { RpcException } from '@nestjs/microservices';
 import { convertDatesToString } from '@app/utils/dateToString';
 import { MeasureAsyncTime } from '@app/decorators/async.decorator';
 import { RecordService } from '../record/record.service';
-import { Record } from '../record/record.model';
+import { Record as RecordVideo } from '../record/record.model';
 import { getSiteCacheKey } from '@app/constants/cache.contant';
 import { RedisService } from '@app/processors/redis/redis.service';
+import { NetworkSpeedLogService } from '../networkSpeedLog/networkSpeedLog.service';
+import { NetworkSpeedLog } from '../networkSpeedLog/networkSpeedLog.model';
+import { normalizeInboundSaveLog } from './logPayload.util';
+import {
+  mapLogDocToListItem,
+  paginateResultToLogList,
+} from './logQuery.util';
+import { isDevEnv } from '@app/app.env';
 
 const logger = createLogger({ scope: 'LogService', time: true });
+
+export class PoisonMessageError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PoisonMessageError';
+  }
+}
+
+export class SiteNotFoundError extends PoisonMessageError {
+  constructor(siteId: unknown) {
+    super(`站点不存在或已删除: ${String(siteId)}`);
+  }
+}
+
+export class UnsupportedCategoryError extends PoisonMessageError {
+  constructor(category: unknown) {
+    super(`上报类型缺失或不支持: ${String(category)}`);
+  }
+}
+
+const categoryRefTypeMap: Partial<{ [key in TransportCategory]: RefType }> = {
+  [TransportCategory.EVENT]: RefType.EventLog,
+  [TransportCategory.API]: RefType.ApiLog,
+  [TransportCategory.ERROR]: RefType.ErrorLog,
+  [TransportCategory.CUSTOM]: RefType.CustomLog,
+  [TransportCategory.PV]: RefType.PvLog,
+  [TransportCategory.PREF]: RefType.PrefLog,
+  [TransportCategory.USER]: RefType.UserLog,
+};
 
 /**
  * 日志服务
@@ -66,6 +102,7 @@ export class LogService {
     private readonly alarnService: HelperServiceAlarn,
     private readonly recordService: RecordService,
     private readonly cacheService: RedisService,
+    private readonly networkSpeedLogService: NetworkSpeedLogService,
   ) {}
 
   onModuleInit() {
@@ -105,99 +142,162 @@ export class LogService {
    */
   @MeasureAsyncTime()
   public async create(data: SaveLogRequest): Promise<any> {
-    const startNow = Date.now();
-    // 站点放进缓存
-    const site = await this.getSiteInfo(data.siteId);
-    logger.info('站点信息获取耗时', `${Date.now() - startNow}ms`);
+    const normalized = normalizeInboundSaveLog(data);
+    const startNow = isDevEnv ? Date.now() : 0;
+    const site = await this.getSiteInfo(normalized.siteId);
+    if (isDevEnv) {
+      logger.info('站点信息获取耗时', `${Date.now() - startNow}ms`);
+    }
     if (!site) {
-      logger.error('站点已删除或者不存在');
-      return '站点已删除或者不存在';
+      throw new SiteNotFoundError(normalized.siteId);
     }
-    // 录屏上报信息
-    if (data.category === TransportCategory.RV) {
-      this.recordService.create(data as unknown as Record); // 录屏上报 done
-      logger.info('录屏保存耗时：', `${Date.now() - startNow}ms`);
-      return data;
-    } else {
-      data.value = isObject(data.value)
-        ? JSON.stringify(data.value)
-        : data.value;
-      const log: Partial<any> = {
-        siteId: data.siteId,
-        category: data.category,
-        userId: data.userId,
-        title: data.title,
-        path: data.path,
-        href: data.href,
-        method: data.method,
-        url: data.url,
-        body: data.body && stringToObjectO(data.body),
-        params: data.params && stringToObjectO(data.params),
-        value: data.value,
-        ip: data.ip,
-        reportsType: data.reportsType,
-        meta: data.meta,
-        traceId: data.traceId,
-        monitorId: data.monitorId,
-        pageId: data.pageId,
-      };
-      try {
-        switch (data.category) {
-          case TransportCategory.EVENT: // 事件上报 done
-            log.onModel = RefType.EventLog;
-            log.doce = await this.eventLogService.create(
-              data as unknown as EventLog,
-            );
-            break;
-          case TransportCategory.API: // API上报 done
-            log.onModel = RefType.ApiLog;
-            log.doce = await this.apiLogService.create(
-              data as unknown as ApiLog,
-            );
-            break;
-          case TransportCategory.ERROR: // 错误上报 done
-            log.onModel = RefType.ErrorLog;
-            this.errorLogService.handleErrorAlert(data as unknown as ErrorLog);
-            log.doce = await this.errorLogService.create(
-              data as unknown as ErrorLog,
-            );
-            break;
-          case TransportCategory.CUSTOM: // 自定义上报、react上报
-            log.onModel = RefType.CustomLog;
-            log.doce = await this.customLogService.create(
-              data as unknown as CustomLog,
-            );
-            break;
-          case TransportCategory.PV: // PV和UV上报 done
-            log.onModel = RefType.PvLog;
-            log.doce = await this.pvLogService.create(data as unknown as PvLog);
-            break;
-          case TransportCategory.PREF: // 性能上报 done
-            // 性能上报 perf
-            log.onModel = RefType.PrefLog;
-            log.doce = await this.prefLogService.create(
-              data as unknown as PrefLog,
-            );
-            break;
-          case TransportCategory.USER: // 用户反馈上报 done
-            await this.userLogService.create(data as unknown as UserLog);
-            break;
-        }
-        if (!Object.is(data.category, TransportCategory.USER)) {
-          this.logModel.create(log);
-        }
-        logger.info('日志保存总耗时：', `${Date.now() - startNow}ms`);
-        return log;
-      } catch (error) {
-        logger.error(`上报错误`, JSON.stringify(data), error);
-        this.alarnService.sendErrorSaveAlarm({
-          content: error,
-          siteId: data.siteId as unknown as ErrorLog['siteId'],
-          userId: data.userId || undefined,
-        });
-        return error;
+
+    if (normalized.category === TransportCategory.RV) {
+      await this.recordService.create(normalized as unknown as RecordVideo);
+      if (isDevEnv) {
+        logger.info('录屏保存耗时：', `${Date.now() - startNow}ms`);
       }
+      return normalized;
     }
+
+    const onModel =
+      categoryRefTypeMap[normalized.category as TransportCategory];
+    if (!onModel) {
+      throw new UnsupportedCategoryError(normalized.category);
+    }
+
+    normalized.value = isObject(normalized.value)
+      ? JSON.stringify(normalized.value)
+      : (normalized.value as string);
+
+    const log: Partial<Log> = {
+      onModel,
+      siteId: normalized.siteId as any,
+      category: normalized.category as TransportCategory,
+      userId: this.toSafeString(normalized.userId),
+      title: this.toSafeString(normalized.title),
+      path: this.toSafeString(normalized.path),
+      href: this.toSafeString(normalized.href),
+      method: this.toSafeString(normalized.method) as Log['method'],
+      url: this.toSafeString(normalized.url),
+      body: normalized.body && stringToObjectO(normalized.body),
+      params: normalized.params && stringToObjectO(normalized.params),
+      value: this.toSafeString(normalized.value),
+      ip: this.toSafeString(normalized.ip),
+      reportsType: normalized.reportsType as any,
+      errorUUid: this.toSafeString(
+        normalized.errorUUid || normalized.errorUid,
+      ),
+      meta: normalized.meta as any,
+      traceId: this.toSafeString(normalized.traceId),
+      monitorId: this.toSafeString(normalized.monitorId),
+      pageId: this.toSafeString(normalized.pageId),
+      totalSize: normalized.totalSize ?? 0,
+      usedSize: normalized.usedSize ?? 0,
+      limitSize: normalized.limitSize ?? 0,
+      ua_result: (normalized as any).ua_result || normalized.uaResult,
+      response: normalized.response as unknown as Log['response'],
+    };
+
+    let networkSpeedAlertData: NetworkSpeedLog | null = null;
+
+    try {
+      switch (normalized.category) {
+        case TransportCategory.EVENT:
+          log.doce = await this.eventLogService.create(
+            normalized as unknown as EventLog,
+          );
+          break;
+        case TransportCategory.API:
+          log.doce = await this.apiLogService.create(
+            normalized as unknown as ApiLog,
+          );
+          break;
+        case TransportCategory.ERROR:
+          this.errorLogService.handleErrorAlert(
+            normalized as unknown as ErrorLog,
+          );
+          log.doce = await this.errorLogService.create(
+            normalized as unknown as ErrorLog,
+          );
+          break;
+        case TransportCategory.CUSTOM:
+          if (this.networkSpeedLogService.isNetworkSpeedLog(normalized)) {
+            const networkSpeedData = this.networkSpeedLogService.normalize(
+              normalized as unknown as { [key: string]: any },
+            );
+            log.onModel = RefType.NetworkSpeedLog;
+            log.doce =
+              await this.networkSpeedLogService.create(networkSpeedData);
+            networkSpeedAlertData = networkSpeedData;
+          } else {
+            log.doce = await this.customLogService.create(
+              normalized as unknown as CustomLog,
+            );
+          }
+          break;
+        case TransportCategory.PV:
+          log.doce = await this.pvLogService.create(
+            normalized as unknown as PvLog,
+          );
+          break;
+        case TransportCategory.PREF:
+          log.doce = await this.prefLogService.create(
+            normalized as unknown as PrefLog,
+          );
+          break;
+        case TransportCategory.USER:
+          await this.userLogService.create(normalized as unknown as UserLog);
+          break;
+      }
+
+      if (
+        normalized.category !== TransportCategory.USER &&
+        !log.doce
+      ) {
+        throw new PoisonMessageError(
+          `关联文档创建失败，category=${String(normalized.category)}`,
+        );
+      }
+
+      if (normalized.category !== TransportCategory.USER) {
+        await this.logModel.create(log);
+      }
+
+      if (
+        networkSpeedAlertData &&
+        this.networkSpeedLogService.shouldSendAlarm(networkSpeedAlertData)
+      ) {
+        void this.alarnService.sendNetworkSpeedAlarm(
+          networkSpeedAlertData,
+          site,
+        );
+      }
+
+      if (isDevEnv) {
+        logger.info('日志保存总耗时：', `${Date.now() - startNow}ms`);
+      }
+      return log;
+    } catch (error) {
+      logger.error(`上报错误`, JSON.stringify(normalized), error);
+      this.alarnService.sendErrorSaveAlarm({
+        content: error,
+        siteId: normalized.siteId as unknown as ErrorLog['siteId'],
+        userId: normalized.userId || undefined,
+      });
+      throw error;
+    }
+  }
+
+  private toSafeString(value: unknown): string | null {
+    if (value === null || value === undefined || value === '') {
+      return null;
+    }
+    return String(value);
+  }
+
+  public async saveLogFromChunkedPayload(data: SaveLogRequest): Promise<any> {
+    return this.create(data);
   }
 
   /**
@@ -211,8 +311,12 @@ export class LogService {
   public async paginate(
     paginateQuery: PaginateQuery<Log>,
     paginateOptions: PaginateOptions,
-  ): Promise<PaginateResult<Log>> {
-    return this.logModel.paginate(paginateQuery, paginateOptions);
+  ) {
+    const result = await this.logModel.paginate(
+      paginateQuery,
+      paginateOptions,
+    );
+    return paginateResultToLogList(result);
   }
 
   /**
@@ -265,18 +369,15 @@ export class LogService {
     const items = hasNextPage ? docs.slice(0, -1) : docs;
 
     // 5. 优化数据转换
-    const list = items.map(({ doce, create_at, update_at, ...rest }) => ({
-      ...rest,
-      ...(doce || {}),
-      cId: doce?.id,
-      tId: doce?._id,
-      create_at: create_at
-        ? dayjs(create_at).format('YYYY-MM-DD HH:mm:ss')
-        : null,
-      update_at: update_at
-        ? dayjs(update_at).format('YYYY-MM-DD HH:mm:ss')
-        : null,
-    }));
+    const list = items.map((doc) => {
+      const item = mapLogDocToListItem(doc as { [key: string]: any });
+      const doce = (doc as any).doce;
+      return {
+        ...item,
+        cId: doce?.id,
+        tId: doce?._id,
+      };
+    });
 
     return {
       data: list,
@@ -486,7 +587,7 @@ export class LogService {
     query: PaginateQuery<Log>,
     option?: QueryOptions<any>,
   ) {
-    return this.logModel.find(query, option).exec();
+    return this.logModel.find(query, undefined, option).exec();
   }
 
   /**

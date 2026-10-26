@@ -18,4 +18,10 @@ message QueryDTO {
   int32 size = 13;
   int32 total = 14;
   string cursor = 15;
+  string type = 16;
+  string path = 17;
+  string format = 18;
+  string errorId = 19;
+  int32 id = 20;
+  string errorUUid = 21;
 }

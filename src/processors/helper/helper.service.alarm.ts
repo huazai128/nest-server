@@ -7,6 +7,7 @@ import { CONFIG } from '@app/config';
 import { RedisService } from '../redis/redis.service';
 import { Site } from '@app/modules/site/site.model';
 import { createLogger } from '@app/utils/logger';
+import { NetworkSpeedLog } from '@app/modules/networkSpeedLog/networkSpeedLog.model';
 
 const logger = createLogger({ scope: 'HelperServiceAlarn', time: true });
 
@@ -140,6 +141,45 @@ export class HelperServiceAlarn {
       },
     };
     this.sendAlarm(userLog.siteId + '', data, true);
+  }
+
+  /**
+   * 网速告警：发往站点 networkSpeedReportUrl
+   */
+  public async sendNetworkSpeedAlarm(
+    data: NetworkSpeedLog,
+    site?: Site | null,
+  ) {
+    const siteInfo =
+      site ||
+      (await this.cacheService.get<Site>(
+        getSiteCacheKey(String(data.siteId || '')),
+      ));
+    const url = siteInfo?.networkSpeedReportUrl;
+    if (!url) {
+      return;
+    }
+    const levelText =
+      data.networkLevel === 'critical'
+        ? '网速几乎不可用'
+        : data.networkLevel === 'severe'
+          ? '网速严重偏低'
+          : '网速较慢';
+    const payload: Alarm = {
+      msgtype: 'markdown',
+      markdown: {
+        content: `网速告警：<font color=\"warning\">${levelText}</font>
+                  >站点:<font color=\"comment\">${siteInfo?.name || ''}</font>
+                  >用户ID:<font color=\"comment\">${data.userId || '-'}</font>
+                  >环境:<font color=\"comment\">${data.mode || '-'}</font>
+                  >网速:<font color=\"comment\">${data.speedKBps ?? '-'} KB/s</font>
+                  >页面:<font color=\"comment\">${data.path || data.href || '-'}</font>
+                  `,
+      },
+    };
+    this.httpService.axiosRef.post(url, payload).catch((error) => {
+      logger.error(`网速告警发送失败:${url}`, error);
+    });
   }
 
   /**

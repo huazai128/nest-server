@@ -1,0 +1,17 @@
+syntax = "proto3";
+package logproto;
+
+/**
+ * 日志上报/查询字段约束（文档型 message，供各端对齐；不参与 SaveLogRequest 编解码）。
+ * 服务端以 nest-server `logFieldLimits` 常量为准做最终裁剪。
+ */
+message LogFieldLimits {
+  int32 indexed_string_max_bytes = 1;   // 900，Mongo WiredTiger 索引键上限
+  int32 value_max_bytes = 2;            // 8000，错误摘要
+  int32 response_result_max_bytes = 3;  // 2000，HTTP 响应体摘要
+  int32 events_max_bytes = 4;           // 3145728，录屏/events 单字段上限
+  int32 ua_max_bytes = 5;               // 2048
+  int32 chunk_json_max_bytes = 6;       // 4194304，分片重组后 JSON 上限
+  int64 memory_metric_max = 7;          // 9007199254740991，JS 安全整数上限
+  int32 grpc_string_warn_bytes = 8;     // 512000，超过则建议走 saveLogChunked
+}

@@ -1,6 +1,15 @@
 syntax = "proto3";
 package siteproto;
 import public "common/pagination.proto";
+import "google/protobuf/struct.proto";
+
+message SiteApiRule {
+  string apiUrlPattern = 1;
+  string key = 2;
+  google.protobuf.Struct enums = 3;
+  bool allowEmpty = 4;
+  bool ignore = 5;
+}
 
 service SiteService {
   rpc saveSite (SiteRequest) returns (stream SiteResponse);
@@ -16,12 +25,13 @@ message SiteDocument {
   bool isApi = 3;                      // 是否为API
   string reportUrl = 4;                // 报告URL
   int32 state = 5;                     // 状态
-  repeated string apiRules = 6;        // API规则列表
+  repeated SiteApiRule apiRules = 6;   // API 告警屏蔽规则
   string create_at = 7;                // 创建时间
   string update_at = 8;                // 更新时间
   repeated string recordWhiteList = 9; // 白名单记录
   string _id = 10;                     // 系统id
   string feedbackUrl = 11;             // 反馈URL
+  string networkSpeedReportUrl = 12;   // 网速告警群接口
 }
 
 message SiteRequest {
@@ -31,6 +41,7 @@ message SiteRequest {
   string reportUrl = 4;
   int32 state = 5;
   string feedbackUrl = 6;
+  string networkSpeedReportUrl = 7;
 }
 
 message SiteResponse {

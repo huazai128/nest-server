@@ -30,30 +30,46 @@ import {
   MetricsTypes,
   TransportCategory,
 } from '@app/constants/enum.contant';
+import { ApiLog } from '../api/api.model';
+import { EventLog } from '../eventLog/eventLog.model';
+import { ErrorLog, Meta } from '../error/error.model';
+import { PrefLog } from '../perf/pref.model';
+import { PvLog } from '../pv/pv.model';
+import { CustomLog } from '../customLog/customLog.model';
+import { UserLog } from '../user/user.model';
+import { NetworkSpeedLog } from '../networkSpeedLog/networkSpeedLog.model';
 
-// 定义内容类型接口
-export type Content = { name: string };
-
-// 定义日志引用类型枚举
 export enum RefType {
-  ApiLog = 'ApiLog', // API日志
-  EventLog = 'EventLog', // 事件日志
-  ErrorLog = 'ErrorLog', // 错误日志
-  PrefLog = 'PrefLog', // 性能日志
-  PvLog = 'PvLog', // 页面访问日志
-  CustomLog = 'CustomLog', // 自定义日志
-  UserLog = 'UserLog', // 用户行为日志
+  ApiLog = 'ApiLog',
+  EventLog = 'EventLog',
+  ErrorLog = 'ErrorLog',
+  PrefLog = 'PrefLog',
+  PvLog = 'PvLog',
+  CustomLog = 'CustomLog',
+  NetworkSpeedLog = 'NetworkSpeedLog',
+  UserLog = 'UserLog',
 }
 
-// 日志引用类型常量
 export const LOG_REF_TYPE = [
   RefType.ApiLog,
   RefType.EventLog,
   RefType.ErrorLog,
   RefType.PrefLog,
   RefType.PvLog,
+  RefType.CustomLog,
+  RefType.NetworkSpeedLog,
   RefType.UserLog,
 ];
+
+export type Content =
+  | ApiLog
+  | EventLog
+  | ErrorLog
+  | PrefLog
+  | PvLog
+  | CustomLog
+  | NetworkSpeedLog
+  | UserLog;
 
 // 1. 分离text索引
 @index(
@@ -207,6 +223,30 @@ export class Log {
   @IsString()
   @prop({ type: String, default: null, index: true }) // 添加索引提升监控查询性能
   pageId: string | null; // 用于当前页面
+
+  @IsString()
+  @IsOptional()
+  @prop({ type: String, default: null, index: true })
+  errorUUid?: string | null;
+
+  @IsOptional()
+  @prop({ type: Number, default: 0 })
+  totalSize?: number;
+
+  @IsOptional()
+  @prop({ type: Number, default: 0 })
+  usedSize?: number;
+
+  @IsOptional()
+  @prop({ type: Number, default: 0 })
+  limitSize?: number;
+
+  @IsOptional()
+  @prop({ type: String, default: null })
+  ua_result?: string | null;
+
+  @prop({ type: () => Meta, _id: false, default: null, select: false })
+  meta?: Meta | null;
 }
 
 export const LogProvider = getProviderByTypegoose(Log);

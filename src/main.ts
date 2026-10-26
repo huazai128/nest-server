@@ -7,19 +7,23 @@ import { getServerIp } from './utils/util';
 import { APP, CONFIG } from './config';
 import { join } from 'path';
 import { PROTOPACKAGE, PROTOPATH } from './constants/proto.contant';
+import {
+  getKafkaServerOptions,
+  isKafkaConsumerEnabled,
+  resolveKafkaBrokers,
+  startKafkaMicroserviceWithRetry,
+} from './config/kafka.config';
+import { createLogger } from './utils/logger';
+import { isDevEnv } from './app.env';
+
+const logger = createLogger({ scope: 'Bootstrap', time: true });
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  // grpc 微服务
+
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      // 这种方法 引用存在 import 时会报错，如import public "orders/service.proto";
-      // protoPath: [
-      //   join(__dirname, '../protos/user.proto'),
-      //   join(__dirname, '../protos/auth.proto'),
-      // ],
-      // 每次新增proto 都要在这里配置
       package: PROTOPACKAGE,
       protoPath: PROTOPATH,
       loader: {
@@ -27,29 +31,58 @@ async function bootstrap() {
         keepCase: true,
       },
       url: CONFIG.grpcUrl,
-      // gRPC 反射
       onLoadPackageDefinition: (pkg, server) => {
-        // nodev22 版本运行这里会报错 issues: https://github.com/protobufjs/protobuf.js/issues/2025
-        // ReflectionService的作用是向gRPC客户端提供有关gRPC服务的元数据信息。它允许客户端查询和发现可用的gRPC服务，以及服务中的方法、消息类型和其他元数据。ReflectionService提供的元数据信息可以用于自动生成客户端代码、动态调用gRPC服务方法以及进行服务发现和探测等。
         new ReflectionService(pkg).addToServer(server);
       },
     },
   });
 
-  // redis 微服务
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.REDIS,
     options: CONFIG.redisConf,
   });
-  // app.useGlobalInterceptors(new LoggingInterceptor());
-  // // 对应微服务全局配置，配置无效
-  // microservice.useGlobalInterceptors(new LoggingInterceptor());
 
-  await app.startAllMicroservices();
-  await app.listen(APP.PORT).then(() => {
-    console.info(
-      `Application is running on: http://${getServerIp()}:${APP.PORT}`,
+  const kafkaEnabled = isKafkaConsumerEnabled() && !!CONFIG.kafkaOptions;
+  if (kafkaEnabled) {
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.KAFKA,
+      options: getKafkaServerOptions(CONFIG.kafkaOptions as any),
+    });
+  }
+
+  const kafkaBrokers = resolveKafkaBrokers(
+    ((CONFIG.kafkaOptions as any)?.client?.brokers as string[]) || [],
+  );
+  logger.info(
+    `Kafka consumer: enabled=${kafkaEnabled}, brokers=${kafkaBrokers.join(',')}`,
+  );
+
+  try {
+    if (kafkaEnabled) {
+      await startKafkaMicroserviceWithRetry(async () => {
+        await app.startAllMicroservices();
+      }, kafkaBrokers);
+    } else {
+      await app.startAllMicroservices();
+    }
+    logger.info('gRPC / Redis / Kafka 微服务已就绪');
+  } catch (error) {
+    logger.error(
+      '微服务启动失败（请检查 Kafka broker / KAFKA_BROKERS）',
+      error,
     );
-  });
+    throw error;
+  }
+
+  if (isDevEnv && !kafkaEnabled) {
+    logger.info(
+      '开发环境未启 Kafka consumer；BFF 上报将走 gRPC 直写。启用消费请设 KAFKA_ENABLE_CONSUMER=true',
+    );
+  }
+
+  await app.listen(APP.PORT);
+  console.info(
+    `Application is running on: http://${getServerIp()}:${APP.PORT}`,
+  );
 }
 bootstrap();

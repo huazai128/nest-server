@@ -11,6 +11,7 @@ import { ApiLogModule } from './api/api.module';
 import { UserLogModule } from './user/user.module';
 import { RecordModule } from './record/record.module';
 import { ExpansionModule } from './expansion/expansion.module';
+import { NetworkSpeedLogModule } from './networkSpeedLog/networkSpeedLog.module';
 
 export default [
   AuthModule,
@@ -26,4 +27,5 @@ export default [
   UserLogModule,
   RecordModule,
   ExpansionModule,
+  NetworkSpeedLogModule,
 ];

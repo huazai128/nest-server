@@ -1,0 +1,43 @@
+syntax = "proto3";
+package monitorproto;
+
+import public "common/query_dto.proto";
+import "google/protobuf/struct.proto";
+
+service PvService {
+  rpc getPvPaths(QueryDTO) returns (google.protobuf.Struct);
+  rpc getErrorList(QueryDTO) returns (google.protobuf.Struct);
+  rpc getSingleCount(QueryDTO) returns (google.protobuf.Struct);
+  rpc getTerminalStatistics(QueryDTO) returns (google.protobuf.Struct);
+  rpc getStatisticsPath(QueryDTO) returns (google.protobuf.Struct);
+  rpc getStatisticsSingleDayPath(QueryDTO) returns (google.protobuf.Struct);
+  rpc getStatisticsEquipment(QueryDTO) returns (google.protobuf.Struct);
+}
+
+service PrefService {
+  rpc getFmpChartList(QueryDTO) returns (google.protobuf.Struct);
+  rpc getTimeConsumingList(QueryDTO) returns (google.protobuf.Struct);
+  rpc getTimeConsumingMaxList(QueryDTO) returns (google.protobuf.Struct);
+}
+
+service ApiLogService {
+  rpc getReuqestUrls(QueryDTO) returns (google.protobuf.Struct);
+}
+
+service EventLogService {
+  rpc getEventLogs(QueryDTO) returns (google.protobuf.Struct);
+  rpc getEventChartLogs(QueryDTO) returns (google.protobuf.Struct);
+  rpc getCustomGroupChartLogs(QueryDTO) returns (google.protobuf.Struct);
+}
+
+service CustomLogService {
+  rpc getCustomLogs(QueryDTO) returns (google.protobuf.Struct);
+  rpc getCustomChartLogs(QueryDTO) returns (google.protobuf.Struct);
+  rpc getCustomGroupChartLogs(QueryDTO) returns (google.protobuf.Struct);
+}
+
+service UserLogService {
+  rpc getErrorLogs(QueryDTO) returns (google.protobuf.Struct);
+  rpc getErrorList(QueryDTO) returns (google.protobuf.Struct);
+  rpc getErrorInfo(QueryDTO) returns (google.protobuf.Struct);
+}

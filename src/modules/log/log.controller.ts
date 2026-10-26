@@ -1,8 +1,7 @@
 import { Controller, UseInterceptors } from '@nestjs/common';
-import { PaginateOptions, PaginateResult, PipelineStage } from 'mongoose';
+import { PaginateOptions, PipelineStage } from 'mongoose';
 import { KW_KEYS } from '@app/constants/value.constant';
 import { LogService } from './log.service';
-import { Log } from './log.model';
 import { isUndefined, omitBy, isNil } from 'lodash';
 import {
   groupHourOption,
@@ -17,6 +16,10 @@ import { LoggingInterceptor } from '@app/interceptors/logging.interceptor';
 import { createLogger } from '@app/utils/logger';
 import { getUaInfo } from '@app/utils/util';
 import { Observable } from 'rxjs';
+import {
+  assertChunkPayloadSize,
+  normalizeInboundSaveLog,
+} from './logPayload.util';
 
 // 创建日志记录器，设置作用域为LogController，并启用时间戳
 const logger = createLogger({
@@ -42,14 +45,17 @@ export class LogController {
    */
   @GrpcMethod('LogService', 'saveLog')
   async saveLog(data: SaveLogRequest) {
-    // 清理数据中的空值
-    const cleanedData = omitBy(data, isNil);
-    // 解析用户代理信息
-    const uaInfo = getUaInfo(cleanedData.ua);
-    cleanedData.ua_result = uaInfo && JSON.stringify(uaInfo);
-    // 记录接收到的日志数据
-    logger.info(`日志接收数据${cleanedData.reportsType}`, cleanedData);
-    // 创建日志记录
+    const cleanedData = normalizeInboundSaveLog(
+      omitBy(data, isNil) as SaveLogRequest,
+    );
+    (cleanedData as SaveLogRequest & { ua_result?: string }).ua_result =
+      JSON.stringify(getUaInfo(cleanedData.ua));
+    logger.info(`日志接收数据${cleanedData.reportsType}`, {
+      category: cleanedData.category,
+      reportsType: cleanedData.reportsType,
+      siteId: cleanedData.siteId,
+      traceId: cleanedData.traceId,
+    });
     return this.logService.create(cleanedData);
   }
 
@@ -101,21 +107,18 @@ export class LogController {
               serializedData += chunk;
             }
 
-            // 解析合并后的JSON数据
-            const logData = JSON.parse(serializedData);
-
-            // 清理合并后的数据中的空值
-            const cleanedData = omitBy(logData, isNil);
-            // 解析用户代理信息
-            const uaInfo = getUaInfo(cleanedData.ua);
-            cleanedData.ua_result = uaInfo && JSON.stringify(uaInfo);
-
-            logger.info(
-              `合并后的日志数据${cleanedData.reportsType}`,
-              cleanedData,
+            assertChunkPayloadSize(serializedData);
+            const logData = JSON.parse(serializedData) as SaveLogRequest;
+            const cleanedData = normalizeInboundSaveLog(
+              omitBy(logData, isNil) as SaveLogRequest,
             );
-
-            // 创建日志记录
+            (cleanedData as SaveLogRequest & { ua_result?: string }).ua_result =
+              JSON.stringify(getUaInfo(cleanedData.ua));
+            logger.info(`合并后的日志数据${cleanedData.reportsType}`, {
+              category: cleanedData.category,
+              reportsType: cleanedData.reportsType,
+              siteId: cleanedData.siteId,
+            });
             const result = await this.logService.create(cleanedData);
 
             resolve({
@@ -149,7 +152,7 @@ export class LogController {
    * @memberof LogController
    */
   @GrpcMethod('LogService', 'getLogs')
-  getLogs(params: LogPaginateQueryDTO): Promise<PaginateResult<Log>> {
+  getLogs(params: LogPaginateQueryDTO): Promise<LogList> {
     // 转换查询参数为DTO对象
     const query = plainToClass(LogPaginateQueryDTO, params);
     const { page, size, sort, ...filters } = query;

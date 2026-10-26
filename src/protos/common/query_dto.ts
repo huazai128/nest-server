@@ -26,4 +26,10 @@ export interface QueryDTO {
   size: number;
   total: number;
   cursor: string;
+  type: string;
+  path: string;
+  format: string;
+  errorId: string;
+  id: number;
+  errorUUid: string;
 }

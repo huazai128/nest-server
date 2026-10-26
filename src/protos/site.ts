@@ -10,6 +10,14 @@ import { type Pagination } from "./common/pagination";
 
 export const protobufPackage = "siteproto";
 
+export interface SiteApiRule {
+  apiUrlPattern: string;
+  key: string;
+  enums: { [key: string]: any } | undefined;
+  allowEmpty: boolean;
+  ignore: boolean;
+}
+
 export interface SiteDocument {
   /** 文档ID，这个文档id,不能使用int，会变成Long 就要进行处理，为了减少 */
   id: string;
@@ -21,8 +29,7 @@ export interface SiteDocument {
   reportUrl: string;
   /** 状态 */
   state: number;
-  /** API规则列表 */
-  apiRules: string[];
+  apiRules: SiteApiRule[];
   /** 创建时间 */
   createAt: string;
   /** 更新时间 */
@@ -33,6 +40,7 @@ export interface SiteDocument {
   Id: string;
   /** 反馈URL */
   feedbackUrl: string;
+  networkSpeedReportUrl: string;
 }
 
 export interface SiteRequest {
@@ -42,6 +50,7 @@ export interface SiteRequest {
   reportUrl: string;
   state: number;
   feedbackUrl: string;
+  networkSpeedReportUrl: string;
 }
 
 export interface SiteResponse {

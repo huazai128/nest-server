@@ -1,5 +1,6 @@
 syntax = "proto3";
 package logproto;
+// 字段长度/数值上限见 common/log_field_limits.proto（LogFieldLimits）
 import public "common/pagination.proto";
 import "google/protobuf/struct.proto"; // 导入 google 的结构类型
 import public "common/query_dto.proto";
@@ -12,7 +13,25 @@ service LogService {
   rpc getLogs (QueryDTO) returns (stream LogList);  // 获取日志列表
   rpc getLogsByCursor(QueryDTO) returns (stream LogList);  // 通过游标获取日志列表
   rpc getLogsChart(QueryDTO) returns (stream ChartList);  // 获取日志图表数据
+  rpc getLogsAggregation(QueryDTO) returns (stream LogAggregationResult);  // 路径/URL 聚合分页
+  rpc getMemoryData(QueryDTO) returns (stream ChartList);  // 内存指标时序
   rpc handleIPLocation(IPLocationRequest) returns (stream IPLocationResponse);  // 处理IP地理位置
+}
+
+message LogAggregationResult {
+  repeated LogAggregationItem docs = 1;
+  int32 totalDocs = 2;
+  int32 limit = 3;
+  int32 totalPages = 4;
+  int32 page = 5;
+  bool hasNextPage = 6;
+  bool hasPrevPage = 7;
+}
+
+message LogAggregationItem {
+  string name = 1;
+  string key = 2;
+  int32 value = 3;
 }
 
 message IPLocationRequest {
@@ -131,6 +150,19 @@ message SaveLogRequest {
   string cId = 71;                    // 关联表自增id
   string tId = 72;                    // 关联表_id  
   repeated string recordKeys = 73;    // 录屏uuid key 用于保持
+  int64 totalSize = 74;               // 内存总量（字节）
+  int64 usedSize = 75;                // 已用内存（字节）
+  int64 limitSize = 76;               // 内存上限（字节）
+  string errorUUid = 77;              // 错误 UUID（SDK 字段名，与 errorUid 等价）
+  string eventCategory = 78;          // 自定义事件分类
+  string eventAction = 79;            // 自定义事件 action / 测速标识
+  string eventLabel = 80;             // 自定义事件 label
+  string eventValue = 81;             // 自定义事件 value（测速等为 JSON 字符串）
+  int32 eventId = 82;                 // 自定义事件 id / 测速指标 id
+  double exeTime = 83;                // 性能耗时（ms，metrics 上报）
+  string errorDetail = 84;            // 错误详情摘要
+  google.protobuf.Struct extraInfo = 85;   // 用户反馈等扩展
+  google.protobuf.Struct otherInfo = 86;   // 用户反馈结构化扩展（手机号、团队等）
 }
 
 
@@ -158,6 +190,7 @@ message Meta {
   string col = 15;                   // 列号
   string file = 16;                  // 文件名
   string row = 17;                   // 行号
+  string conponentName = 18;         // React 组件名（历史字段拼写）
 }
 
 message RequestInfo {

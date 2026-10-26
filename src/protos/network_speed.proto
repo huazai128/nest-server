@@ -1,0 +1,17 @@
+syntax = "proto3";
+package networkspeedproto;
+
+import public "common/query_dto.proto";
+import public "common/pagination.proto";
+import public "common/chart_item.proto";
+import "google/protobuf/struct.proto";
+
+service NetworkSpeedLogService {
+  rpc getList(QueryDTO) returns (NetworkSpeedLogList);
+  rpc getChart(QueryDTO) returns (ChartList);
+}
+
+message NetworkSpeedLogList {
+  repeated google.protobuf.Struct data = 1;
+  Pagination pagination = 2;
+}

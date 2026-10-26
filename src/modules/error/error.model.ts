@@ -121,6 +121,14 @@ export class ErrorDto extends Report {
   @prop({ type: String, default: null, index: true })
   value: string | null;
 
+  @IsString()
+  @prop({ type: String, default: null, index: true })
+  errorUUid: string | null;
+
+  @IsString()
+  @prop({ type: String, default: null })
+  errorDetail: string | null;
+
   @IsArray()
   @prop({ type: [String], default: [], select: false })
   errorDetailList: string[];

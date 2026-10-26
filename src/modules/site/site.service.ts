@@ -20,6 +20,7 @@ import { UserLogService } from '../user/user.service';
 import { RedisService } from '@app/processors/redis/redis.service';
 import { Cron } from '@nestjs/schedule';
 import { MeasureAsyncTime } from '@app/decorators/async.decorator';
+import { NetworkSpeedLogService } from '../networkSpeedLog/networkSpeedLog.service';
 
 /**
  * 站点服务类 - 处理站点相关的业务逻辑
@@ -38,6 +39,7 @@ export class SiteService {
     private readonly webLogService: LogService,
     private readonly cacheService: RedisService,
     private readonly userLogService: UserLogService,
+    private readonly networkSpeedLogService: NetworkSpeedLogService,
   ) {}
 
   /**
@@ -81,6 +83,7 @@ export class SiteService {
           this.pvLogService.siteIdRemove(siteId),
           this.prefLogService.siteIdRemove(siteId),
           this.userLogService.siteIdRemove(siteId),
+          this.networkSpeedLogService.siteIdRemove(siteId),
         ]);
         await this.cacheService.del(key);
       }
@@ -129,6 +132,8 @@ export class SiteService {
       isApi: 1,
       reportUrl: 1,
       feedbackUrl: 1,
+      networkSpeedReportUrl: 1,
+      apiRules: 1,
       create_at: 1,
       update_at: 1,
       _id: 0, // 不返回 _id
@@ -217,6 +222,8 @@ export class SiteService {
         isApi: 1,
         reportUrl: 1,
         feedbackUrl: 1,
+        networkSpeedReportUrl: 1,
+        apiRules: 1,
         create_at: 1,
         update_at: 1,
         _id: 0,
@@ -247,6 +254,8 @@ export class SiteService {
         isApi: 1,
         reportUrl: 1,
         feedbackUrl: 1,
+        networkSpeedReportUrl: 1,
+        apiRules: 1,
         create_at: 1,
         update_at: 1,
         _id: 1,

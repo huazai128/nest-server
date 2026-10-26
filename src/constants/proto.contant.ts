@@ -5,6 +5,8 @@ export const PROTOPACKAGE = [
   'logproto',
   'expansionproto',
   'errorproto',
+  'networkspeedproto',
+  'monitorproto',
 ];
 
 export const PROTOPATH = [
@@ -14,4 +16,6 @@ export const PROTOPATH = [
   'log.proto',
   'expansion.proto',
   'error.proto',
+  'network_speed.proto',
+  'monitor_services.proto',
 ];

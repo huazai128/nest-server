@@ -13,4 +13,5 @@ export interface ConfigServer {
   grpcUrl: string;
   pageUrl: string;
   redis: RedisModuleOptions;
+  kafkaOptions?: Record<string, unknown>;
 }

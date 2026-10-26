@@ -67,6 +67,9 @@ export class UserLog extends Report {
   @prop({ type: Object, default: null })
   extraInfo: object | null;
 
+  @prop({ type: Object, default: null })
+  otherInfo?: Record<string, any>;
+
   @IsString()
   @prop({ type: String, default: null })
   traceId: string | null;

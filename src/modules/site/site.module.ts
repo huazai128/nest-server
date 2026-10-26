@@ -10,6 +10,7 @@ import { PrefModule } from '../perf/pref.module';
 import { LogModule } from '../log/log.module';
 import { UserLogModule } from '../user/user.module';
 import { ErrorLogModule } from '../error/error.module';
+import { NetworkSpeedLogModule } from '../networkSpeedLog/networkSpeedLog.module';
 
 /**
  * 站点模块
@@ -26,6 +27,7 @@ import { ErrorLogModule } from '../error/error.module';
     LogModule,
     UserLogModule,
     forwardRef(() => ErrorLogModule),
+    NetworkSpeedLogModule,
   ],
   controllers: [SiteController],
   providers: [SiteProvider, SiteService],

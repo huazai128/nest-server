@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { LogController } from './log.controller';
+import { LogKafkaController } from './log.kafka.controller';
 import { LogService } from './log.service';
+import { LogIngestBatchService } from './log-ingest-batch.service';
 import { LogProvider } from './log.model';
 import { SiteProvider } from '../site/site.model';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -12,6 +14,7 @@ import { PvLogModule } from '../pv/pv.module';
 import { PrefModule } from '../perf/pref.module';
 import { UserLogModule } from '../user/user.module';
 import { RecordModule } from '../record/record.module';
+import { NetworkSpeedLogModule } from '../networkSpeedLog/networkSpeedLog.module';
 
 @Module({
   imports: [
@@ -24,9 +27,10 @@ import { RecordModule } from '../record/record.module';
     PrefModule,
     UserLogModule,
     RecordModule,
+    NetworkSpeedLogModule,
   ],
-  controllers: [LogController],
-  providers: [LogProvider, SiteProvider, LogService],
+  controllers: [LogController, LogKafkaController],
+  providers: [LogProvider, SiteProvider, LogService, LogIngestBatchService],
   exports: [LogService],
 })
 export class LogModule {}

@@ -140,6 +140,15 @@ export class Site {
   })
   feedbackUrl?: string; // 反馈接口URL
 
+  @IsOptional()
+  @IsString()
+  @prop({
+    type: String,
+    default: null,
+    trim: true,
+  })
+  networkSpeedReportUrl?: string | null; // 网速告警群接口
+
   @IsDefined()
   @IsIn(SITE_PUBLISH_STATES)
   @IsInt()
